@@ -1,3 +1,3 @@
 # GUI of the Raspberry Pi
-required librairies
+required libraries
 - customkinter
