@@ -3,7 +3,7 @@ import torchvision.transforms as transforms
 from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
 import time
-import tkinter as tk
+import customtkinter as ctk
 from tkinter import ttk  # For combo boxes
 from picamera2 import Picamera2
 from datetime import datetime
@@ -165,7 +165,7 @@ def update_gui():
     top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",f"{formatted_date_time}_top_background.png",formatted_date_time,top=True)
     top_result_label.config(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
     top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
-    top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
+    top_canvas.create_image(0, 0, anchor=ctk.NW, image=top_photo)
     top_canvas.image = top_photo
 
     # Wait before capturing the bottom
@@ -185,7 +185,7 @@ def update_gui():
     bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",f"{formatted_date_time}_bottom_background.png",formatted_date_time,top=False)
     bottom_result_label.config(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
     bottom_photo = ImageTk.PhotoImage(bottom_image.resize((300, 200)))
-    bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
+    bottom_canvas.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
     bottom_canvas.image = bottom_photo
 
     # Compute final scores
@@ -207,7 +207,7 @@ def update_video_feed():
     frame = ImageTk.PhotoImage(frame)
     
     # Update the video canvas with the new frame
-    video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+    video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
     video_canvas.image = frame
     
     # Schedule the next update
@@ -223,7 +223,7 @@ picam2.configure(camera_config)
 picam2.start()
 
 # Create the main GUI window
-root = tk.Tk()
+root = ctk.CTk()
 root.title("Mango Quality Assessment")
 
 # Configure grid layout
@@ -232,67 +232,67 @@ root.grid_columnconfigure(1, weight=1)  # Right column (video feed and combo box
 root.grid_rowconfigure(0, weight=1)
 
 # Left Side: Analysis Results
-left_frame = tk.Frame(root)
+left_frame = ctk.CTkFrame(root)
 left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
 # Top part UI
-top_label = tk.Label(left_frame, text="Top Image")
+top_label = ctk.CTkLabel(left_frame, text="Top Image")
 top_label.grid(row=0, column=0)
-top_canvas = tk.Canvas(left_frame, width=300, height=200)
+top_canvas = ctk.Canvas(left_frame, width=300, height=200)
 top_canvas.grid(row=1, column=0)
-top_result_label = tk.Label(left_frame, text="Ripeness: -\nBruises: -")
+top_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: -")
 top_result_label.grid(row=2, column=0)
 
 # Bottom part UI
-bottom_label = tk.Label(left_frame, text="Bottom Image")
+bottom_label = ctk.CTkLabel(left_frame, text="Bottom Image")
 bottom_label.grid(row=3, column=0)
-bottom_canvas = tk.Canvas(left_frame, width=300, height=200)
+bottom_canvas = ctk.Canvas(left_frame, width=300, height=200)
 bottom_canvas.grid(row=4, column=0)
-bottom_result_label = tk.Label(left_frame, text="Ripeness: -\nBruises: -")
+bottom_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: -")
 bottom_result_label.grid(row=5, column=0)
 
 # Final Score UI
-final_score_label = tk.Label(left_frame, text="Final Ripeness Score: -\nFinal Bruiseness Score: -")
+final_score_label = ctk.CTkLabel(left_frame, text="Final Ripeness Score: -\nFinal Bruiseness Score: -")
 final_score_label.grid(row=6, column=0)
 
 # Right Side: Video Feed and Combo Boxes
-right_frame = tk.Frame(root)
+right_frame = ctk.CTkFrame(root)
 right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
 # Start Button
-start_button = tk.Button(right_frame, text="Start", command=update_gui)
+start_button = ctk.CTkButton(right_frame, text="Start", command=update_gui)
 start_button.grid(row=0, column=0)
 
 # Stop Button
-stop_button = tk.Button(right_frame, text="Reset", command=stop_now)
+stop_button = ctk.CTkButton(right_frame, text="Reset", command=stop_now)
 stop_button.grid(row=1, column=0)
 
 # Export Button 
-export_button = tk.Button(right_frame, text="Export", command=stop_now)
+export_button = ctk.CTkButton(right_frame, text="Export", command=stop_now)
 export_button.grid(row=2, column=0)
 
 
 # Video Feed
-video_label = tk.Label(right_frame, text="Live Video Feed")
+video_label = ctk.CTkLabel(right_frame, text="Live Video Feed")
 video_label.grid(row=3, column=0)
-video_canvas = tk.Canvas(right_frame, width=300, height=200)
+video_canvas = ctk.Canvas(right_frame, width=300, height=200)
 video_canvas.grid(row=4, column=0)
 
 # User Priority
-priority_label = tk.Label(right_frame, text="User Priority")
+priority_label = ctk.CTkLabel(right_frame, text="User Priority")
 priority_label.grid(row=5, column=0)
 # Combo Boxes
-ripeness_label = tk.Label(right_frame, text="Ripeness Score (0-3):")
+ripeness_label = ctk.CTkLabel(right_frame, text="Ripeness Score (0-3):")
 ripeness_label.grid(row=6, column=0, pady=(10, 0))
 ripeness_combo = ttk.Combobox(right_frame, values=[0, 1, 2, 3])
 ripeness_combo.grid(row=7, column=0)
 
-bruises_label = tk.Label(right_frame, text="Bruises Score (0-3):")
+bruises_label = ctk.CTkLabel(right_frame, text="Bruises Score (0-3):")
 bruises_label.grid(row=8, column=0, pady=(10, 0))
 bruises_combo = ttk.Combobox(right_frame, values=[0, 1, 2, 3])
 bruises_combo.grid(row=9, column=0)
 
-size_label = tk.Label(right_frame, text="Size Score (0-3):")
+size_label = ctk.CTkLabel(right_frame, text="Size Score (0-3):")
 size_label.grid(row=10, column=0, pady=(10, 0))
 size_combo = ttk.Combobox(right_frame, values=[0, 1, 2, 3])
 size_combo.grid(row=11, column=0)
