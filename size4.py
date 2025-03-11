@@ -156,14 +156,14 @@ def update_gui():
     top_background.save(f"{formatted_date_time}_top_background.png")  # Save the top image for size calculation
     # Capture top part
     print("\nCapturing Top Part")
-    top_label.config(text="Capturing top part of the mango...")
+    top_label.configure(text="Capturing top part of the mango...")
     top_image = capture_image(picam2)
     # filename = f"{formatted_date_time}_top.png"
     top_image.save(f"{formatted_date_time}_top.png")  # Save the top image for size calculation
     top_class_ripeness = classify_image(top_image, model_ripeness, class_labels_ripeness)
     top_class_bruises = classify_image(top_image, model_bruises, class_labels_bruises)
     top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",f"{formatted_date_time}_top_background.png",formatted_date_time,top=True)
-    top_result_label.config(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
+    top_result_label.configure(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
     top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
     top_canvas.create_image(0, 0, anchor=ctk.NW, image=top_photo)
     top_canvas.image = top_photo
@@ -177,13 +177,13 @@ def update_gui():
     bottom_background.save(f"{formatted_date_time}_bottom_background.png")  # Save the top image for size calculation
     # Capture bottom part
     print("\nCapturing Bottom Part")
-    bottom_label.config(text="Capturing bottom part of the mango...")
+    bottom_label.configure(text="Capturing bottom part of the mango...")
     bottom_image = capture_image(picam2)
     bottom_image.save(f"{formatted_date_time}_bottom.png")  # Save the bottom image for size calculation
     bottom_class_ripeness = classify_image(bottom_image, model_ripeness, class_labels_ripeness)
     bottom_class_bruises = classify_image(bottom_image, model_bruises, class_labels_bruises)
     bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",f"{formatted_date_time}_bottom_background.png",formatted_date_time,top=False)
-    bottom_result_label.config(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
+    bottom_result_label.configure(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
     bottom_photo = ImageTk.PhotoImage(bottom_image.resize((300, 200)))
     bottom_canvas.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
     bottom_canvas.image = bottom_photo
@@ -192,7 +192,7 @@ def update_gui():
     print("\nComputing")
     ripeness_score = (ripeness_scores[top_class_ripeness] + ripeness_scores[bottom_class_ripeness]) / 2
     bruiseness_score = (bruiseness_scores[top_class_bruises] + bruiseness_scores[bottom_class_bruises]) / 2
-    final_score_label.config(text=f"Final Ripeness Score: {ripeness_score:.1f}\nFinal Bruiseness Score: {bruiseness_score:.1f}")
+    final_score_label.configure(text=f"Final Ripeness Score: {ripeness_score:.1f}\nFinal Bruiseness Score: {bruiseness_score:.1f}")
     print("\nDone!")
 def update_video_feed():
     """Updates the video feed on the Tkinter canvas."""
