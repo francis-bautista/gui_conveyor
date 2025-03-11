@@ -238,7 +238,7 @@ left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 # Top part UI
 top_label = ctk.CTkLabel(left_frame, text="Top Image")
 top_label.grid(row=0, column=0)
-top_canvas = ctk.Canvas(left_frame, width=300, height=200)
+top_canvas = ctk.CTkFrame(left_frame, width=300, height=200)
 top_canvas.grid(row=1, column=0)
 top_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: -")
 top_result_label.grid(row=2, column=0)
