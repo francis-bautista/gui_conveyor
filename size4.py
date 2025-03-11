@@ -260,15 +260,19 @@ right_frame = ctk.CTkFrame(root)
 right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
 # Start Button
-start_button = ctk.CTkButton(right_frame, text="Start", command=update_gui)
+start_button = ctk.CTkButton(right_frame, text="Start",
+                             command=update_gui,
+                             fg_color= "#8AD879")
 start_button.grid(row=0, column=0)
 
 # Stop Button
-stop_button = ctk.CTkButton(right_frame, text="Reset", command=stop_now)
+stop_button = ctk.CTkButton(right_frame, text="Reset", command=stop_now,
+                            fg_color="#F3533A")
 stop_button.grid(row=1, column=0)
 
 # Export Button 
-export_button = ctk.CTkButton(right_frame, text="Export", command=stop_now)
+export_button = ctk.CTkButton(right_frame, text="Export", command=stop_now,
+                              fg_color="#5CACF9")
 export_button.grid(row=2, column=0)
 
 
