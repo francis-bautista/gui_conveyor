@@ -246,7 +246,7 @@ top_result_label.grid(row=2, column=0)
 # Bottom part UI
 bottom_label = ctk.CTkLabel(left_frame, text="Bottom Image")
 bottom_label.grid(row=3, column=0)
-bottom_canvas = ctk.Canvas(left_frame, width=300, height=200)
+bottom_canvas = ctk.CTkFrame(left_frame, width=300, height=200)
 bottom_canvas.grid(row=4, column=0)
 bottom_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: -")
 bottom_result_label.grid(row=5, column=0)
@@ -275,7 +275,7 @@ export_button.grid(row=2, column=0)
 # Video Feed
 video_label = ctk.CTkLabel(right_frame, text="Live Video Feed")
 video_label.grid(row=3, column=0)
-video_canvas = ctk.Canvas(right_frame, width=300, height=200)
+video_canvas = ctk.CTkFrame(right_frame, width=300, height=200)
 video_canvas.grid(row=4, column=0)
 
 # User Priority
