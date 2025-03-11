@@ -233,7 +233,7 @@ root.grid_columnconfigure(1, weight=1)  # Right column (video feed and combo box
 root.grid_rowconfigure(0, weight=1)
 
 # Left Side: Analysis Results
-left_frame = ctk.CTkFrame(root)
+left_frame = ctk.CTkFrame(root, fg_color = "#B3B792")
 left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
 # Top part UI
@@ -257,7 +257,7 @@ final_score_label = ctk.CTkLabel(left_frame, text="Final Ripeness Score: -\nFina
 final_score_label.grid(row=6, column=0)
 
 # Right Side: Video Feed and Combo Boxes
-right_frame = ctk.CTkFrame(root)
+right_frame = ctk.CTkFrame(root, fg_color= "#B3B792")
 right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
 # Start Button
