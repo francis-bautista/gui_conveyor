@@ -173,10 +173,10 @@ def calculate_total_score(ripeness_scores, bruiseness_scores, size_scores, r, b,
     total_score = float(ripeness_scores * ripeness_user_input + bruiseness_scores * bruiseness_user_input + size_scores * size_user_input)
     # Display the total score
     if top:
-        top_score.config(text=f"Top Score: {total_score}")
+        top_score.configure(text=f"Top Score: {total_score}")
         scores_dict["top"] = {total_score}
     else:
-        bottom_score.config(text=f"Bottom Score: {total_score}")
+        bottom_score.configure(text=f"Bottom Score: {total_score}")
         scores_dict["bottom"] = {total_score}
         
 
@@ -226,11 +226,11 @@ def find_grade(input_grade):
     print(f"Max Grade C: {max_gradeC}, Min Grade C: {max_gradeC - difference}, Difference: {max_gradeC - (min_gradeA - (max_gradeC - difference))}")
     
     if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
-        grade_score.config(text=f"Grade - A")
+        grade_score.configure(text=f"Grade - A")
     elif (input_grade >= min_gradeA - difference) and (input_grade < min_gradeA):
-        grade_score.config(text=f"Grade - B")
+        grade_score.configure(text=f"Grade - B")
     else:
-        grade_score.config(text=f"Grade - C")
+        grade_score.configure(text=f"Grade - C")
     
 def update_gui():
     """
@@ -263,13 +263,13 @@ def update_gui():
     top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
     # Capture top part
     print("\nCapturing Top Part")
-    top_label.config(text="Capturing top part of the mango...")
+    top_label.configure(text="Capturing top part of the mango...")
     top_image = capture_image(picam2)
     top_image.save(f"{formatted_date_time}_top.png")  # Save the top image for size calculation
     top_class_ripeness = classify_image(top_image, model_ripeness, class_labels_ripeness)
     top_class_bruises = classify_image(top_image, model_bruises, class_labels_bruises)
     top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",f"{formatted_date_time}_background.png",formatted_date_time,top=True)
-    top_result_label.config(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
+    top_result_label.configure(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
     top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
     top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
     top_canvas.image = top_photo
@@ -278,13 +278,13 @@ def update_gui():
     
     # Capture bottom part
     print("\nCapturing Bottom Part")
-    bottom_label.config(text="Capturing bottom part of the mango...")
+    bottom_label.configure(text="Capturing bottom part of the mango...")
     bottom_image = capture_image(picam2)
     bottom_image.save(f"{formatted_date_time}_bottom.png")  # Save the bottom image for size calculation
     bottom_class_ripeness = classify_image(bottom_image, model_ripeness, class_labels_ripeness)
     bottom_class_bruises = classify_image(bottom_image, model_bruises, class_labels_bruises)
     bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",f"{formatted_date_time}_background.png",formatted_date_time,top=False)
-    bottom_result_label.config(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
+    bottom_result_label.configure(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
     bottom_photo = ImageTk.PhotoImage(bottom_image.resize((300, 200)))
     bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
     bottom_canvas.image = bottom_photo
