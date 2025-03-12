@@ -18,8 +18,54 @@ import sys
 import os
 import csv
 from tkinter import ttk, messagebox
+import RPi.GPIO as GPIO
 
+# Define the GPIO pins connected to the relays
+relay1 = 6   # Motor 1 Forward
+relay2 = 13   # Motor 1 Reverse
+relay3 = 19  # Motor 2 Forward
+relay4 = 26  # Motor 2 Reverse
+delay_time = 2  # 2 seconds delay between direction changes
 
+# Set up the GPIO mode
+GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+GPIO.setup(relay1, GPIO.OUT)
+GPIO.setup(relay2, GPIO.OUT)
+GPIO.setup(relay3, GPIO.OUT)
+GPIO.setup(relay4, GPIO.OUT)
+# Initialize relays to OFF state
+GPIO.output(relay1, GPIO.LOW)
+GPIO.output(relay2, GPIO.LOW)
+GPIO.output(relay3, GPIO.LOW)
+GPIO.output(relay4, GPIO.LOW)
+
+def clockwiseM1(delay):
+	GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
+	GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+	time.sleep(delay)
+	GPIO.output(relay1, GPIO.LOW)
+	GPIO.output(relay2, GPIO.LOW)
+
+def clockwiseM2(delay):
+	GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+	GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
+	time.sleep(delay)
+	GPIO.output(relay3, GPIO.LOW)
+	GPIO.output(relay4, GPIO.LOW)
+    
+def counterclockwiseM1(delay):
+	GPIO.output(relay1, GPIO.LOW)  # Motor 1 Forward OFF
+	GPIO.output(relay2, GPIO.HIGH)   # Motor 1 Reverse 
+	time.sleep(delay)
+	GPIO.output(relay1, GPIO.LOW)
+	GPIO.output(relay2, GPIO.LOW)
+
+def counterclockwiseM2(delay):
+	GPIO.output(relay3, GPIO.LOW)  # Motor 2 Forward OFF
+	GPIO.output(relay4, GPIO.HIGH)   # Motor 2 Reverse 
+	time.sleep(delay)
+	GPIO.output(relay3, GPIO.LOW)
+	GPIO.output(relay4, GPIO.LOW)
 
 # Define classification mapping
 class_labels_ripeness = ['green', 'yellow_green', 'yellow']
@@ -340,9 +386,11 @@ def update_video_feed():
     root.after(10, update_video_feed)
 
 def stop_now():
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+	GPIO.cleanup()  # Reset GPIO settings
+	os.execv(sys.executable, [sys.executable] + sys.argv)
 def exit_program():
     print("Exiting the program. Goodbye!")
+    GPIO.cleanup()  # Reset GPIO settings
     sys.exit(0)  # 0 indicates a successful termination
 def show_help():
     """Opens a new window to display help information."""
