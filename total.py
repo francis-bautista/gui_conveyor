@@ -373,7 +373,7 @@ from tkinter import ttk, messagebox
 # picam2.start()
 # 
 # Create the main GUI window
-root = ctk.CTk(fg_color="#92b3b7")
+root = ctk.CTk(fg_color="#e5e0d8")
 root.title("Carabao Mango Grader and Sorter")
 
 # Configure grid layout
@@ -446,7 +446,7 @@ grade_score = ctk.CTkLabel(right_frame, text="Grade - ")
 grade_score.grid(row=7, column=0)
 
 #frame
-frame_choices = ctk.CTkFrame(right_frame,fg_color="#92b796")
+frame_choices = ctk.CTkFrame(right_frame,fg_color="#809671")
 frame_choices.grid(row=8, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
 frame_choices.columnconfigure(0,weight=2)
 # User Priority
