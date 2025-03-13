@@ -517,7 +517,7 @@ export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
 
 # Toggle Button
 check_var = ctk.StringVar(value="on")
-checkbox = ctk.CTkCheckBox(left_frame, text="CTkCheckBox", command=checkbox_event,
+checkbox = ctk.CTkCheckBox(right_frame, text="CTkCheckBox", command=checkbox_event,
                                      variable=check_var, onvalue="on", offvalue="off")
 checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
 
