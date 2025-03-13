@@ -442,16 +442,7 @@ def show_help():
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
     help_label.pack()
 def checkbox_event():
-    if check_var.get() == 1:
-        ripeness_combo.set("3.0")
-        bruises_combo.set("3.0")
-        size_combo.set("3.0")
-        print("checkbox toggled, current value:", check_var.get())
-        print("ripness value ", ripeness_combo.get())
-        print("bruises value ", bruises_combo.get())
-        print("size value ", size_combo.get())
-        check_var.set(0)
-    else:
+    if check_var.get() == 0:
         ripeness_combo.set("")
         bruises_combo.set("")
         size_combo.set("")
@@ -459,7 +450,14 @@ def checkbox_event():
         print("ripness value ", ripeness_combo.get())
         print("bruises value ", bruises_combo.get())
         print("size value ", size_combo.get())
-        check_var.set(1)
+    else:
+        ripeness_combo.set("3.0")
+        bruises_combo.set("3.0")
+        size_combo.set("3.0")
+        print("checkbox toggled, current value:", check_var.get())
+        print("ripness value ", ripeness_combo.get())
+        print("bruises value ", bruises_combo.get())
+        print("size value ", size_combo.get())
     
 
 
