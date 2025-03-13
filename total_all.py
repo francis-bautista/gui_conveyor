@@ -287,17 +287,21 @@ def find_grade(input_grade):
     b_priority = float(bruises_combo.get())
     s_priority = float(size_combo.get())
     max_gradeA = r_priority*ripeness_scores['green'] + b_priority*bruiseness_scores['unbruised'] + s_priority*size_scores['large']
-    min_gradeA = r_priority*ripeness_scores['yellow_green'] + b_priority*bruiseness_scores['bruised'] + s_priority*size_scores['small']
-    difference = max_gradeA - min_gradeA
+    min_gradeC = r_priority*ripeness_scores['yellow'] + b_priority*bruiseness_scores['bruised'] + s_priority*size_scores['small']
+    difference = (max_gradeA - min_gradeC)/3
+    min_gradeA = max_gradeA - difference
+    max_gradeB = min_gradeA
+    min_gradeB = max_gradeB - difference
+    max_gradeC = min_gradeB
+    min_gradeC = max_gradeC - difference
     print("Calculated Grade Range")
-    print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {difference}")
-    print(f"Max Grade B: {min_gradeA}, Min Grade B: {min_gradeA - difference}, Difference: {min_gradeA - (min_gradeA - difference)}")
-    max_gradeC = min_gradeA - (min_gradeA - difference)
-    print(f"Max Grade C: {max_gradeC}, Min Grade C: {max_gradeC - difference}, Difference: {max_gradeC - (min_gradeA - (max_gradeC - difference))}")
+    print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {max_gradeA-min_gradeA}")
+    print(f"Max Grade B: {max_gradeB}, Min Grade B: {min_gradeB}, Difference: {max_gradeB-min_gradeB}")
+    print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
     
     if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
         grade_score.configure(text=f"Grade - A")
-    elif (input_grade >= min_gradeA - difference) and (input_grade < min_gradeA):
+    elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
         grade_score.configure(text=f"Grade - B")
     else:
         grade_score.configure(text=f"Grade - C")
