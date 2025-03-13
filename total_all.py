@@ -41,10 +41,10 @@ GPIO.output(relay3, GPIO.LOW)
 GPIO.output(relay4, GPIO.LOW)
     
 def moveMotor(val1=0,val2=0,val3=0,val4=0):
-    GPIO.output(relay1, GPIO.val1)  # Motor 1 Forward
-    GPIO.output(relay2, GPIO.val2)   # Motor 1 Reverse OFF
-    GPIO.output(relay3, GPIO.val3)  # Motor 2 Forward
-    GPIO.output(relay4, GPIO.val4)   # Motor 2 Reverse OFF
+    GPIO.output(relay1, val1)  # Motor 1 Forward
+    GPIO.output(relay2, val2)   # Motor 1 Reverse OFF
+    GPIO.output(relay3, val3)  # Motor 2 Forward
+    GPIO.output(relay4, val4)   # Motor 2 Reverse OFF
 def stopMotor():
     GPIO.output(relay1, GPIO.LOW)
     GPIO.output(relay2, GPIO.LOW)
