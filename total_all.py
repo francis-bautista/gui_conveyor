@@ -337,7 +337,17 @@ def update_gui():
     # Capture top part
     # clockwiseM1(1)
     # clockwiseM2(1)
-    topSideCapture(15)
+    # topSideCapture(15)
+    GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
+    GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
+    time.sleep(15)
+    
+    GPIO.output(relay1, GPIO.LOW)
+    GPIO.output(relay2, GPIO.LOW)
+    GPIO.output(relay3, GPIO.LOW)
+    GPIO.output(relay4, GPIO.LOW)
     print("\nCapturing Top Part")
     top_label.configure(text="Capturing top part of the mango...")
     top_image = capture_image(picam2)
