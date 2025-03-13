@@ -278,20 +278,9 @@ def final_grade(r,b,s):
     r_priority = float(ripeness_combo.get())
     b_priority = float(bruises_combo.get())
     s_priority = float(size_combo.get())
-    # max_gradeA = r_priority*ripeness_scores['green'] + b_priority*bruiseness_scores['unbruised'] + s_priority*size_scores['large']
-    # min_gradeA = r_priority*ripeness_scores['yellow_green'] + b_priority*bruiseness_scores['bruised'] + s_priority*size_scores['small']
-    # difference = max_gradeA - min_gradeA
     resulting_grade = r_priority*ripeness_scores[r] + b_priority*bruiseness_scores[b] + s_priority*size_scores[s]
-    # print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {difference}")
-    # print(f"Max Grade B: {min_gradeA}, Min Grade B: {min_gradeA - difference}")
     print(f"Resulting Grade: {resulting_grade}")
     return resulting_grade
-    # if (resulting_grade >= min_gradeA) and (resulting_grade <= max_gradeA):
-    #     grade_score.config(text=f"Grade: A")
-    # elif (resulting_grade >= min_gradeA - difference) and (resulting_grade < min_gradeA):
-    #     grade_score.config(text=f"Grade: B")
-    # else:
-    #     grade_score.config(text=f"Grade: C")
 
 def find_grade(input_grade):
     r_priority = float(ripeness_combo.get())
@@ -300,6 +289,7 @@ def find_grade(input_grade):
     max_gradeA = r_priority*ripeness_scores['green'] + b_priority*bruiseness_scores['unbruised'] + s_priority*size_scores['large']
     min_gradeA = r_priority*ripeness_scores['yellow_green'] + b_priority*bruiseness_scores['bruised'] + s_priority*size_scores['small']
     difference = max_gradeA - min_gradeA
+    print("Calculated Grade Range")
     print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {difference}")
     print(f"Max Grade B: {min_gradeA}, Min Grade B: {min_gradeA - difference}, Difference: {min_gradeA - (min_gradeA - difference)}")
     max_gradeC = min_gradeA - (min_gradeA - difference)
@@ -452,6 +442,9 @@ def show_help():
     """
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
     help_label.pack()
+def checkbox_event():
+    print("checkbox toggled, current value:", check_var.get())
+
 
 # Initialize the camera
 picam2 = Picamera2()
@@ -522,6 +515,11 @@ export_button = ctk.CTkButton(right_frame, text="Export", fg_color="#a95cf9",
 # export_button = tk.Button(right_frame, text="Export", command=exit_program)
 export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
 
+# Toggle Button
+check_var = ctk.StringVar(value="on")
+checkbox = ctk.CTkCheckBox(left_frame, text="CTkCheckBox", command=checkbox_event,
+                                     variable=check_var, onvalue="on", offvalue="off")
+checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
 
 # Video Feed
 video_label = ctk.CTkLabel(right_frame, text="Live Video Feed")
