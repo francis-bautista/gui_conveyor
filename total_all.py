@@ -442,7 +442,7 @@ def show_help():
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
     help_label.pack()
 def checkbox_event():
-    if check_var.get() == "on":  # Check for "on" instead of 1
+    if check_var.get() == "off":  # Check for "on" instead of 1
         ripeness_combo.set("")  # Clears selection
         bruises_combo.set("")  # Clears selection
         size_combo.set("")  # Clears selection
