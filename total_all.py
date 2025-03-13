@@ -33,39 +33,73 @@ GPIO.setup(relay1, GPIO.OUT)
 GPIO.setup(relay2, GPIO.OUT)
 GPIO.setup(relay3, GPIO.OUT)
 GPIO.setup(relay4, GPIO.OUT)
+
 # Initialize relays to OFF state
 GPIO.output(relay1, GPIO.LOW)
 GPIO.output(relay2, GPIO.LOW)
 GPIO.output(relay3, GPIO.LOW)
 GPIO.output(relay4, GPIO.LOW)
 
-def clockwiseM1(delay):
+def clockwiseM2(delay):
 	GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
 	GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
 	time.sleep(delay)
 	GPIO.output(relay1, GPIO.LOW)
 	GPIO.output(relay2, GPIO.LOW)
 
-def clockwiseM2(delay):
+def clockwiseM1(delay):
 	GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
 	GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
 	time.sleep(delay)
 	GPIO.output(relay3, GPIO.LOW)
 	GPIO.output(relay4, GPIO.LOW)
-    
-def counterclockwiseM1(delay):
+
+def counterclockwiseM2(delay):
 	GPIO.output(relay1, GPIO.LOW)  # Motor 1 Forward OFF
 	GPIO.output(relay2, GPIO.HIGH)   # Motor 1 Reverse 
 	time.sleep(delay)
 	GPIO.output(relay1, GPIO.LOW)
 	GPIO.output(relay2, GPIO.LOW)
 
-def counterclockwiseM2(delay):
+def counterclockwiseM1(delay):
 	GPIO.output(relay3, GPIO.LOW)  # Motor 2 Forward OFF
 	GPIO.output(relay4, GPIO.HIGH)   # Motor 2 Reverse 
 	time.sleep(delay)
 	GPIO.output(relay3, GPIO.LOW)
 	GPIO.output(relay4, GPIO.LOW)
+
+def topSideCapture(delay):
+    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
+    GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
+    GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+    time.sleep(delay)
+    GPIO.output(relay1, GPIO.LOW)
+    GPIO.output(relay2, GPIO.LOW)
+    GPIO.output(relay3, GPIO.LOW)
+    GPIO.output(relay4, GPIO.LOW)
+    
+def bottomSideCapture(delay):
+    GPIO.output(relay3, GPIO.LOW)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.HIGH)   # Motor 2 Reverse OFF
+    GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
+    GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+    time.sleep(delay)
+    GPIO.output(relay1, GPIO.LOW)
+    GPIO.output(relay2, GPIO.LOW)
+    GPIO.output(relay3, GPIO.LOW)
+    GPIO.output(relay4, GPIO.LOW)
+    
+def exitAndEnterMango(delay):
+    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
+    GPIO.output(relay1, GPIO.LOW)  # Motor 1 Forward
+    GPIO.output(relay2, GPIO.HIGH)   # Motor 1 Reverse OFF
+    time.sleep(delay)
+    GPIO.output(relay1, GPIO.LOW)
+    GPIO.output(relay2, GPIO.LOW)
+    GPIO.output(relay3, GPIO.LOW)
+    GPIO.output(relay4, GPIO.LOW)
 
 # Define classification mapping
 class_labels_ripeness = ['green', 'yellow_green', 'yellow']
@@ -308,6 +342,9 @@ def update_gui():
     top_background = capture_image(picam2)
     top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
     # Capture top part
+    # clockwiseM1(1)
+    # clockwiseM2(1)
+    topSideCapture(15)
     print("\nCapturing Top Part")
     top_label.configure(text="Capturing top part of the mango...")
     top_image = capture_image(picam2)
@@ -319,7 +356,7 @@ def update_gui():
     top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
     top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
     top_canvas.image = top_photo
-    
+    bottomSideCapture(10)
     # update_video_feed()
     
     # Capture bottom part
@@ -348,8 +385,10 @@ def update_gui():
     bottom_final_grade = final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
     average_final_grade = (top_final_grade + bottom_final_grade) / 2
     print(f"Average Final Score: {average_final_grade}")
-    
+    find_grade(average_final_grade)
+    exitAndEnterMango(10)
     print("\nDone")
+    
     
 def determine_size(length, width):
     """Determines the size of the mango based on its length and width.
