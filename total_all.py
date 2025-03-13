@@ -69,10 +69,10 @@ def counterclockwiseM1(delay):
 	GPIO.output(relay4, GPIO.LOW)
 
 def topSideCapture(delay):
-    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
-    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
     GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
     GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
     time.sleep(delay)
     GPIO.output(relay1, GPIO.LOW)
     GPIO.output(relay2, GPIO.LOW)
@@ -80,10 +80,10 @@ def topSideCapture(delay):
     GPIO.output(relay4, GPIO.LOW)
     
 def bottomSideCapture(delay):
-    GPIO.output(relay3, GPIO.LOW)  # Motor 2 Forward
-    GPIO.output(relay4, GPIO.HIGH)   # Motor 2 Reverse OFF
     GPIO.output(relay1, GPIO.HIGH)  # Motor 1 Forward
     GPIO.output(relay2, GPIO.LOW)   # Motor 1 Reverse OFF
+    GPIO.output(relay3, GPIO.LOW)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.HIGH)   # Motor 2 Reverse OFF
     time.sleep(delay)
     GPIO.output(relay1, GPIO.LOW)
     GPIO.output(relay2, GPIO.LOW)
@@ -91,10 +91,10 @@ def bottomSideCapture(delay):
     GPIO.output(relay4, GPIO.LOW)
     
 def exitAndEnterMango(delay):
-    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
-    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
     GPIO.output(relay1, GPIO.LOW)  # Motor 1 Forward
     GPIO.output(relay2, GPIO.HIGH)   # Motor 1 Reverse OFF
+    GPIO.output(relay3, GPIO.HIGH)  # Motor 2 Forward
+    GPIO.output(relay4, GPIO.LOW)   # Motor 2 Reverse OFF
     time.sleep(delay)
     GPIO.output(relay1, GPIO.LOW)
     GPIO.output(relay2, GPIO.LOW)
