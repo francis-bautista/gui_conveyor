@@ -442,7 +442,7 @@ def show_help():
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
     help_label.pack()
 def checkbox_event():
-    if check_var.get() == 0:
+    if check_var.get() == 1:
         ripeness_combo.set("")
         bruises_combo.set("")
         size_combo.set("")
@@ -531,7 +531,7 @@ export_button = ctk.CTkButton(right_frame, text="Export", fg_color="#a95cf9",
 export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
 
 # Toggle Button
-check_var = ctk.StringVar(value="on")
+check_var = ctk.StringVar(value="off")
 checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=checkbox_event,
                                      variable=check_var, onvalue="on", offvalue="off")
 checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
