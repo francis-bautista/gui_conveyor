@@ -269,9 +269,7 @@ def validate_inputs():
     print(f"Ripeness: '{ripeness_value}', Bruises: '{bruises_value}', Size: '{size_value}'")  # Debugging
 
     # Check if any of the combo boxes are empty
-    if check_var.get() == 1:
-        return True
-    elif ripeness_value.strip() == "" or bruises_value.strip() == "" or size_value.strip() == "":
+    if ripeness_value.strip() == "" or bruises_value.strip() == "" or size_value.strip() == "":
         messagebox.showwarning("Input Error", "Please fill in all the fields (Ripeness, Bruises, and Size).")
         return False
     return True
@@ -320,7 +318,6 @@ def update_gui():
     7. Computes and displays the total scores for ripeness, bruiseness, and size based on user-defined weights.
     """
     # update_video_feed()
-    
     if not validate_inputs():
         return  # Stop execution if validation fails
     """Updates the GUI with the captured images, classification results, and size."""
@@ -445,7 +442,13 @@ def show_help():
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
     help_label.pack()
 def checkbox_event():
+    ripeness_value = ripeness_combo.set("3.0")
+    bruises_value = bruises_combo.set("3.0")
+    size_value = size_combo.set("3.0")
     print("checkbox toggled, current value:", check_var.get())
+    print("ripness value ", ripeness_value)
+    print("bruises value ", bruises_value)
+    print("size value ", size_value)
 
 
 # Initialize the camera
