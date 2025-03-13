@@ -269,7 +269,9 @@ def validate_inputs():
     print(f"Ripeness: '{ripeness_value}', Bruises: '{bruises_value}', Size: '{size_value}'")  # Debugging
 
     # Check if any of the combo boxes are empty
-    if ripeness_value.strip() == "" or bruises_value.strip() == "" or size_value.strip() == "":
+    if check_var.get() == 1:
+        return True
+    elif ripeness_value.strip() == "" or bruises_value.strip() == "" or size_value.strip() == "":
         messagebox.showwarning("Input Error", "Please fill in all the fields (Ripeness, Bruises, and Size).")
         return False
     return True
@@ -517,7 +519,7 @@ export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
 
 # Toggle Button
 check_var = ctk.StringVar(value="on")
-checkbox = ctk.CTkCheckBox(right_frame, text="CTkCheckBox", command=checkbox_event,
+checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=checkbox_event,
                                      variable=check_var, onvalue="on", offvalue="off")
 checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
 
