@@ -443,9 +443,9 @@ def show_help():
     help_label.pack()
 def checkbox_event():
     if check_var.get() == 1:
-        ripeness_combo.set(" ")
-        bruises_combo.set(" ")
-        size_combo.set(" ")
+        ripeness_combo.set("0.0")
+        bruises_combo.set("0.0")
+        size_combo.set("0.0")
         print("checkbox toggled, current value:", check_var.get())
         print("ripness value ", ripeness_combo.get())
         print("bruises value ", bruises_combo.get())
