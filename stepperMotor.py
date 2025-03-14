@@ -2,8 +2,8 @@ import RPi.GPIO as GPIO
 import time
 
 # Define pin connections (using BOARD numbering)
-dir_pin = 21    # Physical pin 3
-step_pin = 20   # Physical pin 5
+dir_pin = 21    # Physical pin 21
+step_pin = 20   # Physical pin 20
 steps_per_revolution = 200
 
 # Define absolute positions (steps from home)
