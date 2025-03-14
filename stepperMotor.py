@@ -15,7 +15,7 @@ position4 = 200
 current_position = 0  # Track current position
 step_delay = 0.001    # 1ms delay between steps (adjust for speed)
 
-def setup():
+def setupPy():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(dir_pin, GPIO.OUT)
     GPIO.setup(step_pin, GPIO.OUT)
@@ -45,7 +45,7 @@ def move_to_position(target):
 
 def main():
     try:
-        setup()
+        setupPy()
         while True:
             move_to_position(position1)
             time.sleep(1)
@@ -59,5 +59,4 @@ def main():
     except KeyboardInterrupt:
         GPIO.cleanup()
 
-setup()
 main()
