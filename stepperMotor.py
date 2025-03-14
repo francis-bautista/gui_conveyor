@@ -10,7 +10,7 @@ steps_per_revolution = 200
 position1 = 50
 position2 = 100
 position3 = 150
-position4 = 200
+# position4 = 200
 
 current_position = 0  # Track current position
 step_delay = 0.001    # 1ms delay between steps (adjust for speed)
@@ -53,8 +53,8 @@ def main():
             time.sleep(1)
             move_to_position(position3)
             time.sleep(1)
-            move_to_position(position4)
-            time.sleep(1)
+            # move_to_position(position4)
+            # time.sleep(1)
             
     except KeyboardInterrupt:
         GPIO.cleanup()
