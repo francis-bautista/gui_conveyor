@@ -16,7 +16,7 @@ current_position = 0  # Track current position
 step_delay = 0.001    # 1ms delay between steps (adjust for speed)
 
 def setupPy():
-    GPIO.setmode(GPIO.BOARD)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(dir_pin, GPIO.OUT)
     GPIO.setup(step_pin, GPIO.OUT)
     GPIO.output(dir_pin, GPIO.LOW)
