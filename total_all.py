@@ -27,19 +27,53 @@ relay3 = 19  # Motor 2 Forward
 relay4 = 26  # Motor 2 Reverse
 delay_time = 2  # 2 seconds delay between direction changes
 
+# Define pin connections (using BOARD numbering)
+dir_pin = 21    # Physical pin 21
+step_pin = 20   # Physical pin 20
+steps_per_revolution = 200
+# Define absolute positions (steps from home)
+position1 = 50
+position2 = 100
+position3 = 150
+current_position = 0  # Track current position
+step_delay = 0.001    # 1ms delay between steps (adjust for speed)
+
 # Set up the GPIO mode
 GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
 GPIO.setup(relay1, GPIO.OUT)
 GPIO.setup(relay2, GPIO.OUT)
 GPIO.setup(relay3, GPIO.OUT)
 GPIO.setup(relay4, GPIO.OUT)
+GPIO.setup(dir_pin, GPIO.OUT)
+GPIO.setup(step_pin, GPIO.OUT)
+GPIO.output(dir_pin, GPIO.LOW)
+GPIO.output(step_pin, GPIO.LOW)
 
 # Initialize relays to OFF state
 GPIO.output(relay1, GPIO.LOW)
 GPIO.output(relay2, GPIO.LOW)
 GPIO.output(relay3, GPIO.LOW)
 GPIO.output(relay4, GPIO.LOW)
+def move_to_position(target):
+    global current_position
+    steps_needed = target - current_position
     
+    if steps_needed == 0:
+        return  # Already at position
+    
+    # Set direction
+    direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
+    GPIO.output(dir_pin, direction)
+    
+    # Move required steps
+    for _ in range(abs(steps_needed)):
+        GPIO.output(step_pin, GPIO.HIGH)
+        time.sleep(step_delay)
+        GPIO.output(step_pin, GPIO.LOW)
+        time.sleep(step_delay)
+    
+    # Update current position
+    current_position = target
 def moveMotor(val1=0,val2=0,val3=0,val4=0):
     GPIO.output(relay1, val1)  # Motor 1 Forward
     GPIO.output(relay2, val2)   # Motor 1 Reverse OFF
@@ -250,10 +284,13 @@ def find_grade(input_grade):
     
     if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
         grade_score.configure(text=f"Grade - A")
+        move_to_position(position1)
     elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
         grade_score.configure(text=f"Grade - B")
+        move_to_position(position2)
     else:
         grade_score.configure(text=f"Grade - C")
+        move_to_position(position3)
     
 def update_gui():
     """
