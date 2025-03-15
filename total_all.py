@@ -369,7 +369,7 @@ def update_gui():
     print(f"Average Final Score: {average_final_grade}")
     find_grade(average_final_grade)
     moveMotor(1,0,1,0)
-    time.sleep(5)
+    time.sleep(15)
     stopMotor()
     print("\nDone")
     
