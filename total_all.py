@@ -494,6 +494,10 @@ bottom_result_label.grid(row=5, column=0)
 right_frame = ctk.CTkFrame(root, fg_color="#B3B792")
 right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
+# Right Side: Video Feed and Combo Boxes
+video_frame = ctk.CTkFrame(root, fg_color="#B3B792")
+video_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+
 # Start Button
 start_button = ctk.CTkButton(right_frame, text="Start",
                              fg_color="#8AD879",command=update_gui)
@@ -530,18 +534,18 @@ checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=checkbox_event,
 checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
 
 # Video Feed
-video_label = ctk.CTkLabel(right_frame, text="Live Video Feed")
-video_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
-video_canvas = tk.Canvas(right_frame, width=300, height=200)
-video_canvas.grid(row=4, column=0, columnspan=2, padx=10,pady=10, sticky="ns")
+video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
+video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+video_canvas = tk.Canvas(video_frame, width=300, height=200)
+video_canvas.grid(row=1, column=0, columnspan=2, padx=10,pady=10, sticky="ns")
 
 # Score
 top_score = ctk.CTkLabel(right_frame, text="Top Score - ")
-top_score.grid(row=5, column=0)
+top_score.grid(row=3, column=0)
 bottom_score = ctk.CTkLabel(right_frame, text="Bottom Score - ")
-bottom_score.grid(row=6, column=0)
+bottom_score.grid(row=4, column=0)
 grade_score = ctk.CTkLabel(right_frame, text="Grade - ")
-grade_score.grid(row=7, column=0)
+grade_score.grid(row=5, column=0)
 
 #frame
 frame_choices = ctk.CTkFrame(right_frame,fg_color="#809671")

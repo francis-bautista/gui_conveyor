@@ -224,6 +224,11 @@ class MangoGraderGUI(ctk.CTk):
         self.right_frame = ctk.CTkFrame(self, fg_color="#B3B792")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
         self._create_control_sections()
+        
+        # Video Panel - Live Feed
+        self.video_frame = ctk.CTkFrame(self, fg_color="#B3B792")
+        self.video_frame.grid(row=0, column=2, sticky="nsew")
+        self._create_control_sections()
 
     def _create_result_sections(self):
         """Create result display sections"""
