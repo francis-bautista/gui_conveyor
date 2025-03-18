@@ -321,7 +321,7 @@ def update_gui():
     top_background = capture_image(picam2)
     top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
     # Capture top part
-    moveMotor(1,0,1,0)
+    moveMotor(0,1,1,0)
     time.sleep(15)
     stopMotor()
     
