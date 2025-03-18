@@ -48,13 +48,13 @@ def main():
         setupPy()
         while True:
             move_to_position(position1)
-            # time.sleep(1)
-            # move_to_position(position2)
-            # time.sleep(1)
-            # move_to_position(position3)
-            # time.sleep(1)
-            # move_to_position(position4)
-            # time.sleep(1)
+            time.sleep(1)
+            move_to_position(position2)
+            time.sleep(1)
+            move_to_position(position3)
+            time.sleep(1)
+            move_to_position(position4)
+            time.sleep(1)
             
     except KeyboardInterrupt:
         GPIO.cleanup()
