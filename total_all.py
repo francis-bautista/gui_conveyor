@@ -398,10 +398,12 @@ def determine_size(length, width):
     :param width: The width of the mango in cm
     :return: A string indicating the size of the mango: 'small', 'medium', or 'large'
     """
+    minArea = float(11.5 * 8.5)  # Minimum area for a mango in cm^2
+    maxArea = float(12.5 * 8.5)  # Maximum area for a mango in cm^2
     area = float(length * width)  # Calculate area (you can use any metric you prefer)
-    if area < 50:  # Example thresholds
+    if area < minArea:  # Example thresholds
         return 'small'
-    elif 50 <= area < 100:
+    elif minArea <= area < maxArea:
         return 'medium'
     else:
         return 'large'
