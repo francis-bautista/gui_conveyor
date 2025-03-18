@@ -193,7 +193,7 @@ def calculate_size(fg, bg, formatted_date_time, top):
             pixel_length = dist.euclidean(tr, br)
             real_width = calculate_real_world_dimension(pixel_width, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS)
             real_length = calculate_real_world_dimension(pixel_length, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS)
-            return real_width, real_length
+            return real_width*3.66, real_length*3.42
         return 0, 0
     except Exception as e:
         print(f"Error in calculate_size: {e}")
