@@ -5,7 +5,7 @@ required libraries
 ## If first time to PUSH and COMMIT
 clone this first
 ```bash
-  git clone https://github.com/kenaniscoding/cpecog2_paper.git
+  git clone https://github.com/francis-bautista/gui_conveyor.git
 ```
 ## How to PUSH and COMMIT changes 
 Add File
