@@ -136,7 +136,7 @@ def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, f
     :param focal_length_pixels: Focal length of the camera in pixels.
     :return: Real world dimension in cm.
     """
-    return (2 * pixel_dimension * distance_camera_to_object) / focal_length_pixels
+    return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
 
 def calculate_size(fg, bg, formatted_date_time, top):
     """
