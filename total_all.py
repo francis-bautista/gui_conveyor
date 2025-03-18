@@ -337,7 +337,7 @@ def update_gui():
     top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
     top_canvas.image = top_photo
     moveMotor(0,1,0,1)
-    time.sleep(5)
+    time.sleep(15)
     stopMotor()
     # update_video_feed()
     
