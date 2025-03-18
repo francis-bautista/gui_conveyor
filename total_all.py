@@ -322,7 +322,7 @@ def update_gui():
     top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
     # Capture top part
     moveMotor(1,0,1,0)
-    time.sleep(5)
+    time.sleep(15)
     stopMotor()
     
     print("\nCapturing Top Part")
