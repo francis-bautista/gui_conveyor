@@ -116,8 +116,8 @@ transform = transforms.Compose([
 ])
 
 # Size calculation parameters
-FOCAL_LENGTH_PIXELS = 2710  # Example value, replace with your camera's focal length
-DISTANCE_CAMERA_TO_OBJECT = 40  # cm
+FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
+DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
 
 def midpoint(ptA, ptB):
     """
@@ -339,7 +339,7 @@ def update_gui():
     top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
     # Capture top part
     moveMotor(0,1,1,0)
-    time.sleep(15)
+    time.sleep(5)
     stopMotor()
     
     print("\nCapturing Top Part")
@@ -354,7 +354,7 @@ def update_gui():
     top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
     top_canvas.image = top_photo
     moveMotor(0,1,0,1)
-    time.sleep(15)
+    time.sleep(5)
     stopMotor()
     # update_video_feed()
     
@@ -409,31 +409,23 @@ def determine_size(length, width):
         return 'large'
     
 def update_video_feed():
-    """
-    Updates the video feed display on the GUI with the current camera view.
-    This function is called repeatedly to provide a live video feed.
-    """
-    global picam2, video_feed_canvas
+    """Updates the video feed on the Tkinter canvas."""
+    global picam2, video_canvas
     
-    try:
-        # Capture current frame
-        frame = picam2.capture_array()
-        
-        # Convert to PIL Image
-        image = Image.fromarray(frame)
-        
-        # Resize to fit canvas
-        image = image.resize((video_feed_canvas.winfo_width(), video_feed_canvas.winfo_height()))
-        
-        # Convert to PhotoImage for tkinter
-        photo = ImageTk.PhotoImage(image)
-        
-        # Update canvas
-        video_feed_canvas.create_image(0, 0, anchor=tk.NW, image=photo)
-        video_feed_canvas.image = photo  # Keep a reference to prevent garbage collection
-        
-    except Exception as e:
-        print(f"Error updating video feed: {e}")
+    # Capture frame from the camera
+    frame = picam2.capture_array()
+    frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+    
+    # Resize and convert to PhotoImage
+    frame = frame.resize((300, 200))
+    frame = ImageTk.PhotoImage(frame)
+    
+    # Update the video canvas with the new frame
+    video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+    video_canvas.image = frame
+    
+    # Schedule the next update
+    root.after(10, update_video_feed)
 
 def stop_now():
 	GPIO.cleanup()  # Reset GPIO settings
@@ -457,8 +449,7 @@ def show_help():
     2. Adjust the priority scores for Ripeness, Bruises, and Size using the dropdown menus.
     3. View the results in the left panel, including ripeness, bruises, size, and total score.
     4. Use the 'Reset' button to restart the analysis.
-    5. Click 'Export' to save the results (not implemented yet).
-    6. Click 'Stop' to exit the application.
+    5. Click 'Stop' to exit the application.
 
     """
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)

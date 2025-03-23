@@ -449,8 +449,7 @@ def show_help():
     2. Adjust the priority scores for Ripeness, Bruises, and Size using the dropdown menus.
     3. View the results in the left panel, including ripeness, bruises, size, and total score.
     4. Use the 'Reset' button to restart the analysis.
-    5. Click 'Export' to save the results (not implemented yet).
-    6. Click 'Stop' to exit the application.
+    5. Click 'Stop' to exit the application.
 
     """
     help_label = tk.Label(help_window, text=help_text, justify=tk.LEFT, padx=10, pady=10)
@@ -540,11 +539,11 @@ help_button = ctk.CTkButton(right_frame, text="Help", fg_color="#f85cf9",
 # help_button = tk.Button(right_frame, text="Help", command=show_help)
 help_button.grid(row=1, column=1, padx=10, pady=10, sticky="ns")  # Place it below the combo boxes
 
-# Export Button 
-export_button = ctk.CTkButton(right_frame, text="Export", fg_color="#a95cf9",
-                              command=exit_program)
-# export_button = tk.Button(right_frame, text="Export", command=exit_program)
-export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
+# # Export Button 
+# export_button = ctk.CTkButton(right_frame, text="Export", fg_color="#a95cf9",
+#                               command=exit_program)
+# # export_button = tk.Button(right_frame, text="Export", command=exit_program)
+# export_button.grid(row=2, column=0, padx=10, pady=10, sticky="ns")
 
 # Toggle Button
 check_var = ctk.StringVar(value="off")
