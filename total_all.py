@@ -407,33 +407,25 @@ def determine_size(length, width):
         return 'medium'
     else:
         return 'large'
-
+    
 def update_video_feed():
-    """
-    Updates the video feed display on the GUI with the current camera view.
-    This function is called repeatedly to provide a live video feed.
-    """
+    """Updates the video feed on the Tkinter canvas."""
     global picam2, video_canvas
     
-    try:
-        # Capture current frame
-        frame = picam2.capture_array()
-        
-        # Convert to PIL Image
-        image = Image.fromarray(frame)
-        
-        # Resize to fit canvas
-        image = image.resize((video_canvas.winfo_width(), video_canvas.winfo_height()))
-        
-        # Convert to PhotoImage for tkinter
-        photo = ImageTk.PhotoImage(image)
-        
-        # Update canvas
-        video_canvas.create_image(0, 0, anchor=tk.NW, image=photo)
-        video_canvas.image = photo  # Keep a reference to prevent garbage collection
-        
-    except Exception as e:
-        print(f"Error updating video feed: {e}")
+    # Capture frame from the camera
+    frame = picam2.capture_array()
+    frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+    
+    # Resize and convert to PhotoImage
+    frame = frame.resize((300, 200))
+    frame = ImageTk.PhotoImage(frame)
+    
+    # Update the video canvas with the new frame
+    video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+    video_canvas.image = frame
+    
+    # Schedule the next update
+    root.after(30, update_video_feed)
 
 def stop_now():
 	GPIO.cleanup()  # Reset GPIO settings
