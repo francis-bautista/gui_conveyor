@@ -117,7 +117,7 @@ transform = transforms.Compose([
 
 # Size calculation parameters
 FOCAL_LENGTH_PIXELS = 2710  # Example value, replace with your camera's focal length
-DISTANCE_CAMERA_TO_OBJECT = 40  # cm
+DISTANCE_CAMERA_TO_OBJECT = 20.5 # cm
 
 def midpoint(ptA, ptB):
     """
