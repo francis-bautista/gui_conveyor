@@ -425,7 +425,7 @@ def update_video_feed():
     video_canvas.image = frame
     
     # Schedule the next update
-    root.after(30, update_video_feed)
+    root.after(5, update_video_feed)
 
 def stop_now():
 	GPIO.cleanup()  # Reset GPIO settings
