@@ -285,7 +285,7 @@ class MangoGraderApp:
             self.update_progress_safe(0.2, "Capturing top part...")
             if self.stop_requested: return
             
-            self.root.after(0, lambda: self.top_label.configure(text="Capturing top part of the mango..."))
+            # self.root.after(0, lambda: self.top_label.configure(text="Capturing top part of the mango..."))
             top_image = self.capture_image(self.picam2)
             top_image.save(f"{formatted_date_time}_top.png")
             
@@ -322,7 +322,7 @@ class MangoGraderApp:
             self.update_progress_safe(0.4, "Capturing bottom part...")
             if self.stop_requested: return
             
-            self.root.after(0, lambda: self.bottom_label.configure(text="Capturing bottom part of the mango..."))
+            # self.root.after(0, lambda: self.bottom_label.configure(text="Capturing bottom part of the mango..."))
             bottom_image = self.capture_image(self.picam2)
             bottom_image.save(f"{formatted_date_time}_bottom.png")
             
@@ -344,7 +344,7 @@ class MangoGraderApp:
             self.update_progress_safe(0.6, "Computing scores...")
             if self.stop_requested: return
             
-            top_size_class = self.determine_size(top_width, top_length)
+            top_size_class = determine_size(top_width, top_length)
             self.calculate_total_score(
                 self.ripeness_scores[top_class_ripeness], 
                 self.bruiseness_scores[top_class_bruises], 
@@ -355,7 +355,7 @@ class MangoGraderApp:
                 top=True
             )
             
-            bottom_size_class = self.determine_size(bottom_width, bottom_length)
+            bottom_size_class = determine_size(bottom_width, bottom_length)
             self.calculate_total_score(
                 self.ripeness_scores[bottom_class_ripeness], 
                 self.bruiseness_scores[bottom_class_bruises], 
