@@ -119,15 +119,10 @@ transform = transforms.Compose([
 FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
 DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
 running = False
-class StopButtonPressed(Exception):
-    pass
+
 def stop_now():
-    if running==False:
-        GPIO.cleanup()  # Reset GPIO settings
-        os.execv(sys.executable, [sys.executable] + sys.argv)
-    else:
-        running==False
-        raise StopButtonPressed("Stop button pressed while running")
+    GPIO.cleanup()  # Reset GPIO settings
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
 def midpoint(ptA, ptB):
     """
@@ -334,76 +329,71 @@ def update_gui():
     6. Waits for 10 seconds between capturing the top and bottom parts.
     7. Computes and displays the total scores for ripeness, bruiseness, and size based on user-defined weights.
     """
-    running = True
     # update_video_feed()
-    try: 
-        if not validate_inputs():
-            return  # Stop execution if validation fails
-        """Updates the GUI with the captured images, classification results, and size."""
-        global top_image, bottom_image, picam2, top_background, bottom_background
-        # Get the current date and time
-        now = datetime.now()
-        # Format the date and time as a string (e.g., "2023-10-05_14-30-45")
-        formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-        
-        print("\nCapturing Background")
-        top_background = capture_image(picam2)
-        top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
-        # Capture top part
-        moveMotor(0,1,1,0)
-        # time.sleep(5)
-        stopMotor()
-        
-        print("\nCapturing Top Part")
-        top_label.configure(text="Capturing top part of the mango...")
-        top_image = capture_image(picam2)
-        top_image.save(f"{formatted_date_time}_top.png")  # Save the top image for size calculation
-        top_class_ripeness = classify_image(top_image, model_ripeness, class_labels_ripeness)
-        top_class_bruises = classify_image(top_image, model_bruises, class_labels_bruises)
-        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",f"{formatted_date_time}_background.png",formatted_date_time,top=True)
-        top_result_label.configure(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
-        top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
-        top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
-        top_canvas.image = top_photo
-        moveMotor(0,1,0,1)
-        # time.sleep(5)
-        stopMotor()
-        # update_video_feed()
-        
-        # Capture bottom part
-        print("\nCapturing Bottom Part")
-        bottom_label.configure(text="Capturing bottom part of the mango...")
-        bottom_image = capture_image(picam2)
-        bottom_image.save(f"{formatted_date_time}_bottom.png")  # Save the bottom image for size calculation
-        bottom_class_ripeness = classify_image(bottom_image, model_ripeness, class_labels_ripeness)
-        bottom_class_bruises = classify_image(bottom_image, model_bruises, class_labels_bruises)
-        bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",f"{formatted_date_time}_background.png",formatted_date_time,top=False)
-        bottom_result_label.configure(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
-        bottom_photo = ImageTk.PhotoImage(bottom_image.resize((300, 200)))
-        bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
-        bottom_canvas.image = bottom_photo
+    if not validate_inputs():
+        return  # Stop execution if validation fails
+    """Updates the GUI with the captured images, classification results, and size."""
+    global top_image, bottom_image, picam2, top_background, bottom_background
+    # Get the current date and time
+    now = datetime.now()
+    # Format the date and time as a string (e.g., "2023-10-05_14-30-45")
+    formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+    
+    print("\nCapturing Background")
+    top_background = capture_image(picam2)
+    top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
+    # Capture top part
+    moveMotor(0,1,1,0)
+    time.sleep(5)
+    stopMotor()
+    
+    print("\nCapturing Top Part")
+    top_label.configure(text="Capturing top part of the mango...")
+    top_image = capture_image(picam2)
+    top_image.save(f"{formatted_date_time}_top.png")  # Save the top image for size calculation
+    top_class_ripeness = classify_image(top_image, model_ripeness, class_labels_ripeness)
+    top_class_bruises = classify_image(top_image, model_bruises, class_labels_bruises)
+    top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",f"{formatted_date_time}_background.png",formatted_date_time,top=True)
+    top_result_label.configure(text=f"Ripeness: {top_class_ripeness}\nBruises: {top_class_bruises}\nSize: {top_width:.2f} cm (W) x {top_length:.2f} cm (L)")
+    top_photo = ImageTk.PhotoImage(top_image.resize((300, 200)))
+    top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
+    top_canvas.image = top_photo
+    moveMotor(0,1,0,1)
+    time.sleep(5)
+    stopMotor()
+    # update_video_feed()
+    
+    # Capture bottom part
+    print("\nCapturing Bottom Part")
+    bottom_label.configure(text="Capturing bottom part of the mango...")
+    bottom_image = capture_image(picam2)
+    bottom_image.save(f"{formatted_date_time}_bottom.png")  # Save the bottom image for size calculation
+    bottom_class_ripeness = classify_image(bottom_image, model_ripeness, class_labels_ripeness)
+    bottom_class_bruises = classify_image(bottom_image, model_bruises, class_labels_bruises)
+    bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",f"{formatted_date_time}_background.png",formatted_date_time,top=False)
+    bottom_result_label.configure(text=f"Ripeness: {bottom_class_ripeness}\nBruises: {bottom_class_bruises}\nSize: {bottom_width:.2f} cm (W) x {bottom_length:.2f} cm (L)")
+    bottom_photo = ImageTk.PhotoImage(bottom_image.resize((300, 200)))
+    bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
+    bottom_canvas.image = bottom_photo
 
-        print("\nComputing Score")
-        top_size_class = determine_size(top_width, top_length)
-        print(f"Top Size = {top_size_class}")
-        calculate_total_score(ripeness_scores[top_class_ripeness], bruiseness_scores[top_class_bruises], size_scores[top_size_class], r=top_class_ripeness, b=top_class_bruises, s=top_size_class, top=True)
-        bottom_size_class = determine_size(bottom_width, bottom_length)
-        print(f"Bottom Size = {bottom_size_class}")
-        calculate_total_score(ripeness_scores[bottom_class_ripeness], bruiseness_scores[bottom_class_bruises], size_scores[bottom_size_class], r=bottom_class_ripeness, b=bottom_class_bruises, s=bottom_size_class, top=False)
-        
-        print("\nComputing Grade")
-        top_final_grade = final_grade(top_class_ripeness, top_class_bruises, top_size_class)
-        bottom_final_grade = final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
-        average_final_grade = (top_final_grade + bottom_final_grade) / 2
-        print(f"Average Final Score: {average_final_grade}")
-        find_grade(average_final_grade)
-        moveMotor(1,0,1,0)
-        # time.sleep(15)
-        stopMotor()
-        print("\nDone")
-        running = False
-    except StopButtonPressed as e:
-        print(e)
+    print("\nComputing Score")
+    top_size_class = determine_size(top_width, top_length)
+    print(f"Top Size = {top_size_class}")
+    calculate_total_score(ripeness_scores[top_class_ripeness], bruiseness_scores[top_class_bruises], size_scores[top_size_class], r=top_class_ripeness, b=top_class_bruises, s=top_size_class, top=True)
+    bottom_size_class = determine_size(bottom_width, bottom_length)
+    print(f"Bottom Size = {bottom_size_class}")
+    calculate_total_score(ripeness_scores[bottom_class_ripeness], bruiseness_scores[bottom_class_bruises], size_scores[bottom_size_class], r=bottom_class_ripeness, b=bottom_class_bruises, s=bottom_size_class, top=False)
+    
+    print("\nComputing Grade")
+    top_final_grade = final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+    bottom_final_grade = final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
+    average_final_grade = (top_final_grade + bottom_final_grade) / 2
+    print(f"Average Final Score: {average_final_grade}")
+    find_grade(average_final_grade)
+    moveMotor(1,0,1,0)
+    time.sleep(15)
+    stopMotor()
+    print("\nDone")
     
 def determine_size(length, width):
     """Determines the size of the mango based on its length and width.
@@ -487,7 +477,7 @@ picam2 = Picamera2()
 camera_config = picam2.create_video_configuration(main={"size": (1920, 1080)})
 picam2.configure(camera_config)
 picam2.start()
-# 
+
 # Create the main GUI window
 root = ctk.CTk(fg_color="#e5e0d8")
 root.title("Carabao Mango Grader and Sorter")
