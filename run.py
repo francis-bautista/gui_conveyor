@@ -237,7 +237,11 @@ class MangoGraderApp:
         if not self.processing:
             self.processing = True
             self.stop_requested = False
-            
+            # Disable input from user priority
+            self.ripeness_combo.configure(state="disabled")  # or "readonly"
+            self.bruises_combo.configure(state="disabled")
+            self.size_combo.configure(state="disabled")
+            self.check_var.configure(state="disabled")
             # Update button states
             self.start_button.configure(state="disabled")
             # Change text to "Stop" during processing
@@ -406,6 +410,11 @@ class MangoGraderApp:
             
             # Process complete
             self.update_progress_safe(1.0, "Process complete!")
+            # Enable input from user priority
+            self.ripeness_combo.configure(state="normal")  # or "readonly"
+            self.bruises_combo.configure(state="normal")
+            self.size_combo.configure(state="normal")
+            self.check_var.configure(state="normal")
             self.root.after(0, self.processing_completed(resultArray))
             
         except Exception as e:
