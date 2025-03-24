@@ -297,10 +297,10 @@ class MangoGraderApp:
             top_class_bruises = self.classify_image(top_image, self.model_bruises, self.class_labels_bruises)
             top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", 
                                                       f"{formatted_date_time}_background.png", 
-                                                      formatted_date_time, 
+                                                      formatted_date_time, True,
                                                       self.DISTANCE_CAMERA_TO_OBJECT, 
-                                                      self.FOCAL_LENGTH_PIXELS,
-                                                      top=True)
+                                                      self.FOCAL_LENGTH_PIXELS
+                                                      )
             
             # Update UI with top results
             self.update_top_results(top_image, top_class_ripeness, top_class_bruises, top_width, top_length)
@@ -336,10 +336,10 @@ class MangoGraderApp:
             bottom_class_bruises = self.classify_image(bottom_image, self.model_bruises, self.class_labels_bruises)
             bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", 
                                                             f"{formatted_date_time}_background.png", 
-                                                            formatted_date_time, 
+                                                            formatted_date_time, False,
                                                             self.DISTANCE_CAMERA_TO_OBJECT, 
-                                                            self.FOCAL_LENGTH_PIXELS,
-                                                            top=False)
+                                                            self.FOCAL_LENGTH_PIXELS
+                                                            )
             
             # Update UI with bottom results
             self.update_bottom_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_width, bottom_length)
