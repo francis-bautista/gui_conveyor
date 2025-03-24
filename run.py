@@ -1,11 +1,24 @@
+import torch
+import torchvision.transforms as transforms
+from efficientnet_pytorch import EfficientNet
+from PIL import Image, ImageTk
+import time
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import ttk
-import time
-import threading
-# from picamera2 import Picamera2
+from tkinter import ttk  # For combo boxes
+from picamera2 import Picamera2
+from datetime import datetime
+import numpy as np
+from scipy.spatial import distance as dist
+from imutils import perspective
+from imutils import contours
+import imutils
+import cv2
 import sys
 import os
+import csv
+from tkinter import ttk, messagebox
+import RPi.GPIO as GPIO
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
@@ -13,10 +26,10 @@ class MangoGraderApp:
         self.root.fg_color = "#e5e0d8"
         
         # Initialize camera
-        # self.picam2 = Picamera2()
-        # self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
-        # self.picam2.configure(self.camera_config)
-        # self.picam2.start()
+        self.picam2 = Picamera2()
+        self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
+        self.picam2.configure(self.camera_config)
+        self.picam2.start()
         
         # Processing state flags
         self.processing = False
@@ -83,29 +96,23 @@ class MangoGraderApp:
                                        command=self.show_help)
         self.help_button.grid(row=1, column=1, padx=10, pady=10, sticky="ns")
         
-        # Progress bar
-        self.progress_label = ctk.CTkLabel(right_frame, text="Progress:")
-        self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
         
-        self.progress_bar = ctk.CTkProgressBar(right_frame, width=200, mode="determinate")
-        self.progress_bar.grid(row=2, column=0, columnspan=2, padx=10, pady=(30, 10), sticky="ew")
-        self.progress_bar.set(0)  # Initialize at 0
         
         # Toggle Button
         self.check_var = ctk.StringVar(value="off")
         checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=self.checkbox_event,
                                    variable=self.check_var, onvalue="on", offvalue="off")
-        checkbox.grid(row=3, column=1, padx=10, pady=10, sticky="ns")
+        checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
         
         # Score displays
         self.top_score = ctk.CTkLabel(right_frame, text="Top Score - ")
-        self.top_score.grid(row=4, column=0)
+        self.top_score.grid(row=3, column=0)
         
         self.bottom_score = ctk.CTkLabel(right_frame, text="Bottom Score - ")
-        self.bottom_score.grid(row=5, column=0)
+        self.bottom_score.grid(row=4, column=0)
         
         self.grade_score = ctk.CTkLabel(right_frame, text="Grade - ")
-        self.grade_score.grid(row=6, column=0)
+        self.grade_score.grid(row=5, column=0)
         
         # User priority section
         self.setup_user_priority_frame(right_frame)
@@ -151,7 +158,15 @@ class MangoGraderApp:
         
         self.video_canvas = tk.Canvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
-    
+
+        # Progress bar
+        self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
+        self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
+        
+        self.progress_bar = ctk.CTkProgressBar(video_frame, width=200, mode="determinate")
+        self.progress_bar.grid(row=2, column=0, columnspan=2, padx=10, pady=(30, 10), sticky="ew")
+        self.progress_bar.set(0)  # Initialize at 0
+        
     def start_processing(self):
         """Start the processing with a loading bar"""
         if not self.processing:
@@ -248,7 +263,8 @@ class MangoGraderApp:
         self.reset_button.configure(state="normal")
     
     def reset_system(self):
-        # GPIO.cleanup()  # Reset GPIO settings
+        GPIO.cleanup()  # Reset GPIO settings
+        self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
     
     def update_results(self, top_ripeness, top_bruises, top_size, 
@@ -317,8 +333,9 @@ class MangoGraderApp:
         """Clean up and exit the application"""
         if self.processing:
             self.stop_requested = True
-        # self.picam2.stop()
-        # self.root.destroy()
+        self.picam2.stop()
+        self.root.destroy()
+        GPIO.cleanup()  # Reset GPIO settings
         sys.exit(0)
 
 # Main application
