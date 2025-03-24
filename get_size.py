@@ -3,7 +3,7 @@ import numpy as np
 import imutils
 from imutils import perspective
 from scipy.spatial import distance as dist
-
+# get_size.py
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
     # TODO IMPORT NALANG AS A SEPARATE PYTHON FUNCTION
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
