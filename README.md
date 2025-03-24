@@ -2,6 +2,7 @@
 required libraries
 - customkinter
 - efficientnet
+run.py is the better version
 ## If first time to PUSH and COMMIT
 clone this first
 ```bash
