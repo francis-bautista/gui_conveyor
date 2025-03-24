@@ -160,8 +160,6 @@ class MangoGraderApp:
                                        command=self.show_help)
         self.help_button.grid(row=1, column=1, padx=10, pady=10, sticky="ns")
         
-        
-        
         # Toggle Button
         self.check_var = ctk.StringVar(value="off")
         checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=self.checkbox_event,
@@ -233,6 +231,9 @@ class MangoGraderApp:
         
     def start_processing(self):
         """Start the processing with a loading bar"""
+        if (self.ripeness_combo.get() == "" or self.bruises_combo.get() == "" or self.size_combo.get() == ""):
+            messagebox.showerror("Error", "Please select values for Ripeness, Bruises, and Size")
+            return
         if not self.processing:
             self.processing = True
             self.stop_requested = False
