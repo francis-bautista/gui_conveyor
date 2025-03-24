@@ -377,7 +377,7 @@ class MangoGraderApp:
             top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
             bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
             average_final_grade = (top_final_grade + bottom_final_grade) / 2
-            self.find_grade(average_final_grade)
+            letter_grade = self.find_grade(average_final_grade)
             
             # Progress: 75% - Final motor movement
             self.update_progress_safe(0.75, "Final positioning...")
@@ -394,9 +394,18 @@ class MangoGraderApp:
             
             self.stopMotor()
             
+            resultArray = [top_class_ripeness, top_class_bruises, 
+                           top_size_class,
+                           top_final_grade,
+                            bottom_class_ripeness, bottom_class_bruises, 
+                            bottom_size_class,
+                            bottom_final_grade,
+                            letter_grade
+                           ]
+            
             # Process complete
             self.update_progress_safe(1.0, "Process complete!")
-            self.root.after(0, self.processing_completed)
+            self.root.after(0, self.processing_completed(resultArray))
             
         except Exception as e:
             print(f"Error in update_gui: {str(e)}")
@@ -495,14 +504,17 @@ class MangoGraderApp:
         print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
         
         if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
-            self.grade_score.configure(text=f"Grade - A")
+            # self.grade_score.configure(text=f"Grade - A")
             self.move_to_position(self.position1)
+            return "A"
         elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
-            self.grade_score.configure(text=f"Grade - B")
+            # self.grade_score.configure(text=f"Grade - B")
             self.move_to_position(self.position2)
+            return "B"
         else:
-            self.grade_score.configure(text=f"Grade - C")
+            # self.grade_score.configure(text=f"Grade - C")
             self.move_to_position(self.position3)
+            return "C"
     
     def move_to_position(self,target):
         steps_needed = target - self.current_position
@@ -544,7 +556,7 @@ class MangoGraderApp:
         percent = int(progress * 100)
         self.progress_label.configure(text=f"Progress: {percent}%")
     
-    def processing_completed(self):
+    def processing_completed(self, resultArray):
         """Called when processing completes successfully"""
         self.processing = False
         self.progress_label.configure(text="Processing completed")
@@ -553,9 +565,18 @@ class MangoGraderApp:
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
         self.reset_button.configure(state="normal")
-        
-        # Simulate completed analysis (in a real app, this would come from the actual analysis)
-        self.update_results("Ripe", "None", "Large", "Unripe", "Minor", "Medium", "Grade A")
+            # resultArray = [top_class_ripeness, top_class_bruises, 
+            #                top_size_class,
+            #                top_final_grade,
+            #                 bottom_class_ripeness, bottom_class_bruises, 
+            #                 bottom_size_class,
+            #                 bottom_final_grade,
+            #                 letter_grade
+            #                ]
+        # TODO: Update with actual analysis results
+        self.update_results(resultArray[0], resultArray[1], resultArray[2], 
+                            resultArray[3], resultArray[4], resultArray[5], 
+                            resultArray[6], resultArray[7], resultArray[8])
     def stop_processing(self):
         """Stop the processing or exit the program"""
         if self.processing:
@@ -581,15 +602,14 @@ class MangoGraderApp:
         self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
     
-    def update_results(self, top_ripeness, top_bruises, top_size, 
-                     bottom_ripeness, bottom_bruises, bottom_size, grade):
+    def update_results(self, top_ripeness, top_bruises, top_size, top_score_val,
+                     bottom_ripeness, bottom_bruises, bottom_size, bottom_score_val, grade):
         """Update result labels with analysis data"""
         self.top_result_label.configure(text=f"Ripeness: {top_ripeness}\nBruises: {top_bruises}\nSize: {top_size}")
         self.bottom_result_label.configure(text=f"Ripeness: {bottom_ripeness}\nBruises: {bottom_bruises}\nSize: {bottom_size}")
         
         # Calculate scores (in a real app this would be based on actual analysis)
-        top_score_val = 85
-        bottom_score_val = 70
+        # TODO: Update with actual analysis results
         
         self.top_score.configure(text=f"Top Score - {top_score_val}")
         self.bottom_score.configure(text=f"Bottom Score - {bottom_score_val}")
