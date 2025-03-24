@@ -49,10 +49,10 @@ class MangoGraderApp:
         self.model_ripeness.eval()
         self.model_ripeness.to(self.device)
         # Bruises model
-        model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_bruises))
-        model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
-        model_bruises.eval()
-        model_bruises.to(self.device)
+        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_bruises))
+        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
+        self.model_bruises.eval()
+        self.model_bruises.to(self.device)
         # Define transformations
         self.transform = transforms.Compose([
             transforms.Resize((224, 224)),
