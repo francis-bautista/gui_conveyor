@@ -8,15 +8,9 @@ import customtkinter as ctk
 from tkinter import ttk  # For combo boxes
 from picamera2 import Picamera2
 from datetime import datetime
-import numpy as np
 from scipy.spatial import distance as dist
-from imutils import perspective
-from imutils import contours
-import imutils
-import cv2
 import sys
 import os
-import csv
 from tkinter import ttk, messagebox
 import RPi.GPIO as GPIO
 import threading
@@ -547,15 +541,10 @@ class MangoGraderApp:
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
         self.reset_button.configure(state="normal")
-            # resultArray = [top_class_ripeness, top_class_bruises, 
-            #                top_size_class,
-            #                top_final_grade,
-            #                 bottom_class_ripeness, bottom_class_bruises, 
-            #                 bottom_size_class,
-            #                 bottom_final_grade,
-            #                 letter_grade
+            # resultArray = [top_class_ripeness, top_class_bruises, top_size_class,
+            #                top_final_grade, bottom_class_ripeness, bottom_class_bruises, 
+            #                 bottom_size_class, bottom_final_grade, letter_grade
             #                ]
-        # TODO: Update with actual analysis results
         self.update_results(resultArray[0], resultArray[1], resultArray[2], 
                             resultArray[3], resultArray[4], resultArray[5], 
                             resultArray[6], resultArray[7], resultArray[8])
@@ -589,9 +578,6 @@ class MangoGraderApp:
         """Update result labels with analysis data"""
         self.top_result_label.configure(text=f"Ripeness: {top_ripeness}\nBruises: {top_bruises}\nSize: {top_size}")
         self.bottom_result_label.configure(text=f"Ripeness: {bottom_ripeness}\nBruises: {bottom_bruises}\nSize: {bottom_size}")
-        
-        # Calculate scores (in a real app this would be based on actual analysis)
-        # TODO: Update with actual analysis results
         
         self.top_score.configure(text=f"Top Score - {top_score_val}")
         self.bottom_score.configure(text=f"Bottom Score - {bottom_score_val}")
