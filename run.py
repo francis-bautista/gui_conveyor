@@ -298,6 +298,8 @@ class MangoGraderApp:
             top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", 
                                                       f"{formatted_date_time}_background.png", 
                                                       formatted_date_time, 
+                                                      self.DISTANCE_CAMERA_TO_OBJECT, 
+                                                      self.FOCAL_LENGTH_PIXELS,
                                                       top=True)
             
             # Update UI with top results
@@ -335,6 +337,8 @@ class MangoGraderApp:
             bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", 
                                                             f"{formatted_date_time}_background.png", 
                                                             formatted_date_time, 
+                                                            self.DISTANCE_CAMERA_TO_OBJECT, 
+                                                            self.FOCAL_LENGTH_PIXELS,
                                                             top=False)
             
             # Update UI with bottom results
