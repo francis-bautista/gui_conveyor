@@ -317,18 +317,24 @@ class MangoGraderApp:
             self.bruises_combo.set("")
             self.size_combo.set("")
     
-    def update_video_feed(self):
-        """Update the video feed from the camera"""
-        # In a real implementation, this would capture frames from the camera
-        # and update the video_canvas
+    def update_video_feed():
+        """Updates the video feed on the Tkinter canvas."""
+        global picam2, video_canvas
         
-        # For now, just draw a placeholder rectangle
-        self.video_canvas.delete("all")
-        self.video_canvas.create_rectangle(50, 50, 250, 150, fill="gray")
-        self.video_canvas.create_text(150, 100, text="Live Camera Feed", fill="white")
+        # Capture frame from the camera
+        frame = picam2.capture_array()
+        frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+        
+        # Resize and convert to PhotoImage
+        frame = frame.resize((300, 200))
+        frame = ImageTk.PhotoImage(frame)
+        
+        # Update the video canvas with the new frame
+        video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+        video_canvas.image = frame
         
         # Schedule the next update
-        self.root.after(100, self.update_video_feed)
+        root.after(10, update_video_feed)
     
     def exit_program(self):
         """Clean up and exit the application"""
