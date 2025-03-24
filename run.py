@@ -19,6 +19,7 @@ import os
 import csv
 from tkinter import ttk, messagebox
 import RPi.GPIO as GPIO
+import threading
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
