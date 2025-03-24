@@ -8,20 +8,6 @@ def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, f
     # TODO IMPORT NALANG AS A SEPARATE PYTHON FUNCTION
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
 def calculate_size(fg, bg, formatted_date_time, top, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS):
-    """
-    Determine the size of an object by comparing foreground and background images.
-    
-    Args:
-        fg (str): Path to the foreground image
-        bg (str): Path to the background image
-        formatted_date_time (str): Formatted date and time string for filenames
-        top (bool): Whether to use 'top' or 'bottom' suffix in filenames
-        DISTANCE_CAMERA_TO_OBJECT (float): Distance from camera to object
-        FOCAL_LENGTH_PIXELS (float): Focal length in pixels
-    
-    Returns:
-        tuple: Real world width and length (float, float)
-    """
     try:
         # Determine the suffix based on the `top` parameter
         suffix = "top" if top else "bottom"
@@ -35,13 +21,13 @@ def calculate_size(fg, bg, formatted_date_time, top, DISTANCE_CAMERA_TO_OBJECT, 
         fgMask = cv2.absdiff(foreground, background)
         fgMask_filename = f"{formatted_date_time}_fgMask_{suffix}.png"
         cv2.imwrite(fgMask_filename, fgMask)
-        print(f"Foreground mask saved as {fgMask_filename}")
+        # print(f"Foreground mask saved as {fgMask_filename}")
         
         # Fix the syntax errors in the thresholding line
         _, thresh = cv2.threshold(cv2.cvtColor(fgMask, cv2.COLOR_BGR2GRAY), 50, 255, cv2.THRESH_BINARY)
         thresh_filename = f"{formatted_date_time}_thresh_{suffix}.png"
         cv2.imwrite(thresh_filename, thresh)
-        print(f"Threshold saved as {thresh_filename}")
+        # print(f"Threshold saved as {thresh_filename}")
         
         # Process the threshold image
         image = cv2.imread(thresh_filename)

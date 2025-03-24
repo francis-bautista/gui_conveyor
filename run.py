@@ -306,9 +306,10 @@ class MangoGraderApp:
                                                       self.DISTANCE_CAMERA_TO_OBJECT, 
                                                       self.FOCAL_LENGTH_PIXELS
                                                       )
-            
+            print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
+            top_size_class = determine_size(top_width, top_length) 
             # Update UI with top results
-            self.update_top_results(top_image, top_class_ripeness, top_class_bruises, top_width, top_length)
+            self.update_top_results(top_image, top_class_ripeness, top_class_bruises, top_size_class)
             
             # Progress: 30% - Moving motor for bottom capture
             self.update_progress_safe(0.3, "Moving motor for bottom capture...")
@@ -345,35 +346,14 @@ class MangoGraderApp:
                                                             self.DISTANCE_CAMERA_TO_OBJECT, 
                                                             self.FOCAL_LENGTH_PIXELS
                                                             )
-            
+            print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
+            bottom_size_class = determine_size(bottom_width, bottom_length)
             # Update UI with bottom results
-            self.update_bottom_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_width, bottom_length)
+            self.update_bottom_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
             
             # Progress: 60% - Computing scores
             self.update_progress_safe(0.6, "Computing scores...")
             if self.stop_requested: return
-            
-            top_size_class = determine_size(top_width, top_length)
-            # top_final_grade = self.calculate_total_score(
-            #     self.ripeness_scores[top_class_ripeness], 
-            #     self.bruiseness_scores[top_class_bruises], 
-            #     self.size_scores[top_size_class], 
-            #     r=top_class_ripeness, 
-            #     b=top_class_bruises, 
-            #     s=top_size_class, 
-            #     top=True
-            # )
-            
-            bottom_size_class = determine_size(bottom_width, bottom_length)
-            # bottom_final_grade = self.calculate_total_score(
-            #     self.ripeness_scores[bottom_class_ripeness], 
-            #     self.bruiseness_scores[bottom_class_bruises], 
-            #     self.size_scores[bottom_size_class], 
-            #     r=bottom_class_ripeness, 
-            #     b=bottom_class_bruises, 
-            #     s=bottom_size_class, 
-            #     top=False
-            # )
             
             # Progress: 70% - Computing grade
             self.update_progress_safe(0.7, "Computing grade...")
@@ -408,6 +388,7 @@ class MangoGraderApp:
                             letter_grade
                            ]
             
+            
             # Process complete
             self.update_progress_safe(1.0, "Process complete!")
             # Enable input from user priority
@@ -433,22 +414,22 @@ class MangoGraderApp:
         percent = int(progress * 100)
         self.progress_label.configure(text=f"{message} {percent}%")
         
-    def update_top_results(self, image, ripeness, bruises, width, length):
+    def update_top_results(self, image, ripeness, bruises, size):
         """Update the UI with top results"""
         def update():
             self.top_result_label.configure(
-                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {width:.2f} cm (W) x {length:.2f} cm (L)"
+                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
             )
             top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
             self.top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
             self.top_canvas.image = top_photo  # Keep a reference
         self.root.after(0, update)
     
-    def update_bottom_results(self, image, ripeness, bruises, width, length):
+    def update_bottom_results(self, image, ripeness, bruises, size):
         """Update the UI with bottom results"""
         def update():
             self.bottom_result_label.configure(
-                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {width:.2f} cm (W) x {length:.2f} cm (L)"
+                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
             )
             bottom_photo = ImageTk.PhotoImage(image.resize((300, 200)))
             self.bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
@@ -478,16 +459,6 @@ class MangoGraderApp:
         output = model(image)
         _, predicted = torch.max(output, 1)
         return class_labels[predicted.item()]
-    
-    # def calculate_total_score(self, ripeness_score, bruises_score, size_score, r, b, s, top=True):
-    #     # This would be implemented to calculate the total score
-    #     # Placeholder implementation
-    #     score = ripeness_score*r + bruises_score*b + size_score*s
-    #     if top:
-    #         self.top_score.configure(text=f"Top Score - {score}")
-    #     else:
-    #         self.bottom_score.configure(text=f"Bottom Score - {score}")
-    #     return score
     
     def final_grade(self,r,b,s):
         r_priority = float(self.ripeness_combo.get())
