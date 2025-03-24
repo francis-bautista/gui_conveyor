@@ -354,33 +354,33 @@ class MangoGraderApp:
             if self.stop_requested: return
             
             top_size_class = determine_size(top_width, top_length)
-            top_final_grade = self.calculate_total_score(
-                self.ripeness_scores[top_class_ripeness], 
-                self.bruiseness_scores[top_class_bruises], 
-                self.size_scores[top_size_class], 
-                r=top_class_ripeness, 
-                b=top_class_bruises, 
-                s=top_size_class, 
-                top=True
-            )
+            # top_final_grade = self.calculate_total_score(
+            #     self.ripeness_scores[top_class_ripeness], 
+            #     self.bruiseness_scores[top_class_bruises], 
+            #     self.size_scores[top_size_class], 
+            #     r=top_class_ripeness, 
+            #     b=top_class_bruises, 
+            #     s=top_size_class, 
+            #     top=True
+            # )
             
             bottom_size_class = determine_size(bottom_width, bottom_length)
-            bottom_final_grade = self.calculate_total_score(
-                self.ripeness_scores[bottom_class_ripeness], 
-                self.bruiseness_scores[bottom_class_bruises], 
-                self.size_scores[bottom_size_class], 
-                r=bottom_class_ripeness, 
-                b=bottom_class_bruises, 
-                s=bottom_size_class, 
-                top=False
-            )
+            # bottom_final_grade = self.calculate_total_score(
+            #     self.ripeness_scores[bottom_class_ripeness], 
+            #     self.bruiseness_scores[bottom_class_bruises], 
+            #     self.size_scores[bottom_size_class], 
+            #     r=bottom_class_ripeness, 
+            #     b=bottom_class_bruises, 
+            #     s=bottom_size_class, 
+            #     top=False
+            # )
             
             # Progress: 70% - Computing grade
             self.update_progress_safe(0.7, "Computing grade...")
             if self.stop_requested: return
             
-            # top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
-            # bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
+            top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+            bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
             average_final_grade = (top_final_grade + bottom_final_grade) / 2
             letter_grade = self.find_grade(average_final_grade)
             
@@ -479,15 +479,15 @@ class MangoGraderApp:
         _, predicted = torch.max(output, 1)
         return class_labels[predicted.item()]
     
-    def calculate_total_score(self, ripeness_score, bruises_score, size_score, r, b, s, top=True):
-        # This would be implemented to calculate the total score
-        # Placeholder implementation
-        score = ripeness_score*r + bruises_score*b + size_score*s
-        if top:
-            self.top_score.configure(text=f"Top Score - {score}")
-        else:
-            self.bottom_score.configure(text=f"Bottom Score - {score}")
-        return score
+    # def calculate_total_score(self, ripeness_score, bruises_score, size_score, r, b, s, top=True):
+    #     # This would be implemented to calculate the total score
+    #     # Placeholder implementation
+    #     score = ripeness_score*r + bruises_score*b + size_score*s
+    #     if top:
+    #         self.top_score.configure(text=f"Top Score - {score}")
+    #     else:
+    #         self.bottom_score.configure(text=f"Bottom Score - {score}")
+    #     return score
     
     def final_grade(self,r,b,s):
         r_priority = float(self.ripeness_combo.get())
