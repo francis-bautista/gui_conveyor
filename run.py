@@ -505,8 +505,7 @@ class MangoGraderApp:
             self.move_to_position(self.position3)
     
     def move_to_position(self,target):
-        global current_position
-        steps_needed = target - current_position
+        steps_needed = target - self.current_position
         
         if steps_needed == 0:
             return  # Already at position
@@ -523,7 +522,7 @@ class MangoGraderApp:
             time.sleep(self.step_delay)
         
         # Update current position
-        current_position = target
+        self.current_position = target
     
     def moveMotor(self,val1=0,val2=0,val3=0,val4=0):
         GPIO.output(self.relay1, val1)  # Motor 1 Forward
