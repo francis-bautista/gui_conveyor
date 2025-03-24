@@ -241,7 +241,7 @@ class MangoGraderApp:
             self.ripeness_combo.configure(state="disabled")  # or "readonly"
             self.bruises_combo.configure(state="disabled")
             self.size_combo.configure(state="disabled")
-            self.check_var.configure(state="disabled")
+            
             # Update button states
             self.start_button.configure(state="disabled")
             # Change text to "Stop" during processing
@@ -414,7 +414,7 @@ class MangoGraderApp:
             self.ripeness_combo.configure(state="normal")  # or "readonly"
             self.bruises_combo.configure(state="normal")
             self.size_combo.configure(state="normal")
-            self.check_var.configure(state="normal")
+            
             self.root.after(0, self.processing_completed(resultArray))
             
         except Exception as e:
@@ -654,11 +654,7 @@ class MangoGraderApp:
             self.ripeness_combo.set(3.0)
             self.bruises_combo.set(3.0)
             self.size_combo.set(3.0)
-        else:
-            # Clear priority values
-            self.ripeness_combo.set("")
-            self.bruises_combo.set("")
-            self.size_combo.set("")
+        
     
     def update_video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
