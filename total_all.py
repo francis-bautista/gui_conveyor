@@ -126,6 +126,7 @@ def stop_now():
         GPIO.cleanup()  # Reset GPIO settings
         os.execv(sys.executable, [sys.executable] + sys.argv)
     else:
+        running==False
         raise StopButtonPressed("Stop button pressed while running")
 
 def midpoint(ptA, ptB):
@@ -350,7 +351,7 @@ def update_gui():
         top_background.save(f"{formatted_date_time}_background.png")  # Save the top image for size calculation
         # Capture top part
         moveMotor(0,1,1,0)
-        time.sleep(5)
+        # time.sleep(5)
         stopMotor()
         
         print("\nCapturing Top Part")
@@ -365,7 +366,7 @@ def update_gui():
         top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
         top_canvas.image = top_photo
         moveMotor(0,1,0,1)
-        time.sleep(5)
+        # time.sleep(5)
         stopMotor()
         # update_video_feed()
         
@@ -397,7 +398,7 @@ def update_gui():
         print(f"Average Final Score: {average_final_grade}")
         find_grade(average_final_grade)
         moveMotor(1,0,1,0)
-        time.sleep(15)
+        # time.sleep(15)
         stopMotor()
         print("\nDone")
         running = False
