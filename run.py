@@ -317,7 +317,7 @@ class MangoGraderApp:
             self.bruises_combo.set("")
             self.size_combo.set("")
     
-    def update_video_feed():
+    def update_video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
         global picam2, video_canvas
         
@@ -334,7 +334,7 @@ class MangoGraderApp:
         video_canvas.image = frame
         
         # Schedule the next update
-        root.after(10, update_video_feed)
+        root.after(10, self.update_video_feed)
     
     def exit_program(self):
         """Clean up and exit the application"""
