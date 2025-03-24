@@ -319,10 +319,10 @@ class MangoGraderApp:
     
     def update_video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
-        global picam2, video_canvas
+        
         
         # Capture frame from the camera
-        frame = picam2.capture_array()
+        frame = self.picam2.capture_array()
         frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
         
         # Resize and convert to PhotoImage
@@ -330,8 +330,8 @@ class MangoGraderApp:
         frame = ImageTk.PhotoImage(frame)
         
         # Update the video canvas with the new frame
-        video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
-        video_canvas.image = frame
+        self.video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+        self.video_canvas.image = frame
         
         # Schedule the next update
         root.after(10, self.update_video_feed)
