@@ -586,7 +586,7 @@ class MangoGraderApp:
     
     def show_help(self):
         """Display help information in a scrollable, styled window"""
-        help_window = ctk.CTkToplevel(self.root)
+        help_window = ctk.CTkToplevel(self.root, fg_color="#e5e0d8")
         help_window.title("Help Documentation")
         help_window.geometry("800x500")
         help_window.minsize(600, 400)
@@ -594,7 +594,7 @@ class MangoGraderApp:
         help_window.grid_rowconfigure(0, weight=1)
 
         # Create main frame for better layout control
-        main_frame = ctk.CTkFrame(help_window)
+        main_frame = ctk.CTkFrame(help_window, fg_color="#B3B792")
         main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         main_frame.grid_columnconfigure(0, weight=1)
         main_frame.grid_rowconfigure(1, weight=1)
