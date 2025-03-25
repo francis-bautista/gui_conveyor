@@ -272,7 +272,7 @@ class MangoGraderApp:
             self.moveMotor(0, 1, 1, 0)
             
             # Progress from 10% to 20% during 5 second sleep
-            for i in range(10):
+            for i in range(15):
                 if self.stop_requested: return
                 progress = 0.1 + (i * 0.01)
                 self.update_progress_safe(progress, "Positioning for top capture...")
