@@ -15,6 +15,7 @@ from tkinter import ttk, messagebox
 import RPi.GPIO as GPIO
 import threading
 from get_size import calculate_size, determine_size
+from help_page import hp
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
@@ -589,18 +590,7 @@ class MangoGraderApp:
         help_window.title("Help")
         help_window.geometry("400x300")
         
-        help_text = """
-        Carabao Mango Grader and Sorter
-        ------------------------------
-        
-        Start: Begin the grading process
-        Stop: Stop the current process
-        Reset: Reset all values to default
-        
-        User Priority: Set your preferences for
-        ripeness, bruises, and size scoring.
-        """
-        
+        help_text = hp()
         help_label = ctk.CTkLabel(help_window, text=help_text, justify="left")
         help_label.pack(padx=20, pady=20)
     
