@@ -613,7 +613,7 @@ class MangoGraderApp:
             main_frame,
             wrap="word",
             font=("Arial", 13),
-            fg_color=("white", "#2E2E2E"),
+            fg_color=("white", "#e5e0d8"),
             scrollbar_button_color=("#3B8ED0", "#1F6AA5"),
             scrollbar_button_hover_color=("#36719F", "#184E73"),
             padx=10,
@@ -632,8 +632,8 @@ class MangoGraderApp:
             text="Close",
             command=help_window.destroy,
             width=100,
-            fg_color="#3B8ED0",
-            hover_color="#36719F"
+            fg_color="#F3533A",
+            hover_color="#db4b35"
         )
         close_button.grid(row=2, column=0, padx=10, pady=(15, 10), sticky="e")
 
