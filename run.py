@@ -365,7 +365,7 @@ class MangoGraderApp:
             self.moveMotor(1, 0, 0, 1)
             
             # Progress from 75% to 100% during 15 second sleep
-            for i in range(10):
+            for i in range(15):
                 if self.stop_requested: return
                 progress = 0.75 + (i * 0.005)  # Increment by 0.5% each time (0.005 * 50 = 0.25 = 25%)
                 self.update_progress_safe(progress, "Completing process...")
