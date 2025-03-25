@@ -585,15 +585,62 @@ class MangoGraderApp:
         self.grade_score.configure(text=f"Grade - {grade}")
     
     def show_help(self):
-        """Display help information"""
+        """Display help information in a scrollable, styled window"""
         help_window = ctk.CTkToplevel(self.root)
-        help_window.title("Help")
-        help_window.geometry("400x300")
-        
+        help_window.title("Help Documentation")
+        help_window.geometry("800x500")
+        help_window.minsize(600, 400)
+        help_window.grid_columnconfigure(0, weight=1)
+        help_window.grid_rowconfigure(0, weight=1)
+
+        # Create main frame for better layout control
+        main_frame = ctk.CTkFrame(help_window)
+        main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        main_frame.grid_columnconfigure(0, weight=1)
+        main_frame.grid_rowconfigure(1, weight=1)
+
+        # Add header
+        header_label = ctk.CTkLabel(
+            main_frame,
+            text="Help Guide",
+            font=("Arial Bold", 16),
+            anchor="w"
+        )
+        header_label.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="ew")
+
+        # Create scrollable textbox
+        help_textbox = ctk.CTkTextbox(
+            main_frame,
+            wrap="word",
+            font=("Arial", 13),
+            fg_color=("white", "#2E2E2E"),
+            scrollbar_button_color=("#3B8ED0", "#1F6AA5"),
+            scrollbar_button_hover_color=("#36719F", "#184E73"),
+            padx=10,
+            pady=10
+        )
+        help_textbox.grid(row=1, column=0, sticky="nsew")
+
+        # Insert help text
         help_text = hp()
-        help_label = ctk.CTkLabel(help_window, text=help_text, justify="left")
-        help_label.pack(padx=20, pady=20)
-    
+        help_textbox.insert("1.0", help_text)
+        help_textbox.configure(state="disabled")  # Make read-only
+
+        # Add close button
+        close_button = ctk.CTkButton(
+            main_frame,
+            text="Close",
+            command=help_window.destroy,
+            width=100,
+            fg_color="#3B8ED0",
+            hover_color="#36719F"
+        )
+        close_button.grid(row=2, column=0, padx=10, pady=(15, 10), sticky="e")
+
+        # Make window stay on top
+        help_window.attributes('-topmost', True)
+        help_window.after(200, lambda: help_window.attributes('-topmost', False))
+        
     def checkbox_event(self):
         """Handle checkbox state changes"""
         state = self.check_var.get()
