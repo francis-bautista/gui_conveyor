@@ -1,0 +1,84 @@
+@startuml classes
+set namespaceSeparator none
+class "MangoGraderApp" as run.MangoGraderApp {
+  DISTANCE_CAMERA_TO_OBJECT : int
+  FOCAL_LENGTH_PIXELS : int
+  bottom_canvas : Canvas
+  bottom_result_label : CTkLabel
+  bottom_score : CTkLabel
+  bruiseness_scores : dict
+  bruises_combo : Combobox
+  camera_config
+  check_var : StringVar
+  class_labels_bruises : list
+  class_labels_ripeness : list
+  class_labels_size : list
+  current_position : int
+  current_progress
+  delay_time : int
+  device : device
+  dir_pin : int
+  grade_score : CTkLabel
+  help_button : CTkButton
+  model_bruises : EfficientNet
+  model_ripeness : EfficientNet
+  picam2
+  position1 : int
+  position2 : int
+  position3 : int
+  process_thread : Thread
+  processing : bool
+  progress_bar : CTkProgressBar
+  progress_label : CTkLabel
+  relay1 : int
+  relay2 : int
+  relay3 : int
+  relay4 : int
+  reset_button : CTkButton
+  ripeness_combo : Combobox
+  ripeness_scores : dict
+  root
+  scores_dict : dict
+  size_combo : Combobox
+  size_scores : dict
+  start_button : CTkButton
+  step_delay : float
+  step_pin : int
+  steps_per_revolution : int
+  stop_button : CTkButton
+  stop_requested : bool
+  top_canvas : Canvas
+  top_result_label : CTkLabel
+  top_score : CTkLabel
+  transform : Compose
+  video_canvas : Canvas
+  capture_image(picam2)
+  checkbox_event()
+  classify_image(image, model, class_labels)
+  exit_program()
+  final_grade(r, b, s)
+  find_grade(input_grade)
+  moveMotor(val1, val2, val3, val4)
+  move_to_position(target)
+  processing_completed(resultArray)
+  processing_stopped()
+  reset_system()
+  setup_analysis_frame()
+  setup_control_frame()
+  setup_user_priority_frame(parent_frame)
+  setup_video_frame()
+  show_help()
+  start_processing()
+  stopMotor()
+  stop_processing()
+  update_bottom_results(image, ripeness, bruises, size)
+  update_gui()
+  update_progress(progress)
+  update_progress_safe(progress, message)
+  update_progress_ui(progress, message)
+  update_results(top_ripeness, top_bruises, top_size, top_score_val, bottom_ripeness, bottom_bruises, bottom_size, bottom_score_val, grade)
+  update_top_results(image, ripeness, bruises, size)
+  update_video_feed()
+  validate_inputs()
+}
+@enduml
