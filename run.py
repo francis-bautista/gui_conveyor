@@ -678,7 +678,9 @@ class MangoGraderApp:
         self.root.destroy()
         GPIO.cleanup()  # Reset GPIO settings
         sys.exit(0)
-
+# UML Diagram
+# pyreverse -o html run.py
+# pyreverse -o png run.py
 # Main application
 if __name__ == "__main__":
     root = ctk.CTk(fg_color="#e5e0d8")
