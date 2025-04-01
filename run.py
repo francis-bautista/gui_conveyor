@@ -560,6 +560,7 @@ class MangoGraderApp:
             self.stop_requested = True
             # Update button text back to "Exit" for when processing finishes
             self.stop_button.configure(text="Exit")
+            self.reset_button.configure(state="normal")
         else:
             # If not processing, exit the program
             self.exit_program()
