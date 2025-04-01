@@ -556,6 +556,7 @@ class MangoGraderApp:
             print("Stopping processing...")
             self.exit_program()
         if self.processing:
+            self.stopMotor()
             # If processing is active, stop it
             self.stop_requested = True
             self.reset_button.configure(state="normal")
