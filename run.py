@@ -537,7 +537,7 @@ class MangoGraderApp:
         """Called when processing completes successfully"""
         self.processing = False
         self.progress_label.configure(text="Processing completed")
-        print("Processing completed")
+        
         # Re-enable buttons
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
@@ -558,6 +558,9 @@ class MangoGraderApp:
             self.stop_button.configure(text="Exit")
         else:
             # If not processing, exit the program
+            self.exit_program()
+        if self.stop_requested:
+            print("Stopping processing...")
             self.exit_program()
     def processing_stopped(self):
         """Called when processing is stopped by user"""
