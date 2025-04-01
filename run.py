@@ -143,7 +143,7 @@ class MangoGraderApp:
                                          command=self.start_processing)
         self.start_button.grid(row=0, column=0, padx=10, pady=10, sticky="ns")
         
-        self.stop_button = ctk.CTkButton(right_frame, text="Stop", fg_color="#F3533A",
+        self.stop_button = ctk.CTkButton(right_frame, text="Exit", fg_color="#F3533A",
                                        command=self.stop_processing)
         self.stop_button.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
         
@@ -558,9 +558,9 @@ class MangoGraderApp:
         if self.processing:
             # If processing is active, stop it
             self.stop_requested = True
+            self.reset_button.configure(state="normal")
             # Update button text back to "Exit" for when processing finishes
             self.stop_button.configure(text="Exit")
-            self.reset_button.configure(state="normal")
         else:
             # If not processing, exit the program
             self.exit_program()
