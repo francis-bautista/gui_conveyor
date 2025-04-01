@@ -551,6 +551,10 @@ class MangoGraderApp:
                             resultArray[6], resultArray[7], resultArray[8])
     def stop_processing(self):
         """Stop the processing or exit the program"""
+        exit_text = self.stop_button.cget("text")  # Get the button text
+        if exit_text == "Exit":
+            print("Stopping processing...")
+            self.exit_program()
         if self.processing:
             # If processing is active, stop it
             self.stop_requested = True
@@ -558,10 +562,6 @@ class MangoGraderApp:
             self.stop_button.configure(text="Exit")
         else:
             # If not processing, exit the program
-            self.exit_program()
-        exit_text = self.stop_button.cget("text")  # Get the button text
-        if exit_text == "Exit":
-            print("Stopping processing...")
             self.exit_program()
 
     def processing_stopped(self):
