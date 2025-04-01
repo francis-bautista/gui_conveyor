@@ -434,6 +434,7 @@ def exit_program():
     print("Exiting the program. Goodbye!")
     GPIO.cleanup()  # Reset GPIO settings
     sys.exit(0)  # 0 indicates a successful termination
+
 def show_help():
     """Opens a new window to display help information."""
     help_window = tk.Toplevel(root)
