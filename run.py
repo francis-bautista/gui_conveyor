@@ -537,7 +537,7 @@ class MangoGraderApp:
         """Called when processing completes successfully"""
         self.processing = False
         self.progress_label.configure(text="Processing completed")
-        
+        print("Processing completed")
         # Re-enable buttons
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
