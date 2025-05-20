@@ -19,6 +19,7 @@ import os
 import csv
 from tkinter import ttk, messagebox
 import RPi.GPIO as GPIO
+from get_size import calculate_size, determine_size, calculate_real_world_dimension, midpoint
 
 # Define the GPIO pins connected to the relays
 relay1 = 6   # Motor 1 Forward
@@ -119,24 +120,24 @@ transform = transforms.Compose([
 FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
 DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
 
-def midpoint(ptA, ptB):
-    """
-    Calculate the midpoint of two points.
-    :param ptA: First point.
-    :param ptB: Second point.
-    :return: Midpoint of the two points.
-    """
-    return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+# def midpoint(ptA, ptB):
+#     """
+#     Calculate the midpoint of two points.
+#     :param ptA: First point.
+#     :param ptB: Second point.
+#     :return: Midpoint of the two points.
+#     """
+#     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
-def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
-    """
-    Calculate the real-world dimension of an object.
-    :param pixel_dimension: Dimension of the object in pixels (width or length).
-    :param distance_camera_to_object: Distance from the camera to the object in cm.
-    :param focal_length_pixels: Focal length of the camera in pixels.
-    :return: Real world dimension in cm.
-    """
-    return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
+# def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
+#     """
+#     Calculate the real-world dimension of an object.
+#     :param pixel_dimension: Dimension of the object in pixels (width or length).
+#     :param distance_camera_to_object: Distance from the camera to the object in cm.
+#     :param focal_length_pixels: Focal length of the camera in pixels.
+#     :return: Real world dimension in cm.
+#     """
+#     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
 
 def calculate_size(fg, bg, formatted_date_time, top):
     """
@@ -391,22 +392,22 @@ def update_gui():
     print("\nDone")
     
     
-def determine_size(length, width):
-    """Determines the size of the mango based on its length and width.
+# def determine_size(length, width):
+#     """Determines the size of the mango based on its length and width.
     
-    :param length: The length of the mango in cm
-    :param width: The width of the mango in cm
-    :return: A string indicating the size of the mango: 'small', 'medium', or 'large'
-    """
-    minArea = float(11.5 * 8.5)  # Minimum area for a mango in cm^2
-    maxArea = float(12.5 * 8.5)  # Maximum area for a mango in cm^2
-    area = float(length * width)  # Calculate area (you can use any metric you prefer)
-    if area < minArea:  # Example thresholds
-        return 'small'
-    elif minArea <= area < maxArea:
-        return 'medium'
-    else:
-        return 'large'
+#     :param length: The length of the mango in cm
+#     :param width: The width of the mango in cm
+#     :return: A string indicating the size of the mango: 'small', 'medium', or 'large'
+#     """
+#     minArea = float(11.5 * 8.5)  # Minimum area for a mango in cm^2
+#     maxArea = float(12.5 * 8.5)  # Maximum area for a mango in cm^2
+#     area = float(length * width)  # Calculate area (you can use any metric you prefer)
+#     if area < minArea:  # Example thresholds
+#         return 'small'
+#     elif minArea <= area < maxArea:
+#         return 'medium'
+#     else:
+#         return 'large'
     
 def update_video_feed():
     """Updates the video feed on the Tkinter canvas."""
@@ -434,7 +435,6 @@ def exit_program():
     print("Exiting the program. Goodbye!")
     GPIO.cleanup()  # Reset GPIO settings
     sys.exit(0)  # 0 indicates a successful termination
-
 def show_help():
     """Opens a new window to display help information."""
     help_window = tk.Toplevel(root)
@@ -469,9 +469,6 @@ def checkbox_event():
     print("ripeness value:", ripeness_combo.get())
     print("bruises value:", bruises_combo.get())
     print("size value:", size_combo.get())
-
-    
-
 
 # Initialize the camera
 picam2 = Picamera2()

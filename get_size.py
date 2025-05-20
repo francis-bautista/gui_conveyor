@@ -93,3 +93,12 @@ def determine_size(length, width):
         return 'medium'
     else:
         return 'large'
+    
+def midpoint(ptA, ptB):
+    """
+    Calculate the midpoint of two points.
+    :param ptA: First point.
+    :param ptB: Second point.
+    :return: Midpoint of the two points.
+    """
+    return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)

@@ -6,15 +6,12 @@ import time
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import ttk  # For combo boxes
-from picamera2 import Picamera2
 from datetime import datetime
-from scipy.spatial import distance as dist
 import sys
 import os
 from tkinter import ttk, messagebox
-import RPi.GPIO as GPIO
 import threading
-from get_size import calculate_size, determine_size
+import cv2
 from help_page import hp
 class MangoGraderApp:
     def __init__(self, root):
@@ -22,74 +19,15 @@ class MangoGraderApp:
         self.root.title("Carabao Mango Grader and Sorter")
         self.root.fg_color = "#e5e0d8"
         
-        # Initialize camera
-        self.picam2 = Picamera2()
-        self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
-        self.picam2.configure(self.camera_config)
-        self.picam2.start()
-        
-        self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
-        self.class_labels_bruises = ['bruised', 'unbruised']
-        self.class_labels_size = ['small', 'medium', 'large']
-        self.ripeness_scores = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
-        self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
-        self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
-        self.scores_dict = {}
-
-        # Load Training and Testing Models
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # Ripeness model
-        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_ripeness))
-        self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
-        self.model_ripeness.eval()
-        self.model_ripeness.to(self.device)
-        # Bruises model
-        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_bruises))
-        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
-        self.model_bruises.eval()
-        self.model_bruises.to(self.device)
-        # Define transformations
-        self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])
-
         # Size calculation parameters
-        self.FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
-        self.DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
+        self.FOCAL_LENGTH_PIXELS = 3500  # Example value
+        self.DISTANCE_CAMERA_TO_OBJECT = 40  # cm
         
-        # Define the GPIO pins connected to the relays
-        self.relay1 = 6   # Motor 1 Forward
-        self.relay2 = 13   # Motor 1 Reverse
-        self.relay3 = 19  # Motor 2 Forward
-        self.relay4 = 26  # Motor 2 Reverse
-        self.delay_time = 2  # 2 seconds delay between direction changes
-        # Define pin connections (using BOARD numbering)
-        self.dir_pin = 21    # Physical pin 21
-        self.step_pin = 20   # Physical pin 20
-        self.steps_per_revolution = 200
-        # Define absolute positions (steps from home)
-        self.position1 = 50
-        self.position2 = 100
-        self.position3 = 150
+        # Virtual motor positions (for simulation)
         self.current_position = 0  # Track current position
-        self.step_delay = 0.001    # 1ms delay between steps (adjust for speed)
-        # Setup GPIO
-        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-        GPIO.setup(self.relay1, GPIO.OUT)
-        GPIO.setup(self.relay2, GPIO.OUT)
-        GPIO.setup(self.relay3, GPIO.OUT)
-        GPIO.setup(self.relay4, GPIO.OUT)
-        GPIO.setup(self.dir_pin, GPIO.OUT)
-        GPIO.setup(self.step_pin, GPIO.OUT)
-        GPIO.output(self.dir_pin, GPIO.LOW)
-        GPIO.output(self.step_pin, GPIO.LOW)
-        # Initialize relays to OFF state
-        GPIO.output(self.relay1, GPIO.LOW)
-        GPIO.output(self.relay2, GPIO.LOW)
-        GPIO.output(self.relay3, GPIO.LOW)
-        GPIO.output(self.relay4, GPIO.LOW)
+        self.position1 = 50  # Position for Grade A
+        self.position2 = 100  # Position for Grade B
+        self.position3 = 150  # Position for Grade C
         
         # Processing state flags
         self.processing = False
@@ -106,8 +44,6 @@ class MangoGraderApp:
         self.setup_control_frame()
         self.setup_video_frame()
         
-        # Start the video feed
-        self.update_video_feed()
     
     def setup_analysis_frame(self):
         """Setup the left frame for analysis results"""
@@ -264,14 +200,14 @@ class MangoGraderApp:
             if self.stop_requested: return
             
             # Capture background
-            top_background = self.capture_image(self.picam2)
+            top_background = self.capture_image()
             top_background.save(f"{formatted_date_time}_background.png")
             
             # Progress: 10% - Moving motor for top capture
             self.update_progress_safe(0.1, "Moving motor for top capture...")
             if self.stop_requested: return
             
-            self.moveMotor(0, 1, 0, 1)
+            self.simulate_motor_movement()
             
             # Progress from 10% to 20% during 5 second sleep
             for i in range(15):
@@ -280,30 +216,24 @@ class MangoGraderApp:
                 self.update_progress_safe(progress, "Positioning for top capture...")
                 time.sleep(0.5)  # Sleep for 0.5 seconds, 10 times = 5 seconds
             
-            self.stopMotor()
+            self.simulate_motor_stop()
             
             # Progress: 20% - Capturing top part
             self.update_progress_safe(0.2, "Capturing top part...")
             if self.stop_requested: return
             
-            # self.root.after(0, lambda: self.top_label.configure(text="Capturing top part of the mango..."))
-            top_image = self.capture_image(self.picam2)
+            top_image = self.capture_image()
             top_image.save(f"{formatted_date_time}_top.png")
             
             # Progress: 25% - Analyzing top part
             self.update_progress_safe(0.25, "Analyzing top part...")
             if self.stop_requested: return
             
-            top_class_ripeness = self.classify_image(top_image, self.model_ripeness, self.class_labels_ripeness)
-            top_class_bruises = self.classify_image(top_image, self.model_bruises, self.class_labels_bruises)
-            top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", 
-                                                      f"{formatted_date_time}_background.png", 
-                                                      formatted_date_time, True,
-                                                      self.DISTANCE_CAMERA_TO_OBJECT, 
-                                                      self.FOCAL_LENGTH_PIXELS
-                                                      )
+            top_class_ripeness = self.classify_image(top_image, "ripeness")
+            top_class_bruises = self.classify_image(top_image, "bruises")
+            top_width, top_length = self.calculate_size(top_image)
             print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
-            top_size_class = determine_size(top_width, top_length) 
+            top_size_class = self.determine_size(top_width, top_length) 
             # Update UI with top results
             self.update_top_results(top_image, top_class_ripeness, top_class_bruises, top_size_class)
             
@@ -311,7 +241,7 @@ class MangoGraderApp:
             self.update_progress_safe(0.3, "Moving motor for bottom capture...")
             if self.stop_requested: return
             
-            self.moveMotor(0, 1, 1, 0)
+            self.simulate_motor_movement()
             
             # Progress from 30% to 40% during 5 second sleep
             for i in range(10):
@@ -320,30 +250,24 @@ class MangoGraderApp:
                 self.update_progress_safe(progress, "Positioning for bottom capture...")
                 time.sleep(0.5)  # Sleep for 0.5 seconds, 10 times = 5 seconds
             
-            self.stopMotor()
+            self.simulate_motor_stop()
             
             # Progress: 40% - Capturing bottom part
             self.update_progress_safe(0.4, "Capturing bottom part...")
             if self.stop_requested: return
             
-            # self.root.after(0, lambda: self.bottom_label.configure(text="Capturing bottom part of the mango..."))
-            bottom_image = self.capture_image(self.picam2)
+            bottom_image = self.capture_image()
             bottom_image.save(f"{formatted_date_time}_bottom.png")
             
             # Progress: 50% - Analyzing bottom part
             self.update_progress_safe(0.5, "Analyzing bottom part...")
             if self.stop_requested: return
             
-            bottom_class_ripeness = self.classify_image(bottom_image, self.model_ripeness, self.class_labels_ripeness)
-            bottom_class_bruises = self.classify_image(bottom_image, self.model_bruises, self.class_labels_bruises)
-            bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", 
-                                                            f"{formatted_date_time}_background.png", 
-                                                            formatted_date_time, False,
-                                                            self.DISTANCE_CAMERA_TO_OBJECT, 
-                                                            self.FOCAL_LENGTH_PIXELS
-                                                            )
+            bottom_class_ripeness = self.classify_image(bottom_image, "ripeness")
+            bottom_class_bruises = self.classify_image(bottom_image, "bruises")
+            bottom_width, bottom_length = self.calculate_size(bottom_image)
             print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
-            bottom_size_class = determine_size(bottom_width, bottom_length)
+            bottom_size_class = self.determine_size(bottom_width, bottom_length)
             # Update UI with bottom results
             self.update_bottom_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
             
@@ -364,7 +288,7 @@ class MangoGraderApp:
             self.update_progress_safe(0.75, "Final positioning...")
             if self.stop_requested: return
             
-            self.moveMotor(1, 0, 0, 1)
+            self.simulate_motor_movement()
             
             # Progress from 75% to 100% during 15 second sleep
             for i in range(15):
@@ -373,7 +297,7 @@ class MangoGraderApp:
                 self.update_progress_safe(progress, "Completing process...")
                 time.sleep(0.3)  # Sleep for 0.3 seconds, 50 times = 15 seconds
             
-            self.stopMotor()
+            self.simulate_motor_stop()
             
             resultArray = [top_class_ripeness, top_class_bruises, 
                            top_size_class,
@@ -391,7 +315,7 @@ class MangoGraderApp:
             self.bruises_combo.configure(state="normal")
             self.size_combo.configure(state="normal")
             
-            self.root.after(0, self.processing_completed(resultArray))
+            self.root.after(0, lambda: self.processing_completed(resultArray))
             
         except Exception as e:
             print(f"Error in update_gui: {str(e)}")
@@ -439,31 +363,77 @@ class MangoGraderApp:
             tk.messagebox.showerror("Input Error", "Please select values for Ripeness, Bruises, and Size")
             return False
         return True
-######################################################################################
-    def capture_image(self, picam2):
-        # This would be implemented to capture an image from the camera
-        # Placeholder implementation
-        image = picam2.capture_array()
-        image = Image.fromarray(image).convert("RGB")
+        
+    def capture_image(self):
+        """Capture an image from the webcam"""
+        ret, frame = self.camera.read()
+        if not ret:
+            # If camera read fails, create a dummy image
+            img = Image.new('RGB', (640, 480), color=(200, 200, 200))
+            return img
+        
+        # Convert from BGR to RGB
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(frame_rgb)
         return image
     
-    def classify_image(self, image, model, class_labels):
-        # This would be implemented to classify the image
-        # Placeholder implementation
-        image = self.transform(image).unsqueeze(0).to(self.device)
-        output = model(image)
+    def classify_image(self, image, model_type):
+        """Classify an image using the appropriate model"""
+        if self.use_dummy_models:
+            # Return dummy results if models aren't loaded
+            import random
+            if model_type == "ripeness":
+                return random.choice(self.class_labels_ripeness)
+            else:  # bruises
+                return random.choice(self.class_labels_bruises)
+        
+        # Use actual models if available
+        image_tensor = self.transform(image).unsqueeze(0).to(self.device)
+        
+        if model_type == "ripeness":
+            output = self.model_ripeness(image_tensor)
+        else:  # bruises
+            output = self.model_bruises(image_tensor)
+            
         _, predicted = torch.max(output, 1)
-        return class_labels[predicted.item()]
+        
+        if model_type == "ripeness":
+            return self.class_labels_ripeness[predicted.item()]
+        else:  # bruises
+            return self.class_labels_bruises[predicted.item()]
     
-    def final_grade(self,r,b,s):
+    def calculate_size(self, image):
+        """Calculate size of mango in the image (simplified version)"""
+        # In a real application, this would use computer vision to detect the mango
+        # and calculate its dimensions. Here we'll just return random reasonable values
+        import random
+        width = random.uniform(5.0, 12.0)  # cm
+        length = random.uniform(10.0, 18.0)  # cm
+        return width, length
+    
+    def determine_size(self, width, length):
+        """Determine size category based on dimensions"""
+        # Calculate area as a simple metric
+        area = width * length
+        
+        if area < 80:
+            return "small"
+        elif area < 150:
+            return "medium"
+        else:
+            return "large"
+    
+    def final_grade(self, r, b, s):
+        """Calculate final grade based on selected priorities"""
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
         s_priority = float(self.size_combo.get())
-        resulting_grade = r_priority*self.ripeness_scores[r] + b_priority*self.bruiseness_scores[b] + s_priority*self.size_scores[s]
+        resulting_grade = r_priority * self.ripeness_scores[r] + b_priority * self.bruiseness_scores[b] + s_priority * self.size_scores[s]
         print(f"Resulting Grade: {resulting_grade}")
         return resulting_grade
     
-    def find_grade(self,input_grade):
+    def find_grade(self, input_grade):
+        """Determine letter grade based on score"""
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
         s_priority = float(self.size_combo.get())
@@ -481,50 +451,38 @@ class MangoGraderApp:
         print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
         
         if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
-            # self.grade_score.configure(text=f"Grade - A")
             self.move_to_position(self.position1)
             return "A"
         elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
-            # self.grade_score.configure(text=f"Grade - B")
             self.move_to_position(self.position2)
             return "B"
         else:
-            # self.grade_score.configure(text=f"Grade - C")
             self.move_to_position(self.position3)
             return "C"
     
-    def move_to_position(self,target):
+    def move_to_position(self, target):
+        """Simulate moving to a specific position"""
         steps_needed = target - self.current_position
         
         if steps_needed == 0:
             return  # Already at position
         
-        # Set direction
-        direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
-        GPIO.output(self.dir_pin, direction)
-        
-        # Move required steps
-        for _ in range(abs(steps_needed)):
-            GPIO.output(self.step_pin, GPIO.HIGH)
-            time.sleep(self.step_delay)
-            GPIO.output(self.step_pin, GPIO.LOW)
-            time.sleep(self.step_delay)
+        print(f"Moving from position {self.current_position} to position {target}")
+        # Simulate movement delay
+        time.sleep(0.5)
         
         # Update current position
         self.current_position = target
+        print(f"Now at position {self.current_position}")
     
-    def moveMotor(self,val1=0,val2=0,val3=0,val4=0):
-        GPIO.output(self.relay1, val1)  # Motor 1 Forward
-        GPIO.output(self.relay2, val2)   # Motor 1 Reverse OFF
-        GPIO.output(self.relay3, val3)  # Motor 2 Forward
-        GPIO.output(self.relay4, val4)   # Motor 2 Reverse OFF
-
-    def stopMotor(self):
-        GPIO.output(self.relay1, GPIO.LOW)  # Motor 1 Forward
-        GPIO.output(self.relay2, GPIO.LOW)   # Motor 1 Reverse OFF
-        GPIO.output(self.relay3, GPIO.LOW)  # Motor 2 Forward
-        GPIO.output(self.relay4, GPIO.LOW)   # Motor 2 Reverse OFF
-######################################################################################
+    def simulate_motor_movement(self):
+        """Simulate motor movement"""
+        print("Motor movement started")
+    
+    def simulate_motor_stop(self):
+        """Simulate stopping the motor"""
+        print("Motor stopped")
+        
     def update_progress(self, progress):
         """Update the progress bar"""
         self.progress_bar.set(progress)
@@ -542,21 +500,21 @@ class MangoGraderApp:
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
         self.reset_button.configure(state="normal")
-            # resultArray = [top_class_ripeness, top_class_bruises, top_size_class,
-            #                top_final_grade, bottom_class_ripeness, bottom_class_bruises, 
-            #                 bottom_size_class, bottom_final_grade, letter_grade
-            #                ]
+        
         self.update_results(resultArray[0], resultArray[1], resultArray[2], 
                             resultArray[3], resultArray[4], resultArray[5], 
                             resultArray[6], resultArray[7], resultArray[8])
+                            
     def stop_processing(self):
         """Stop the processing or exit the program"""
         exit_text = self.stop_button.cget("text")  # Get the button text
         if exit_text == "Exit":
-            print("Stopping processing...")
+            print("Exiting program...")
             self.exit_program()
+            return
+            
         if self.processing:
-            self.stopMotor()
+            self.simulate_motor_stop()
             # If processing is active, stop it
             self.stop_requested = True
             self.reset_button.configure(state="normal")
@@ -566,19 +524,31 @@ class MangoGraderApp:
             # If not processing, exit the program
             self.exit_program()
 
-    def processing_stopped(self):
+    def processing_stopped(self, error_message=None):
         """Called when processing is stopped by user"""
         self.processing = False
-        self.progress_label.configure(text="Processing stopped")
+        if error_message:
+            self.progress_label.configure(text=error_message)
+            messagebox.showerror("Processing Error", error_message)
+        else:
+            self.progress_label.configure(text="Processing stopped")
         
         # Re-enable buttons
         self.start_button.configure(state="normal")
         self.stop_button.configure(text="Exit")  # Change text back to "Exit"
         self.reset_button.configure(state="normal")
+        
+        # Re-enable combos
+        self.ripeness_combo.configure(state="normal")
+        self.bruises_combo.configure(state="normal")
+        self.size_combo.configure(state="normal")
     
     def reset_system(self):
-        GPIO.cleanup()  # Reset GPIO settings
-        self.picam2.stop()
+        """Reset the system to its initial state"""
+        # Release camera
+        self.camera.release()
+        
+        # Restart the application
         os.execv(sys.executable, [sys.executable] + sys.argv)
     
     def update_results(self, top_ripeness, top_bruises, top_size, top_score_val,
@@ -683,7 +653,6 @@ class MangoGraderApp:
             self.stop_requested = True
         self.picam2.stop()
         self.root.destroy()
-        GPIO.cleanup()  # Reset GPIO settings
         sys.exit(0)
 # UML Diagram
 # pyreverse -o html run.py
