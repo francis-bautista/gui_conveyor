@@ -633,8 +633,8 @@ class MangoGraderApp:
         
         
         # Capture frame from the camera
-        frame = self.picam2.capture_array()
-        frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+        # frame = self.picam2.capture_array()
+        # frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
         
         # Resize and convert to PhotoImage
         frame = frame.resize((300, 200))
@@ -651,7 +651,7 @@ class MangoGraderApp:
         """Clean up and exit the application"""
         if self.processing:
             self.stop_requested = True
-        self.picam2.stop()
+        # self.picam2.stop()
         self.root.destroy()
         sys.exit(0)
 # UML Diagram
