@@ -1,5 +1,5 @@
 # GUI of the Raspberry Pi
-## RUN.PY IS THE MAIN FILE
+## MAIN.PY IS THE MAIN FILE
 required libraries
 - customkinter
 - efficientnet
