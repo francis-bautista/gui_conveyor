@@ -12,7 +12,7 @@ import os
 from tkinter import ttk, messagebox
 import threading
 import cv2
-from help_page import hp
+from old_repo.help_page import hp
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
@@ -630,7 +630,6 @@ class MangoGraderApp:
     
     def update_video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
-        
         
         # Capture frame from the camera
         # frame = self.picam2.capture_array()

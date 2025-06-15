@@ -15,7 +15,7 @@ from tkinter import ttk, messagebox
 import RPi.GPIO as GPIO
 import threading
 from get_size import calculate_size, determine_size
-from help_page import hp
+from old_repo.help_page import hp
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
