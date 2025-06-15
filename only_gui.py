@@ -12,7 +12,7 @@ import os
 from tkinter import ttk, messagebox
 import threading
 import cv2
-from old_repo.help_page import hp
+from help_page import hp
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
