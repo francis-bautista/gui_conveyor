@@ -90,7 +90,7 @@ class MangoGraderApp:
         GPIO.output(self.relay2, GPIO.LOW)
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
-        
+        GPIO.setwarnings(False)
         # Processing state flags
         self.processing = False
         self.stop_requested = False
