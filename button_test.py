@@ -13,7 +13,12 @@ class ConveyorController:
         # Set consistent button dimensions
         self.button_width = 180
         self.button_height = 40
-        
+
+        self.relay1 = 6   # Motor 1 Forward
+        self.relay2 = 13   # Motor 1 Reverse
+        self.relay3 = 19  # Motor 2 Forward
+        self.relay4 = 26  # Motor 2 Reverse
+
         # Initialize UI components
         self.init_ui()
         
@@ -125,10 +130,10 @@ class ConveyorController:
         
     def move_motor(self, motor_array):
         """Control motor movement based on array values"""
-        # GPIO.output(self.relay1, val1)  # Motor 1 Forward
-        # GPIO.output(self.relay2, val2)   # Motor 1 Reverse OFF
-        # GPIO.output(self.relay3, val3)  # Motor 2 Forward
-        # GPIO.output(self.relay4, val4)   # Motor 2 Reverse OFF
+        GPIO.output(self.relay1, motor_array[0])  
+        GPIO.output(self.relay2, motor_array[1])   
+        GPIO.output(self.relay3, motor_array[2])  
+        GPIO.output(self.relay4, motor_array[3])   
         
         if motor_array[0] == 1:
             print("Motor 1 is moving in Clockwise")
