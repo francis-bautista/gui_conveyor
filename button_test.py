@@ -61,6 +61,30 @@ class ConveyorController:
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        row_index=0
+        self.buttonExit = ctk.CTkButton(
+            left_frame, 
+            text="Exit", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF4C4C", 
+            hover_color="#CC0000",
+        )
+        self.buttonExit.configure(command=self.exit_program)
+        self.buttonExit.grid(row=row_index, column=0, padx=20, pady=20)
+
+        self.buttonReset = ctk.CTkButton(
+            left_frame, 
+            text="Reset", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF4C4C", 
+            hover_color="#CC0000",  
+        )
+        self.buttonReset.configure(command=self.reset_program)
+        self.buttonReset.grid(row=row_index, column=1, padx=20, pady=20)
+
+        row_index += 1
 
         # Motor control buttons
         self.buttonCWC1 = ctk.CTkButton(
@@ -71,7 +95,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
-        self.buttonCWC1.grid(row=0, column=0, padx=20, pady=20)
+        self.buttonCWC1.grid(row=row_index, column=0, padx=20, pady=20)
 
         self.buttonCCWC1 = ctk.CTkButton(
             left_frame, 
@@ -81,7 +105,9 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCCWC1.configure(command=self.button_callback(self.buttonCCWC1))
-        self.buttonCCWC1.grid(row=0, column=1, padx=20, pady=20)
+        self.buttonCCWC1.grid(row=row_index, column=1, padx=20, pady=20)
+
+        row_index += 1
 
         self.buttonCWC2 = ctk.CTkButton(
             left_frame, 
@@ -91,7 +117,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCWC2.configure(command=self.button_callback(self.buttonCWC2))
-        self.buttonCWC2.grid(row=1, column=0, padx=20, pady=20)
+        self.buttonCWC2.grid(row=row_index, column=0, padx=20, pady=20)
 
         self.buttonCCWC2 = ctk.CTkButton(
             left_frame, 
@@ -101,7 +127,9 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCCWC2.configure(command=self.button_callback(self.buttonCCWC2))
-        self.buttonCCWC2.grid(row=1, column=1, padx=20, pady=20)
+        self.buttonCCWC2.grid(row=row_index, column=1, padx=20, pady=20)
+
+        row_index += 1
 
         # Time input section
         self.label = ctk.CTkLabel(
@@ -109,14 +137,16 @@ class ConveyorController:
             text="Time to Move (in seconds?)", 
             fg_color="transparent"
         )
-        self.label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+        self.label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10)
 
         self.textbox = ctk.CTkTextbox(
             left_frame, 
             width=self.button_width * 2 + 40, 
             height=self.button_height
         )
-        self.textbox.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+
+        row_index += 1
 
         # Run button
         self.buttonRun = ctk.CTkButton(
@@ -128,7 +158,9 @@ class ConveyorController:
             hover_color="#177E80"
         )
         self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
-        self.buttonRun.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
+        self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=20, pady=20)
+
+        row_index += 1
 
         # Camera control buttons
         self.buttonSide1 = ctk.CTkButton(
@@ -140,7 +172,7 @@ class ConveyorController:
             hover_color="#177E80"
         )
         self.buttonSide1.configure(command=self.picture_side1)
-        self.buttonSide1.grid(row=5, column=0, padx=20, pady=20)
+        self.buttonSide1.grid(row=row_index, column=0, padx=20, pady=20)
 
         self.buttonSide2 = ctk.CTkButton(
             left_frame, 
@@ -152,29 +184,7 @@ class ConveyorController:
             state="disabled"
         )
         self.buttonSide2.configure(command=self.picture_side2)
-        self.buttonSide2.grid(row=5, column=1, padx=20, pady=20)
-
-        self.buttonExit = ctk.CTkButton(
-            left_frame, 
-            text="Exit", 
-            width=self.button_width, 
-            height=self.button_height, 
-            fg_color="#FF4C4C", 
-            hover_color="#CC0000",
-        )
-        self.buttonExit.configure(command=self.exit_program)
-        self.buttonExit.grid(row=6, column=0, padx=20, pady=20)
-
-        self.buttonReset = ctk.CTkButton(
-            left_frame, 
-            text="Reset", 
-            width=self.button_width, 
-            height=self.button_height, 
-            fg_color="#FF4C4C", 
-            hover_color="#CC0000",  
-        )
-        self.buttonReset.configure(command=self.reset_program)
-        self.buttonReset.grid(row=6, column=1, padx=20, pady=20)
+        self.buttonSide2.grid(row=row_index, column=1, padx=20, pady=20)
 
     def video_frame(self):
         """Setup the video feed frame"""
@@ -321,7 +331,6 @@ class ConveyorController:
 
     def video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
-        
         
         # Capture frame from the camera
         frame = self.picam2.capture_array()
