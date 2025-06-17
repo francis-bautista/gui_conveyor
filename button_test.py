@@ -146,7 +146,6 @@ class ConveyorController:
 
     def exit_program(self):
         print("Goodbye")
-        self.controller.destroy()
         GPIO.cleanup()  # Reset GPIO settings
         sys.exit(0)
 
