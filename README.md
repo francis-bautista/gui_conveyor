@@ -1,5 +1,12 @@
 # GUI of the Raspberry Pi
-## MAIN.PY IS THE MAIN FILE
+## Kenan's TODO List
+- ~~make the controller buttons and gpio~~
+- add the rpi camera with live video feed
+- add the top part picturing
+- add the bottom part picturing
+- display the results on the controller similar to the run.py
+
+## RUN.PY IS THE MAIN FILE
 required libraries
 - customkinter
 - efficientnet
