@@ -20,17 +20,17 @@ class ConveyorController:
         self.relay2 = 13   # Motor 1 Reverse
         self.relay3 = 19  # Motor 2 Forward
         self.relay4 = 26  # Motor 2 Reverse
-        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-        GPIO.setup(self.relay1, GPIO.OUT)
-        GPIO.setup(self.relay2, GPIO.OUT)
-        GPIO.setup(self.relay3, GPIO.OUT)
-        GPIO.setup(self.relay4, GPIO.OUT)
+        self.GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+        self.GPIO.setup(self.relay1, GPIO.OUT)
+        self.GPIO.setup(self.relay2, GPIO.OUT)
+        self.GPIO.setup(self.relay3, GPIO.OUT)
+        self.GPIO.setup(self.relay4, GPIO.OUT)
         # Initialize relays to OFF state
-        GPIO.output(self.relay1, GPIO.LOW)
-        GPIO.output(self.relay2, GPIO.LOW)
-        GPIO.output(self.relay3, GPIO.LOW)
-        GPIO.output(self.relay4, GPIO.LOW)
-        GPIO.setwarnings(False)
+        self.GPIO.output(self.relay1, GPIO.LOW)
+        self.GPIO.output(self.relay2, GPIO.LOW)
+        self.GPIO.output(self.relay3, GPIO.LOW)
+        self.GPIO.output(self.relay4, GPIO.LOW)
+        self.GPIO.setwarnings(False)
         # Initialize UI components
 
         # Initialize camera
@@ -42,10 +42,10 @@ class ConveyorController:
         self.init_ui()
     
     def stop_motors(self):
-        GPIO.output(self.relay1, GPIO.LOW)
-        GPIO.output(self.relay2, GPIO.LOW)
-        GPIO.output(self.relay3, GPIO.LOW)
-        GPIO.output(self.relay4, GPIO.LOW)
+        self.GPIO.output(self.relay1, GPIO.LOW)
+        self.GPIO.output(self.relay2, GPIO.LOW)
+        self.GPIO.output(self.relay3, GPIO.LOW)
+        self.GPIO.output(self.relay4, GPIO.LOW)
         print("Motors stopped!")
 
     def init_ui(self):
@@ -196,12 +196,14 @@ class ConveyorController:
 
     def reset_program(self):
         print("Resetting")
-        GPIO.cleanup()  # Reset GPIO settings
+        self.GPIO.cleanup()  # Reset GPIO settings
+        self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
-        GPIO.cleanup()  # Reset GPIO settings
+        self.GPIO.cleanup()  # Reset GPIO settings
+        self.picam2.stop()
         sys.exit(0)
 
     def picture_side1(self):
@@ -246,9 +248,9 @@ class ConveyorController:
         
     def countdown(self, start_count):
         """Countdown loop that prints the count and sleeps"""
-        for i in range(start_count, 0, -1):
+        for i in range(start_count*2, 0, -1):
             print(i)
-            time.sleep(1)
+            time.sleep(0.5)
         
     def button_callback(self, button):
         """Create callback function for button color toggle"""
