@@ -182,9 +182,8 @@ class ConveyorController:
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
         
-        self.video_canvas = tk.Canvas(video_frame, width=300, height=200)
+        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
-
         # Progress bar
         # self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
         # self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
