@@ -314,7 +314,7 @@ class ConveyorController:
         self.video_canvas.image = frame
         
         # Schedule the next update
-        root.after(10, self.video_feed)
+        app.after(10, self.video_feed)
 
     def run(self):
         """Start the application main loop"""
