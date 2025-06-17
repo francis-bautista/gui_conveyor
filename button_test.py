@@ -206,12 +206,10 @@ class ConveyorController:
         
         if run_time is None:
             print("Input a value")
-            return None
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
                 print("ERROR Unselect one of the buttons for C1/C2")
-                textbox.configure(state="normal")  
             else:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
                 self.move_motor(button_state_array)
@@ -222,12 +220,11 @@ class ConveyorController:
                 print("Done Running!")
                 self.stop_motors()
                 for button in button_list:
-                    button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
-                textbox.configure(state="normal")      
+                    button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")     
                 textbox.delete("0.0", "end")  # delete all text
         else: 
             print("Select One of the Buttons") 
-            textbox.configure(state="normal") 
+        textbox.configure(state="normal") 
 
     def run(self):
         """Start the application main loop"""
