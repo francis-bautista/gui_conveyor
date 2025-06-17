@@ -188,12 +188,14 @@ class ConveyorController:
 
     def video_frame(self):
         """Setup the video feed frame"""
+        row_index=0
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        video_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        video_frame.grid(row=row_index, column=0, padx=10, pady=10, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
-        video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
 
+        row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
         # Progress bar
