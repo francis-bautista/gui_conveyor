@@ -137,7 +137,7 @@ class ConveyorController:
             text="Exit", 
             width=self.button_width, 
             height=self.button_height, 
-            fg_color="#FF0000", 
+            fg_color="#FF4C4C", 
             hover_color="#CC0000",
         )
         self.buttonExit.configure(command=self.exit_program)
@@ -148,7 +148,7 @@ class ConveyorController:
             text="Reset", 
             width=self.button_width, 
             height=self.button_height, 
-            fg_color="#FF0000", 
+            fg_color="#FF4C4C", 
             hover_color="#CC0000",  
         )
         self.buttonReset.configure(command=self.reset_program)
