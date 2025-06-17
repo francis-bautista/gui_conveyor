@@ -1,8 +1,7 @@
 import customtkinter as ctk
-import time
+import time, sys, os
 from tkinter import ttk  # For combo boxes
 import RPi.GPIO as GPIO   
-import sys
 class ConveyorController:
     def __init__(self):
         # Initialize the main application
@@ -143,6 +142,23 @@ class ConveyorController:
         )
         self.buttonExit.configure(command=self.exit_program)
         self.buttonExit.grid(row=6, column=0, padx=20, pady=20)
+
+        self.buttonReset = ctk.CTkButton(
+            self.app, 
+            text="Reset", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF0000", 
+            hover_color="#CC0000",  
+        )
+        self.buttonReset.configure(command=self.reset_program)
+        self.buttonReset.grid(row=6, column=1, padx=20, pady=20)
+
+
+    def reset_program(self):
+        print("Resetting")
+        GPIO.cleanup()  # Reset GPIO settings
+        os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
