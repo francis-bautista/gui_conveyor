@@ -3,6 +3,7 @@ import time, sys, os
 from tkinter import ttk  # For combo boxes
 import RPi.GPIO as GPIO   
 from picamera2 import Picamera2
+from PIL import Image, ImageTk
 class ConveyorController:
     def __init__(self, app):
         # Initialize the main application
