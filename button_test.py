@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import time, sys, os
+import time, sys, os, threading
 from tkinter import ttk  # For combo boxes
 import RPi.GPIO as GPIO   
 from picamera2 import Picamera2
@@ -246,12 +246,29 @@ class ConveyorController:
             print("Please enter a valid number")
             return None
         
-    def countdown(self, start_count):
-        """Countdown loop that prints the count and sleeps"""
+    def countdown_thread(self, start_count, buttontorun, textbox):
+        """Countdown in separate thread"""
+        button_list = [self.buttonCWC1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
+        
         for i in range(start_count*2, 0, -1):
             print(i)
             time.sleep(0.5)
+
+        # Use app.after to safely update GUI from thread
+        self.app.after(0, lambda: self._finish_motor_run_threaded(buttontorun, textbox, button_list))
+
+    def _finish_motor_run_threaded(self, buttontorun, textbox, button_list):
+        """Finish motor run - called from main thread"""
+        buttontorun.configure(text="Run C1/C2", state="normal")
+        print("Done Running!")
+        self.stop_motors()
         
+        for button in button_list:
+            button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
+        
+        textbox.delete("0.0", "end")
+        textbox.configure(state="normal")
+
     def button_callback(self, button):
         """Create callback function for button color toggle"""
         def toggle_color():
@@ -265,9 +282,9 @@ class ConveyorController:
         return toggle_color
 
     def button_run(self, buttontorun, textbox):
-        """Handle the run button functionality"""
+        """Handle the run button functionality with threading"""
         run_time = self.get_number_from_textbox(textbox)
-        textbox.configure(state="disabled")  # configure textbox to be read-only
+        textbox.configure(state="disabled")
         
         button_color = [
             self.buttonCWC1.cget("fg_color"), 
@@ -275,30 +292,31 @@ class ConveyorController:
             self.buttonCWC2.cget("fg_color"), 
             self.buttonCCWC2.cget("fg_color")
         ]
-        button_list = [self.buttonCWC1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
         
         if run_time is None:
             print("Input a value")
+            textbox.configure(state="normal")
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
                 print("ERROR Unselect one of the buttons for C1/C2")
+                textbox.configure(state="normal")
             else:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
                 self.move_motor(button_state_array)
                 buttontorun.configure(text="Running...", state="disabled")
-                self.countdown(int(run_time))
                 
-                buttontorun.configure(text="Run C1/C2", state="normal")
-                print("Done Running!")
-                self.stop_motors()
-                for button in button_list:
-                    button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")     
-                textbox.delete("0.0", "end")  # delete all text
+                # Start countdown in separate thread
+                countdown_thread = threading.Thread(
+                    target=self.countdown_thread, 
+                    args=(int(run_time), buttontorun, textbox)
+                )
+                countdown_thread.daemon = True  # Thread will close when main program closes
+                countdown_thread.start()
         else: 
-            print("Select One of the Buttons") 
-        textbox.configure(state="normal") 
-
+            print("Select One of the Buttons")
+            textbox.configure(state="normal")
+            
     def video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
         
