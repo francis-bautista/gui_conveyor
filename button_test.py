@@ -142,7 +142,7 @@ class ConveyorController:
             hover_color="#CC0000",
         )
         self.buttonExit.configure(command=self.exit_program)
-        self.buttonSide2.grid(row=6, column=0, padx=20, pady=20)
+        self.buttonExit.grid(row=6, column=0, padx=20, pady=20)
 
     def exit_program(self):
         print("Goodbye")
