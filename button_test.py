@@ -197,7 +197,21 @@ class ConveyorController:
 
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        self.video_canvas.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        
+        row_index += 1
+        self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
+        self.side1_label.grid(row=row_index, column=0, padx=10, pady=10, sticky="ns")
+        row_index += 1
+        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: -\nBruises: - \nSize - ")
+        self.side1_results.grid(row=row_index, column=0, sticky="nswe")
+        
+        row_index += 1
+        self.side2_label = ctk.CTkLabel(video_frame, text="Side 2")
+        self.side2_label.grid(row=row_index, column=1, padx=10, pady=10, sticky="ns")
+        row_index += 1
+        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: -\nBruises: - \nSize - ")
+        self.side2_results.grid(row=row_index, column=1, sticky="nswe")
         # Progress bar
         # self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
         # self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
