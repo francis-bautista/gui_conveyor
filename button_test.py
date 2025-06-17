@@ -32,13 +32,12 @@ class ConveyorController:
         # Initialize UI components
         self.init_ui()
     
-    def stop_motors(self){
+    def stop_motors(self):
         GPIO.output(self.relay1, GPIO.LOW)
         GPIO.output(self.relay2, GPIO.LOW)
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
         print("Motors stopped!")
-    }
 
     def init_ui(self):
         """Initialize all UI components"""
