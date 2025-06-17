@@ -20,17 +20,17 @@ class ConveyorController:
         self.relay2 = 13   # Motor 1 Reverse
         self.relay3 = 19  # Motor 2 Forward
         self.relay4 = 26  # Motor 2 Reverse
-        self.GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-        self.GPIO.setup(self.relay1, GPIO.OUT)
-        self.GPIO.setup(self.relay2, GPIO.OUT)
-        self.GPIO.setup(self.relay3, GPIO.OUT)
-        self.GPIO.setup(self.relay4, GPIO.OUT)
+        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+        GPIO.setup(self.relay1, GPIO.OUT)
+        GPIO.setup(self.relay2, GPIO.OUT)
+        GPIO.setup(self.relay3, GPIO.OUT)
+        GPIO.setup(self.relay4, GPIO.OUT)
         # Initialize relays to OFF state
-        self.GPIO.output(self.relay1, GPIO.LOW)
-        self.GPIO.output(self.relay2, GPIO.LOW)
-        self.GPIO.output(self.relay3, GPIO.LOW)
-        self.GPIO.output(self.relay4, GPIO.LOW)
-        self.GPIO.setwarnings(False)
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
+        GPIO.setwarnings(False)
         # Initialize UI components
 
         # Initialize camera
@@ -42,10 +42,10 @@ class ConveyorController:
         self.init_ui()
     
     def stop_motors(self):
-        self.GPIO.output(self.relay1, GPIO.LOW)
-        self.GPIO.output(self.relay2, GPIO.LOW)
-        self.GPIO.output(self.relay3, GPIO.LOW)
-        self.GPIO.output(self.relay4, GPIO.LOW)
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
         print("Motors stopped!")
 
     def init_ui(self):
@@ -196,13 +196,13 @@ class ConveyorController:
 
     def reset_program(self):
         print("Resetting")
-        self.GPIO.cleanup()  # Reset GPIO settings
+        GPIO.cleanup()  # Reset GPIO settings
         self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
-        self.GPIO.cleanup()  # Reset GPIO settings
+        GPIO.cleanup()  # Reset GPIO settings
         self.picam2.stop()
         sys.exit(0)
 
