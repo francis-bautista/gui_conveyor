@@ -31,7 +31,15 @@ class ConveyorController:
         GPIO.setwarnings(False)
         # Initialize UI components
         self.init_ui()
-        
+    
+    def stop_motors(self){
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
+        print("Motors stopped!")
+    }
+
     def init_ui(self):
         """Initialize all UI components"""
         # Motor control buttons
@@ -213,6 +221,7 @@ class ConveyorController:
                 
                 buttontorun.configure(text="Run C1/C2", state="normal")
                 print("Done Running!")
+                self.stop_motors()
                 for button in button_list:
                     button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
                 textbox.configure(state="normal")      
