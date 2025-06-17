@@ -133,6 +133,23 @@ class ConveyorController:
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=5, column=1, padx=20, pady=20)
 
+        self.buttonExit. ctk.CTkButton(
+            self.app, 
+            text="Exit", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF0000", 
+            hover_color="#CC0000",
+        )
+        self.buttonExit.configure(command=self.exit_program)
+        self.buttonSide2.grid(row=6, column=0, padx=20, pady=20)
+
+    def exit_program(self):
+        print("Goodbye")
+        self.controller.destroy()
+        GPIO.cleanup()  # Reset GPIO settings
+        sys.exit(0)
+
     def picture_side1(self):
         """Handle capturing side 1 image"""
         print("Process and pictured side 1")
