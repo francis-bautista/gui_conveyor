@@ -2,7 +2,7 @@ import customtkinter as ctk
 import time
 from tkinter import ttk  # For combo boxes
 import RPi.GPIO as GPIO   
-
+import sys
 class ConveyorController:
     def __init__(self):
         # Initialize the main application
