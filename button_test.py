@@ -18,7 +18,17 @@ class ConveyorController:
         self.relay2 = 13   # Motor 1 Reverse
         self.relay3 = 19  # Motor 2 Forward
         self.relay4 = 26  # Motor 2 Reverse
-
+        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+        GPIO.setup(self.relay1, GPIO.OUT)
+        GPIO.setup(self.relay2, GPIO.OUT)
+        GPIO.setup(self.relay3, GPIO.OUT)
+        GPIO.setup(self.relay4, GPIO.OUT)
+        # Initialize relays to OFF state
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
+        GPIO.setwarnings(False)
         # Initialize UI components
         self.init_ui()
         
