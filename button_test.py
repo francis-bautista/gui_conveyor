@@ -133,7 +133,7 @@ class ConveyorController:
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=5, column=1, padx=20, pady=20)
 
-        self.buttonExit. ctk.CTkButton(
+        self.buttonExit = ctk.CTkButton(
             self.app, 
             text="Exit", 
             width=self.button_width, 
