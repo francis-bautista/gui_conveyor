@@ -174,7 +174,7 @@ class ConveyorController:
         self.buttonReset.configure(command=self.reset_program)
         self.buttonReset.grid(row=6, column=1, padx=20, pady=20)
 
-    def setup_video_frame(self):
+    def video_frame(self):
         """Setup the video feed frame"""
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         video_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
