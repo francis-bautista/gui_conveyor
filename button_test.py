@@ -55,6 +55,7 @@ class ConveyorController:
         self.app.grid_columnconfigure(2, weight=1)  # Video feed
         self.control_frame()
         self.video_frame()
+        self.video_feed()
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
@@ -294,6 +295,25 @@ class ConveyorController:
         else: 
             print("Select One of the Buttons") 
         textbox.configure(state="normal") 
+
+    def video_feed(self):
+        """Updates the video feed on the Tkinter canvas."""
+        
+        
+        # Capture frame from the camera
+        frame = self.picam2.capture_array()
+        frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+        
+        # Resize and convert to PhotoImage
+        frame = frame.resize((300, 200))
+        frame = ImageTk.PhotoImage(frame)
+        
+        # Update the video canvas with the new frame
+        self.video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+        self.video_canvas.image = frame
+        
+        # Schedule the next update
+        root.after(10, self.video_feed)
 
     def run(self):
         """Start the application main loop"""
