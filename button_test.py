@@ -310,7 +310,7 @@ class ConveyorController:
         frame = ImageTk.PhotoImage(frame)
         
         # Update the video canvas with the new frame
-        self.video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+        self.video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
         
         # Schedule the next update
