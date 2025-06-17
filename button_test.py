@@ -313,6 +313,7 @@ class ConveyorController:
                 )
                 countdown_thread.daemon = True  # Thread will close when main program closes
                 countdown_thread.start()
+                textbox.configure(state="normal")
                 textbox.delete("0.0", "end")  # delete all text
         else: 
             print("Select One of the Buttons")
