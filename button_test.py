@@ -53,14 +53,14 @@ class ConveyorController:
         # Configure grid layout
         self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
         self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
-        self.app.grid_columnconfigure(2, weight=1)  # Video feed
+        # self.app.grid_columnconfigure(2, weight=1)  # Video feed
         self.control_frame()
         self.video_frame()
         self.video_feed()
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        left_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
         row_index=0
         self.buttonExit = ctk.CTkButton(
             left_frame, 
@@ -189,7 +189,7 @@ class ConveyorController:
     def video_frame(self):
         """Setup the video feed frame"""
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        video_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+        video_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
