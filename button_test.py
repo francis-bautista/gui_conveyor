@@ -250,9 +250,9 @@ class ConveyorController:
         """Countdown in separate thread"""
         button_list = [self.buttonCWC1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
         
-        for i in range(start_count*2, 0, -1):
+        for i in range(start_count, 0, -1):
             print(i)
-            time.sleep(0.5)
+            time.sleep(1)
 
         # Use app.after to safely update GUI from thread
         self.app.after(0, lambda: self._finish_motor_run_threaded(buttontorun, textbox, button_list))
@@ -316,7 +316,7 @@ class ConveyorController:
         else: 
             print("Select One of the Buttons")
             textbox.configure(state="normal")
-            
+
     def video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
         
