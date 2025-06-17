@@ -168,7 +168,6 @@ class ConveyorController:
             if text:  # Check if not empty
                 return float(text)  # or int(text) for integer
             else:
-                print("Please enter a number")
                 return None  # default value for empty textbox
         except ValueError:
             print("Please enter a valid number")
@@ -207,6 +206,7 @@ class ConveyorController:
         
         if run_time is None:
             print("Input a value")
+            return None
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
