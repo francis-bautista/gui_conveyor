@@ -2,12 +2,14 @@ import customtkinter as ctk
 import time, sys, os
 from tkinter import ttk  # For combo boxes
 import RPi.GPIO as GPIO   
+from picamera2 import Picamera2
 class ConveyorController:
-    def __init__(self):
+    def __init__(self, app):
         # Initialize the main application
-        self.app = ctk.CTk()
+        self.app = app
         self.app.title("Conveyor Controller")
         self.app.geometry("500x500")
+        self.app.fg_color = "#e5e0d8"
         
         # Set consistent button dimensions
         self.button_width = 180
@@ -29,6 +31,13 @@ class ConveyorController:
         GPIO.output(self.relay4, GPIO.LOW)
         GPIO.setwarnings(False)
         # Initialize UI components
+
+        # Initialize camera
+        self.picam2 = Picamera2()
+        self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
+        self.picam2.configure(self.camera_config)
+        self.picam2.start()
+
         self.init_ui()
     
     def stop_motors(self):
@@ -40,9 +49,20 @@ class ConveyorController:
 
     def init_ui(self):
         """Initialize all UI components"""
+        # Configure grid layout
+        self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
+        self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
+        self.app.grid_columnconfigure(2, weight=1)  # Video feed
+        self.control_frame()
+        self.video_frame()
+
+    def control_frame(self):
+        left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
         # Motor control buttons
         self.buttonCWC1 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Clockwise C1", 
             width=self.button_width, 
             height=self.button_height, 
@@ -52,7 +72,7 @@ class ConveyorController:
         self.buttonCWC1.grid(row=0, column=0, padx=20, pady=20)
 
         self.buttonCCWC1 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Counter Clockwise C1", 
             width=self.button_width, 
             height=self.button_height, 
@@ -62,7 +82,7 @@ class ConveyorController:
         self.buttonCCWC1.grid(row=0, column=1, padx=20, pady=20)
 
         self.buttonCWC2 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Clockwise C2", 
             width=self.button_width, 
             height=self.button_height, 
@@ -72,7 +92,7 @@ class ConveyorController:
         self.buttonCWC2.grid(row=1, column=0, padx=20, pady=20)
 
         self.buttonCCWC2 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Counter Clockwise C2", 
             width=self.button_width, 
             height=self.button_height, 
@@ -83,14 +103,14 @@ class ConveyorController:
 
         # Time input section
         self.label = ctk.CTkLabel(
-            self.app, 
+            left_frame, 
             text="Time to Move (in seconds?)", 
             fg_color="transparent"
         )
         self.label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
         self.textbox = ctk.CTkTextbox(
-            self.app, 
+            left_frame, 
             width=self.button_width * 2 + 40, 
             height=self.button_height
         )
@@ -98,7 +118,7 @@ class ConveyorController:
 
         # Run button
         self.buttonRun = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Run C1/C2", 
             width=self.button_width * 2 + 40, 
             height=self.button_height, 
@@ -110,7 +130,7 @@ class ConveyorController:
 
         # Camera control buttons
         self.buttonSide1 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Capture Side 1", 
             width=self.button_width, 
             height=self.button_height, 
@@ -121,7 +141,7 @@ class ConveyorController:
         self.buttonSide1.grid(row=5, column=0, padx=20, pady=20)
 
         self.buttonSide2 = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Capture Side 2", 
             width=self.button_width, 
             height=self.button_height, 
@@ -133,7 +153,7 @@ class ConveyorController:
         self.buttonSide2.grid(row=5, column=1, padx=20, pady=20)
 
         self.buttonExit = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Exit", 
             width=self.button_width, 
             height=self.button_height, 
@@ -144,7 +164,7 @@ class ConveyorController:
         self.buttonExit.grid(row=6, column=0, padx=20, pady=20)
 
         self.buttonReset = ctk.CTkButton(
-            self.app, 
+            left_frame, 
             text="Reset", 
             width=self.button_width, 
             height=self.button_height, 
@@ -154,6 +174,24 @@ class ConveyorController:
         self.buttonReset.configure(command=self.reset_program)
         self.buttonReset.grid(row=6, column=1, padx=20, pady=20)
 
+    def setup_video_frame(self):
+        """Setup the video feed frame"""
+        video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        video_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+        
+        video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
+        video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        
+        self.video_canvas = tk.Canvas(video_frame, width=300, height=200)
+        self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+
+        # Progress bar
+        # self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
+        # self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
+        
+        # self.progress_bar = ctk.CTkProgressBar(video_frame, width=200, mode="determinate")
+        # self.progress_bar.grid(row=2, column=0, columnspan=2, padx=10, pady=(30, 10), sticky="ew")
+        # self.progress_bar.set(0)  # Initialize at 0
 
     def reset_program(self):
         print("Resetting")
@@ -265,5 +303,6 @@ class ConveyorController:
 
 # Create and run the application
 if __name__ == "__main__":
-    controller = ConveyorController()
+    app = ctk.CTk(fg_color="#e5e0d8")
+    controller = ConveyorController(app)
     controller.run()
