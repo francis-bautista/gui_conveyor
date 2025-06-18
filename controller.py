@@ -202,7 +202,7 @@ class ConveyorController:
         video_frame.grid(row=row_index, column=0, padx=7, pady=7, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
-        video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        video_label.grid(row=row_index, column=0, padx=10, pady=10, sticky="ns")
 
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
@@ -221,10 +221,12 @@ class ConveyorController:
         self.side1_box.grid(row=row_index, column=1, padx=10, pady=10, sticky="nswe")
         
         row_index += 1
-        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: -\nBruises: - \nSize - ")
+        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side1_results.grid(row=row_index, column=0, padx=10, pady=10,  sticky="nswe")
-        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: -\nBruises: - \nSize - ")
+        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side2_results.grid(row=row_index, column=1, padx=10, pady=10, sticky="nswe")
+        
+        
         
         return video_frame
     
