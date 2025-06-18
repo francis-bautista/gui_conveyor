@@ -274,10 +274,14 @@ class ConveyorController:
         self.size_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
         
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority)
-        self.button_enter.grid(row=6, column=0, padx=padding, pady=padding, sticky="nswe")
+        self.button_enter.grid(row=index_row+2, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
+        
+        self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.help_page)
+        self.button_help.grid(row=index_row+3, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
         
         return frame_choices
-        
+    def help_page(self):
+        print("Help page")
     def enter_priority(self):
         ripeness = self.ripeness_combo.get()
         bruises = self.bruises_combo.get()
