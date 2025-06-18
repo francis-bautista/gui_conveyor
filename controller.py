@@ -9,7 +9,7 @@ class ConveyorController:
         # Initialize the main application
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1280x720")
+        self.app.geometry("1920x1080")
         self.app.fg_color = "#e5e0d8"
         
         # Set consistent button dimensions
@@ -227,7 +227,7 @@ class ConveyorController:
         """Setup the user priority section with combo boxes"""
         index_row=0
         padding=7
-        # width_combobox=5
+        width_combobox=5
         frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
         frame_choices.grid(row=index_row, column=2, padx=7, pady=7, columnspan=2, sticky="nswe")
         frame_choices.columnconfigure(0, weight=2)
@@ -241,7 +241,7 @@ class ConveyorController:
         ripeness_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
         
         index_row+=1
-        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"])
+        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.ripeness_combo.set("0.0")  # Set default value
         self.ripeness_combo.grid(row=index_row, column=2)
 
@@ -251,7 +251,7 @@ class ConveyorController:
         bruises_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
         
         index_row+=1
-        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"])
+        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.bruises_combo.set("0.0")  # Set default value
         self.bruises_combo.grid(row=index_row, column=2)
         
@@ -261,7 +261,7 @@ class ConveyorController:
         size_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
         
         index_row+=1
-        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"])
+        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.size_combo.set("0.0")  # Set default value
         self.size_combo.grid(row=index_row, column=2)
         
