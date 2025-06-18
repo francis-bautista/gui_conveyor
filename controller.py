@@ -9,7 +9,7 @@ class ConveyorController:
         # Initialize the main application
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1280x720")
+        self.app.geometry("1200x700")
         self.app.fg_color = "#e5e0d8"
         
         # Set consistent button dimensions
