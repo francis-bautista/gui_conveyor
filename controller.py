@@ -53,10 +53,13 @@ class ConveyorController:
         # Configure grid layout
         self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
         self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
-        # self.app.grid_columnconfigure(2, weight=1)  # Video feed
+        self.app.grid_columnconfigure(2, weight=1)
+        # User priority section
+        self.user_priority_frame()
         self.control_frame()
         self.video_frame()
         self.video_feed()
+        
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
@@ -186,8 +189,6 @@ class ConveyorController:
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=row_index, column=1, padx=20, pady=20)
         
-        # User priority section
-        self.setup_user_priority_frame(left_frame)
 
     def video_frame(self):
         """Setup the video feed frame"""
@@ -222,36 +223,42 @@ class ConveyorController:
         
         return video_frame
     
-    def setup_user_priority_frame(self, parent_frame):
+    def user_priority_frame(self):
         """Setup the user priority section with combo boxes"""
-        frame_choices = ctk.CTkFrame(parent_frame, fg_color="#809671")
-        frame_choices.grid(row=8, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        index_row=0
+        frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        frame_choices.grid(row=index_row, column=0, padx=10, pady=10, columnspan=2, sticky="ns")
         frame_choices.columnconfigure(0, weight=2)
-        
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
-        priority_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        priority_label.grid(row=index_row, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        index_row+=1
         
         # Ripeness combo
-        ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness Score (0-3):")
-        ripeness_label.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness:")
+        ripeness_label.grid(row=index_row, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
         
+        index_row+=1
         self.ripeness_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.ripeness_combo.grid(row=2, column=0)
+        self.ripeness_combo.grid(row=index_row, column=0)
         
         # Bruises combo
-        bruises_label = ctk.CTkLabel(frame_choices, text="Bruises Score (0-3):")
-        bruises_label.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        index_row+=1
+        bruises_label = ctk.CTkLabel(frame_choices, text="Bruises:")
+        bruises_label.grid(row=index_row, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
         
+        index_row+=1
         self.bruises_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.bruises_combo.grid(row=4, column=0)
+        self.bruises_combo.grid(row=index_row, column=0)
         
         # Size combo
-        size_label = ctk.CTkLabel(frame_choices, text="Size Score (0-3):")
-        size_label.grid(row=5, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        index_row+=1
+        size_label = ctk.CTkLabel(frame_choices, text="Size:")
+        size_label.grid(row=index_row, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
         
+        index_row+=1
         self.size_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.size_combo.grid(row=6, column=0, padx=10, pady=(0, 20))
+        self.size_combo.grid(row=index_row, column=0, padx=10, pady=(0, 20))
         
     def reset_program(self):
         print("Resetting")
