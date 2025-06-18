@@ -233,37 +233,37 @@ class ConveyorController:
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
-        priority_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        priority_label.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         index_row+=1
         
         # Ripeness combo
         ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness:")
-        ripeness_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        ripeness_label.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         
         index_row+=1
         self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.ripeness_combo.set("0.0")  # Set default value
-        self.ripeness_combo.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        self.ripeness_combo.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
 
         # Bruises combo
         index_row+=1
         bruises_label = ctk.CTkLabel(frame_choices, text="Bruises:")
-        bruises_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        bruises_label.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         
         index_row+=1
         self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.bruises_combo.set("0.0")  # Set default value
-        self.bruises_combo.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        self.bruises_combo.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         
         # Size combo
         index_row+=1
         size_label = ctk.CTkLabel(frame_choices, text="Size:")
-        size_label.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        size_label.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         
         index_row+=1
         self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.size_combo.set("0.0")  # Set default value
-        self.size_combo.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="nswe")
+        self.size_combo.grid(row=index_row, column=2, padx=padding, pady=padding, sticky="nswe")
         
     def reset_program(self):
         print("Resetting")
