@@ -63,7 +63,7 @@ class ConveyorController:
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        left_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
+        left_frame.grid(row=0, column=1, padx=7, pady=7)
         row_index=0
         self.buttonExit = ctk.CTkButton(
             left_frame, 
