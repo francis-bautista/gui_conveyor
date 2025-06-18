@@ -205,10 +205,16 @@ class ConveyorController:
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
-
+        
+        results_label = ctk.CTkLabel(video_frame, text="Overall Results")
+        results_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
+        results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        
         
         row_index += 1
         self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
