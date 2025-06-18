@@ -64,6 +64,8 @@ class ConveyorController:
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         left_frame.grid(row=0, column=1, padx=7, pady=7)
+        button_padx=7
+        button_pady=7
         row_index=0
         self.buttonExit = ctk.CTkButton(
             left_frame, 
@@ -74,7 +76,7 @@ class ConveyorController:
             hover_color="#CC0000",
         )
         self.buttonExit.configure(command=self.exit_program)
-        self.buttonExit.grid(row=row_index, column=0, padx=20, pady=20, sticky="nswe")
+        self.buttonExit.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonReset = ctk.CTkButton(
             left_frame, 
@@ -85,7 +87,7 @@ class ConveyorController:
             hover_color="#CC0000",  
         )
         self.buttonReset.configure(command=self.reset_program)
-        self.buttonReset.grid(row=row_index, column=1, padx=20, pady=20, sticky="nswe")
+        self.buttonReset.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -98,7 +100,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
-        self.buttonCWC1.grid(row=row_index, column=0, padx=20, pady=20, sticky="nswe")
+        self.buttonCWC1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonCCWC1 = ctk.CTkButton(
             left_frame, 
@@ -108,7 +110,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCCWC1.configure(command=self.button_callback(self.buttonCCWC1))
-        self.buttonCCWC1.grid(row=row_index, column=1, padx=20, pady=20, sticky="nswe")
+        self.buttonCCWC1.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -120,7 +122,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCWC2.configure(command=self.button_callback(self.buttonCWC2))
-        self.buttonCWC2.grid(row=row_index, column=0, padx=20, pady=20, sticky="nswe")
+        self.buttonCWC2.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonCCWC2 = ctk.CTkButton(
             left_frame, 
@@ -130,7 +132,7 @@ class ConveyorController:
             fg_color="#1F6AA5"
         )
         self.buttonCCWC2.configure(command=self.button_callback(self.buttonCCWC2))
-        self.buttonCCWC2.grid(row=row_index, column=1, padx=20, pady=20, sticky="nswe")
+        self.buttonCCWC2.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -140,14 +142,14 @@ class ConveyorController:
             text="Time to Move (in seconds?)", 
             fg_color="transparent"
         )
-        self.label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        self.label.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.textbox = ctk.CTkTextbox(
             left_frame, 
             width=self.button_width * 2 + 40, 
             height=self.button_height
         )
-        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -161,7 +163,7 @@ class ConveyorController:
             hover_color="#177E80"
         )
         self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
-        self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=20, pady=20, sticky="nswe")
+        self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -175,7 +177,7 @@ class ConveyorController:
             hover_color="#177E80"
         )
         self.buttonSide1.configure(command=self.picture_side1)
-        self.buttonSide1.grid(row=row_index, column=0, padx=20, pady=20, sticky="nswe")
+        self.buttonSide1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonSide2 = ctk.CTkButton(
             left_frame, 
@@ -187,7 +189,7 @@ class ConveyorController:
             state="disabled"
         )
         self.buttonSide2.configure(command=self.picture_side2)
-        self.buttonSide2.grid(row=row_index, column=1, padx=20, pady=20, sticky="nswe")
+        self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
         
 
     def video_frame(self):
