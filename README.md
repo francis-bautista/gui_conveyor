@@ -1,9 +1,11 @@
 # GUI of the Raspberry Pi
 ## Kenan's TODO List
 - ~~make the controller buttons and gpio~~
-- add the rpi camera with live video feed
+- ~~add the rpi camera with live video feed~~
 - add the top part picturing
 - add the bottom part picturing
+- add the user priority input
+- make it work
 - display the results on the controller similar to the run.py
 
 ## RUN.PY IS THE MAIN FILE

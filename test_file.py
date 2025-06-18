@@ -18,7 +18,7 @@ try:
     from paste import button_test
 except ImportError:
     try:
-        from button_test import ConveyorController
+        from controller import ConveyorController
     except ImportError:
         # If you have a different filename, update this import
         print("Please ensure your main file is named either:")
