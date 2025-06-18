@@ -185,6 +185,9 @@ class ConveyorController:
         )
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=row_index, column=1, padx=20, pady=20)
+        
+        # User priority section
+        self.setup_user_priority_frame(left_frame)
 
     def video_frame(self):
         """Setup the video feed frame"""
@@ -217,16 +220,39 @@ class ConveyorController:
         self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: -\nBruises: - \nSize - ")
         self.side2_results.grid(row=row_index, column=1, padx=10, pady=10, sticky="nswe")
         
+        return video_frame
+    
+    def setup_user_priority_frame(self, parent_frame):
+        """Setup the user priority section with combo boxes"""
+        frame_choices = ctk.CTkFrame(parent_frame, fg_color="#809671")
+        frame_choices.grid(row=8, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        frame_choices.columnconfigure(0, weight=2)
         
+        # User Priority heading
+        priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
+        priority_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
         
-        # Progress bar
-        # self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
-        # self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
+        # Ripeness combo
+        ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness Score (0-3):")
+        ripeness_label.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
         
-        # self.progress_bar = ctk.CTkProgressBar(video_frame, width=200, mode="determinate")
-        # self.progress_bar.grid(row=2, column=0, columnspan=2, padx=10, pady=(30, 10), sticky="ew")
-        # self.progress_bar.set(0)  # Initialize at 0
-
+        self.ripeness_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
+        self.ripeness_combo.grid(row=2, column=0)
+        
+        # Bruises combo
+        bruises_label = ctk.CTkLabel(frame_choices, text="Bruises Score (0-3):")
+        bruises_label.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        
+        self.bruises_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
+        self.bruises_combo.grid(row=4, column=0)
+        
+        # Size combo
+        size_label = ctk.CTkLabel(frame_choices, text="Size Score (0-3):")
+        size_label.grid(row=5, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+        
+        self.size_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
+        self.size_combo.grid(row=6, column=0, padx=10, pady=(0, 20))
+        
     def reset_program(self):
         print("Resetting")
         GPIO.cleanup()  # Reset GPIO settings
