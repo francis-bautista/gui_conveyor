@@ -273,6 +273,20 @@ class ConveyorController:
         self.size_combo.set("0.0")  # Set default value
         self.size_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
         
+        self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority)
+        self.button_enter.grid(row=6, column=0, padx=padding, pady=padding, sticky="nswe")
+        
+        return frame_choices
+        
+    def enter_priority(self):
+        ripeness = self.ripeness_combo.get()
+        bruises = self.bruises_combo.get()
+        size = self.size_combo.get()
+        print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
+        self.ripeness_combo.state("disabled")
+        self.bruises_combo.state("disabled")
+        self.size_combo.state("disabled")
+        
     def reset_program(self):
         print("Resetting")
         GPIO.cleanup()  # Reset GPIO settings
