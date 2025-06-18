@@ -254,7 +254,7 @@ class ConveyorController:
         # Bruises combo
         col+=1
         bruises_label = ctk.CTkLabel(frame_choices, text="Bruises:")
-        bruises_label.grid(row=index_row-1, column=col, padx=padding, pady=padding, sticky="nswe")
+        bruises_label.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="nswe")
         
         col+=1
         self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
@@ -264,7 +264,7 @@ class ConveyorController:
         # Size combo
         index_row+=1
         size_label = ctk.CTkLabel(frame_choices, text="Size:")
-        size_label.grid(row=index_row-1, column=col, padx=padding, pady=padding, sticky="nswe")
+        size_label.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="nswe")
         
         index_row+=1
         self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
