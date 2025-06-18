@@ -57,12 +57,10 @@ class ConveyorController:
         
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
-        self.main_video_page = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        self.main_video_page.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
         
         self.user_priority_frame(self.main_frame)
         self.control_frame(self.main_frame)
-        self.video_frame(self.main_video_page)
+        self.video_frame()
         self.video_feed()
         
 
@@ -197,10 +195,10 @@ class ConveyorController:
         self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
         
 
-    def video_frame(self, main):
+    def video_frame(self):
         """Setup the video feed frame"""
         row_index=0
-        video_frame = ctk.CTkFrame(main)
+        video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         video_frame.grid(row=row_index, column=0, padx=7, pady=7, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
