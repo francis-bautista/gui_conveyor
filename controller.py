@@ -236,10 +236,10 @@ class ConveyorController:
         col=0
         frame_choices = ctk.CTkFrame(main_frame)
         frame_choices.grid(row=index_row, column=0, padx=padding, pady=padding, sticky="nswe")
-        frame_choices.columnconfigure(0, weight=1)
+        frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
-        priority_label.grid(row=7, column=col, padx=padding, pady=padding, sticky="nswe")
+        priority_label.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=2)
         index_row+=1
         
         # Ripeness combo
