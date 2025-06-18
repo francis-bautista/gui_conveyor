@@ -63,7 +63,7 @@ class ConveyorController:
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        left_frame.grid(row=0, column=1, padx=7, pady=7)
+        left_frame.grid(row=0, column=1, padx=3, pady=3)
         button_padx=7
         button_pady=7
         row_index=0
@@ -196,7 +196,7 @@ class ConveyorController:
         """Setup the video feed frame"""
         row_index=0
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        video_frame.grid(row=row_index, column=0, padx=7, pady=7)
+        video_frame.grid(row=row_index, column=0, padx=3, pady=3)
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
