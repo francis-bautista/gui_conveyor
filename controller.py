@@ -226,7 +226,7 @@ class ConveyorController:
     def user_priority_frame(self):
         """Setup the user priority section with combo boxes"""
         index_row=0
-        padding=5
+        padding=7
         frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
         frame_choices.grid(row=index_row, column=2, padx=padding, pady=padding, columnspan=2, sticky="ns")
         frame_choices.columnconfigure(0, weight=2)
