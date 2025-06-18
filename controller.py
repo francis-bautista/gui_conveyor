@@ -53,7 +53,7 @@ class ConveyorController:
         # Configure grid layout
         self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
         self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
-        self.app.grid_columnconfigure(2, weight=1)
+        # self.app.grid_columnconfigure(2, weight=1)
         # User priority section
         self.user_priority_frame()
         self.control_frame()
@@ -227,12 +227,12 @@ class ConveyorController:
     
     def user_priority_frame(self):
         """Setup the user priority section with combo boxes"""
-        index_row=0
+        index_row=6
         padding=7
         width_combobox=10
         col=0
         frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        frame_choices.grid(row=index_row, column=2, padx=padding, pady=padding)
+        frame_choices.grid(row=index_row, column=1, padx=padding, pady=padding)
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
