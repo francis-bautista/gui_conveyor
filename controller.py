@@ -38,7 +38,7 @@ class ConveyorController:
         self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
         self.picam2.configure(self.camera_config)
         self.picam2.start()
-
+        
         self.init_ui()
     
     def stop_motors(self):
@@ -59,11 +59,12 @@ class ConveyorController:
         self.control_frame()
         self.video_frame()
         self.video_feed()
+        self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         
 
     def control_frame(self):
-        left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        left_frame.grid(row=0, column=1, padx=3, pady=3)
+        left_frame = ctk.CTkFrame(self.main_frame)
+        left_frame.grid(row=0, column=1, padx=7, pady=7)
         button_padx=7
         button_pady=7
         row_index=0
@@ -196,7 +197,7 @@ class ConveyorController:
         """Setup the video feed frame"""
         row_index=0
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        video_frame.grid(row=row_index, column=0, padx=3, pady=3)
+        video_frame.grid(row=row_index, column=0, padx=7, pady=7, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
@@ -231,7 +232,7 @@ class ConveyorController:
         padding=7
         width_combobox=10
         col=0
-        frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        frame_choices = ctk.CTkFrame(self.main_frame, fg_color="#B3B792")
         frame_choices.grid(row=index_row, column=1, padx=padding, pady=padding)
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
