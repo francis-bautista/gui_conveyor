@@ -232,14 +232,14 @@ class ConveyorController:
         """Setup the user priority section with combo boxes"""
         index_row=6
         padding=7
-        width_combobox=10
+        width_combobox=6
         col=0
         frame_choices = ctk.CTkFrame(main_frame)
         frame_choices.grid(row=index_row, column=0, padx=padding, pady=padding, sticky="nswe")
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
-        priority_label.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=2)
+        priority_label.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=3)
         index_row+=1
         
         # Ripeness combo
