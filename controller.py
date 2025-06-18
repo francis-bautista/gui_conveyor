@@ -63,7 +63,7 @@ class ConveyorController:
 
     def control_frame(self):
         left_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        left_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nsew")
+        left_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
         row_index=0
         self.buttonExit = ctk.CTkButton(
             left_frame, 
@@ -194,7 +194,7 @@ class ConveyorController:
         """Setup the video feed frame"""
         row_index=0
         video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        video_frame.grid(row=row_index, column=0, padx=7, pady=7, sticky="ns")
+        video_frame.grid(row=row_index, column=0, padx=7, pady=7, sticky="nswe")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
         video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
@@ -228,7 +228,7 @@ class ConveyorController:
         index_row=0
         padding=7
         frame_choices = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        frame_choices.grid(row=index_row, column=2, padx=7, pady=7, columnspan=2, sticky="ns")
+        frame_choices.grid(row=index_row, column=2, padx=7, pady=7, columnspan=2, sticky="nswe")
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
