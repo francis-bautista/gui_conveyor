@@ -283,9 +283,9 @@ class ConveyorController:
         bruises = self.bruises_combo.get()
         size = self.size_combo.get()
         print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
-        self.ripeness_combo.state("disabled")
-        self.bruises_combo.state("disabled")
-        self.size_combo.state("disabled")
+        self.ripeness_combo.configure(state="disabled")
+        self.bruises_combo.configure(state="disabled")
+        self.size_combo.configure(state="disabled")
         
     def reset_program(self):
         print("Resetting")
