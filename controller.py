@@ -193,11 +193,11 @@ class ConveyorController:
         video_frame.grid(row=row_index, column=0, padx=10, pady=10, sticky="ns")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
-        video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        video_label.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
 
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        self.video_canvas.grid(row=row_index, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
         
         row_index += 1
         self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
