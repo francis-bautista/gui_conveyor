@@ -66,7 +66,7 @@ class ConveyorController:
 
     def control_frame(self, main_frame):
         left_frame = ctk.CTkFrame(main_frame)
-        left_frame.grid(row=0, column=1, padx=7, pady=7)
+        left_frame.grid(row=0, column=0, padx=7, pady=7)
         button_padx=7
         button_pady=7
         row_index=0
