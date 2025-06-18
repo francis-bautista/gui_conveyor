@@ -146,7 +146,7 @@ class ConveyorController:
             fg_color="transparent"
         )
         self.label.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
-
+        row_index += 1
         self.textbox = ctk.CTkTextbox(
             left_frame, 
             width=self.button_width * 2 + 40, 
