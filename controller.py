@@ -54,16 +54,17 @@ class ConveyorController:
         self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
         self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
         # self.app.grid_columnconfigure(2, weight=1)
-        # User priority section
-        self.user_priority_frame()
-        self.control_frame()
-        self.video_frame()
-        self.video_feed()
+        
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         
+        self.user_priority_frame(self.main_frame)
+        self.control_frame(self.main_frame)
+        self.video_frame()
+        self.video_feed()
+        
 
-    def control_frame(self):
-        left_frame = ctk.CTkFrame(self.main_frame)
+    def control_frame(self, main_frame):
+        left_frame = ctk.CTkFrame(main_frame)
         left_frame.grid(row=0, column=1, padx=7, pady=7)
         button_padx=7
         button_pady=7
@@ -226,13 +227,13 @@ class ConveyorController:
         
         return video_frame
     
-    def user_priority_frame(self):
+    def user_priority_frame(self, main_frame):
         """Setup the user priority section with combo boxes"""
         index_row=6
         padding=7
         width_combobox=10
         col=0
-        frame_choices = ctk.CTkFrame(self.main_frame, fg_color="#B3B792")
+        frame_choices = ctk.CTkFrame(main_frame, fg_color="#B3B792")
         frame_choices.grid(row=index_row, column=1, padx=padding, pady=padding)
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
