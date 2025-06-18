@@ -235,7 +235,7 @@ class ConveyorController:
         width_combobox=10
         col=0
         frame_choices = ctk.CTkFrame(main_frame)
-        frame_choices.grid(row=index_row, column=3, padx=padding, pady=padding)
+        frame_choices.grid(row=index_row, column=0, padx=padding, pady=padding)
         frame_choices.columnconfigure(0, weight=2)
         # User Priority heading
         priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
