@@ -29,7 +29,8 @@ class ConveyorController:
         self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
         self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        
+        self.top_final_score = 0
+        self.bottom_final_score = 0
         # Load Training and Testing Models
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # Ripeness model
@@ -270,8 +271,8 @@ class ConveyorController:
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
-        results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
-        results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        self.results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
+        self.results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
         
         
         row_index += 1
@@ -401,12 +402,39 @@ class ConveyorController:
         print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
         top_size_class = determine_size(top_width, top_length) 
         top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+        self.top_final_score=top_final_grade
         top_letter_grade = self.find_letter_grade(top_final_grade)
         self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
-            
+        
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
+
+    def picture_side2(self):
+        """Handle capturing side 2 image"""
+        print("Process and pictured side 2")
+        bottom_image = self.capture_image(self.picam2)
+        bottom_image.save(f"{self.recorded_time}_bottom.png")
+        formatted_date_time = self.recorded_time
+        bottom_class_ripeness = self.classify_image(bottom_image, self.model_ripeness, self.class_labels_ripeness)
+        bottom_class_bruises = self.classify_image(bottom_image, self.model_bruises, self.class_labels_bruises)
+        bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", f"{formatted_date_time}_background.png", 
+        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
         
+        print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
+        bottom_size_class = determine_size(bottom_width, bottom_length) 
+        bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
+        self.bottom_final_score=bottom_final_grade
+        bottom_letter_grade = self.find_letter_grade(bottom_final_grade)
+        self.update_side_box_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class, bottom_final_grade, bottom_letter_grade, False)
+        
+        average_score = (self.top_final_score + self.bottom_final_score) / 2
+        average_letter = self.find_letter_grade(average_score)
+        
+        self.results_data.configure(text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
+        
+        self.buttonSide2.configure(state="disabled")
+        self.buttonBackground.configure(state="normal")
+     
     def find_letter_grade(self,input_grade):
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
@@ -459,15 +487,6 @@ class ConveyorController:
                 self.side2_box.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
                 self.side2_box.image = bottom_photo  # Keep a reference
         self.app.after(0, update) # either video_frame or app
-
-    def picture_side2(self):
-        """Handle capturing side 2 image"""
-        print("Process and pictured side 2")
-        bottom_background = self.capture_image(self.picam2)
-        bottom_background.save(f"{self.recorded_time}_bottom.png")
-        
-        self.buttonSide2.configure(state="disabled")
-        self.buttonBackground.configure(state="normal")
         
     def move_motor(self, motor_array):
         """Control motor movement based on array values"""
