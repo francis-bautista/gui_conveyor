@@ -1,6 +1,9 @@
+import torch, time, sys, os, threading
+import torchvision.transforms as transforms
 import customtkinter as ctk
-import time, sys, os, threading
+from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
+from get_size import calculate_size, determine_size
 try:
     import RPi.GPIO as GPIO
     from picamera2 import Picamera2
@@ -17,6 +20,34 @@ class ConveyorController:
         self.app.title("Conveyor Controller")
         self.app.geometry("1100x620")
         self.app.fg_color = "#e5e0d8"
+        
+        self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
+        self.class_labels_bruises = ['bruised', 'unbruised']
+        self.class_labels_size = ['small', 'medium', 'large']
+        self.ripeness_scores = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
+        self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
+        self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
+        # Load Training and Testing Models
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Ripeness model
+        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_ripeness))
+        self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
+        self.model_ripeness.eval()
+        self.model_ripeness.to(self.device)
+        # Bruises model
+        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_bruises))
+        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
+        self.model_bruises.eval()
+        self.model_bruises.to(self.device)
+        # Define transformations
+        self.transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+        # Size calculation parameters
+        self.FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
+        self.DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
         
         # Set consistent button dimensions
         self.button_width = 180
@@ -37,7 +68,6 @@ class ConveyorController:
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
         GPIO.setwarnings(False)
-        # Initialize UI components
 
         # Initialize camera
         try:
