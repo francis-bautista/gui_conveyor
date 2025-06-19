@@ -406,7 +406,7 @@ class ConveyorController:
             
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
-
+        
     def find_letter_grade(self,input_grade):
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
@@ -428,7 +428,7 @@ class ConveyorController:
         elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
             return "B"
         else:
-            return "C"
+            return "C"        
 
     def final_grade(self,r,b,s):
         r_priority = float(self.ripeness_combo.get())
