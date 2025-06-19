@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import time, sys, os, threading
-from tkinter import ttk  # For combo boxes
 from PIL import Image, ImageTk
 try:
     import RPi.GPIO as GPIO
