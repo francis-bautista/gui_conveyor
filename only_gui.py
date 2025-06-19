@@ -283,8 +283,8 @@ class ConveyorController:
         row_index += 1
         self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.side1_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
         self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
@@ -361,7 +361,7 @@ class ConveyorController:
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         background_img = self.capture_image(self.picam2)
-        background_img.save(f"background_{self.recorded_time}.jpg")
+        background_img.save(f"{self.recorded_time}_background.png")
         
         self.buttonBackground.configure(state="disabled")
         self.buttonSide1.configure(state="normal")
@@ -395,19 +395,49 @@ class ConveyorController:
         formatted_date_time = self.recorded_time
         top_class_ripeness = self.classify_image(top_image, self.model_ripeness, self.class_labels_ripeness)
         top_class_bruises = self.classify_image(top_image, self.model_bruises, self.class_labels_bruises)
-        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", 
-                                                      f"{formatted_date_time}_background.png", 
-                                                      formatted_date_time, True,
-                                                      self.DISTANCE_CAMERA_TO_OBJECT, 
-                                                      self.FOCAL_LENGTH_PIXELS
-                                                      )
+        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", f"{formatted_date_time}_background.png", 
+        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
+        
         print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
         top_size_class = determine_size(top_width, top_length) 
-        self.update_side1_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class)
+        top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+        top_letter_grade = self.find_letter_grade(top_final_grade)
+        self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
             
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
-        
+
+    def find_letter_grade(self,input_grade):
+        r_priority = float(self.ripeness_combo.get())
+        b_priority = float(self.bruises_combo.get())
+        s_priority = float(self.size_combo.get())
+        max_gradeA = r_priority*self.ripeness_scores['green'] + b_priority*self.bruiseness_scores['unbruised'] + s_priority*self.size_scores['large']
+        min_gradeC = r_priority*self.ripeness_scores['yellow'] + b_priority*self.bruiseness_scores['bruised'] + s_priority*self.size_scores['small']
+        difference = (max_gradeA - min_gradeC)/3
+        min_gradeA = max_gradeA - difference
+        max_gradeB = min_gradeA
+        min_gradeB = max_gradeB - difference
+        max_gradeC = min_gradeB
+        min_gradeC = max_gradeC - difference
+        print("Calculated Grade Range")
+        print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {max_gradeA-min_gradeA}")
+        print(f"Max Grade B: {max_gradeB}, Min Grade B: {min_gradeB}, Difference: {max_gradeB-min_gradeB}")
+        print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
+        if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
+            return "A"
+        elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
+            return "B"
+        else:
+            return "C"
+
+    def final_grade(self,r,b,s):
+        r_priority = float(self.ripeness_combo.get())
+        b_priority = float(self.bruises_combo.get())
+        s_priority = float(self.size_combo.get())
+        resulting_grade = r_priority*self.ripeness_scores[r] + b_priority*self.bruiseness_scores[b] + s_priority*self.size_scores[s]
+        print(f"Resulting Grade: {resulting_grade}")
+        return resulting_grade
+    
     def capture_image(self, picam2):
         # This would be implemented to capture an image from the camera
         # Placeholder implementation
@@ -415,16 +445,20 @@ class ConveyorController:
         image = Image.fromarray(image).convert("RGB")
         return image
 
-    def update_side1_box_results(self, image, ripeness, bruises, size):
+    def update_side_box_results(self, image, ripeness, bruises, size, score, letter, isTop):
         """Update the UI with top results"""
         def update():
-            self.top_result_label.configure(
-                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
-            )
-            top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
-            self.side1_box.create_image(0, 0, anchor=ctk.NW, image=top_photo)
-            self.side1_box.image = top_photo  # Keep a reference
-        self.app.after(0, update)
+            if isTop:
+                self.side1_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
+                top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
+                self.side1_box.create_image(0, 0, anchor=ctk.NW, image=top_photo)
+                self.side1_box.image = top_photo  # Keep a reference
+            else:
+                self.side2_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
+                bottom_photo = ImageTk.PhotoImage(image.resize((300, 200)))
+                self.side2_box.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
+                self.side2_box.image = bottom_photo  # Keep a reference
+        self.app.after(0, update) # either video_frame or app
 
     def picture_side2(self):
         """Handle capturing side 2 image"""
