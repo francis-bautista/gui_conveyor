@@ -1,665 +1,468 @@
-import torch
-import torchvision.transforms as transforms
-from efficientnet_pytorch import EfficientNet
-from PIL import Image, ImageTk
-import time
-import tkinter as tk
 import customtkinter as ctk
+import time, sys, os, threading
 from tkinter import ttk  # For combo boxes
-from datetime import datetime
-import sys
-import os
-from tkinter import ttk, messagebox
-import threading
-import cv2
-from help_page import hp
-class MangoGraderApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Carabao Mango Grader and Sorter")
-        self.root.fg_color = "#e5e0d8"
+from PIL import Image, ImageTk
+try:
+    import RPi.GPIO as GPIO
+    from picamera2 import Picamera2
+    print("Running on Raspberry Pi - using real GPIO")
+except ImportError:
+    from fake_gpio import GPIO
+    from fake_picamera2 import Picamera2
+    print("Running on non-RPi system - using mock GPIO")
+
+class ConveyorController:
+    def __init__(self, app):
+        # Initialize the main application
+        self.app = app
+        self.app.title("Conveyor Controller")
+        self.app.geometry("1100x620")
+        self.app.fg_color = "#e5e0d8"
         
-        # Size calculation parameters
-        self.FOCAL_LENGTH_PIXELS = 3500  # Example value
-        self.DISTANCE_CAMERA_TO_OBJECT = 40  # cm
+        # Set consistent button dimensions
+        self.button_width = 180
+        self.button_height = 40
+
+        self.relay1 = 6   # Motor 1 Forward
+        self.relay2 = 13   # Motor 1 Reverse
+        self.relay3 = 19  # Motor 2 Forward
+        self.relay4 = 26  # Motor 2 Reverse
+        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+        GPIO.setup(self.relay1, GPIO.OUT)
+        GPIO.setup(self.relay2, GPIO.OUT)
+        GPIO.setup(self.relay3, GPIO.OUT)
+        GPIO.setup(self.relay4, GPIO.OUT)
+        # Initialize relays to OFF state
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
+        GPIO.setwarnings(False)
+        # Initialize UI components
+
+        # Initialize camera
+        try:
+            self.picam2 = Picamera2()
+            self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
+            self.picam2.configure(self.camera_config)
+            self.picam2.start()
+            print("Camera initialized successfully")
+        except Exception as e:
+            print(f"Error initializing camera: {e}")
+            self.picam2 = None
         
-        # Virtual motor positions (for simulation)
-        self.current_position = 0  # Track current position
-        self.position1 = 50  # Position for Grade A
-        self.position2 = 100  # Position for Grade B
-        self.position3 = 150  # Position for Grade C
-        
-        # Processing state flags
-        self.processing = False
-        self.stop_requested = False
-        
+        self.init_ui()
+    
+    def stop_motors(self):
+        GPIO.output(self.relay1, GPIO.LOW)
+        GPIO.output(self.relay2, GPIO.LOW)
+        GPIO.output(self.relay3, GPIO.LOW)
+        GPIO.output(self.relay4, GPIO.LOW)
+        print("Motors stopped!")
+
+    def init_ui(self):
+        """Initialize all UI components"""
         # Configure grid layout
-        self.root.grid_columnconfigure(0, weight=1)  # Left column (analysis results)
-        self.root.grid_columnconfigure(1, weight=1)  # Right column (controls)
-        self.root.grid_columnconfigure(2, weight=1)  # Video feed
-        self.root.grid_rowconfigure(0, weight=1)
+        self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
+        self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
+        # self.app.grid_columnconfigure(2, weight=1)
         
-        # Create frames
-        self.setup_analysis_frame()
-        self.setup_control_frame()
-        self.setup_video_frame()
+        self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
         
-    
-    def setup_analysis_frame(self):
-        """Setup the left frame for analysis results"""
-        left_frame = ctk.CTkFrame(self.root, fg_color="#B3B792")
-        left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.user_priority_frame(self.main_frame)
+        self.control_frame(self.main_frame)
+        self.video_frame()
+        self.video_feed()
         
-        # Top part UI
-        top_label = ctk.CTkLabel(left_frame, text="Top Image")
-        top_label.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
+
+    def control_frame(self, main_frame):
+        left_frame = ctk.CTkFrame(main_frame)
+        left_frame.grid(row=0, column=0, padx=7, pady=7)
+        button_padx=7
+        button_pady=7
+        row_index=0
+        self.buttonExit = ctk.CTkButton(
+            left_frame, 
+            text="Exit", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF4C4C", 
+            hover_color="#CC0000",
+        )
+        self.buttonExit.configure(command=self.exit_program)
+        self.buttonExit.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        self.buttonReset = ctk.CTkButton(
+            left_frame, 
+            text="Reset", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#FF4C4C", 
+            hover_color="#CC0000",  
+        )
+        self.buttonReset.configure(command=self.reset_program)
+        self.buttonReset.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        row_index += 1
+
+        # Motor control buttons
+        self.buttonCWC1 = ctk.CTkButton(
+            left_frame, 
+            text="Clockwise C1", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1F6AA5"
+        )
+        self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
+        self.buttonCWC1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        self.buttonCCWC1 = ctk.CTkButton(
+            left_frame, 
+            text="Counter Clockwise C1", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1F6AA5"
+        )
+        self.buttonCCWC1.configure(command=self.button_callback(self.buttonCCWC1))
+        self.buttonCCWC1.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        row_index += 1
+
+        self.buttonCWC2 = ctk.CTkButton(
+            left_frame, 
+            text="Clockwise C2", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1F6AA5"
+        )
+        self.buttonCWC2.configure(command=self.button_callback(self.buttonCWC2))
+        self.buttonCWC2.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        self.buttonCCWC2 = ctk.CTkButton(
+            left_frame, 
+            text="Counter Clockwise C2", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1F6AA5"
+        )
+        self.buttonCCWC2.configure(command=self.button_callback(self.buttonCCWC2))
+        self.buttonCCWC2.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        row_index += 1
+
+        # Time input section
+        self.label = ctk.CTkLabel(
+            left_frame, 
+            text="Time to Move (in seconds?)", 
+            fg_color="transparent"
+        )
+        self.label.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        row_index += 1
+        self.textbox = ctk.CTkTextbox(
+            left_frame, 
+            width=self.button_width * 2 + 40, 
+            height=self.button_height
+        )
+        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        row_index += 1
+
+        # Run button
+        self.buttonRun = ctk.CTkButton(
+            left_frame, 
+            text="Run C1/C2", 
+            width=self.button_width * 2 + 40, 
+            height=self.button_height, 
+            fg_color="#1FA3A5", 
+            hover_color="#177E80"
+        )
+        self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
+        self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        row_index += 1
+
+        # Camera control buttons
+        self.buttonSide1 = ctk.CTkButton(
+            left_frame, 
+            text="Capture Side 1", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1FA3A5", 
+            hover_color="#177E80"
+        )
+        self.buttonSide1.configure(command=self.picture_side1)
+        self.buttonSide1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+
+        self.buttonSide2 = ctk.CTkButton(
+            left_frame, 
+            text="Capture Side 2", 
+            width=self.button_width, 
+            height=self.button_height, 
+            fg_color="#1FA3A5", 
+            hover_color="#177E80",
+            state="disabled"
+        )
+        self.buttonSide2.configure(command=self.picture_side2)
+        self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
         
-        self.top_canvas = tk.Canvas(left_frame, width=300, height=200)
-        self.top_canvas.grid(row=1, column=0, padx=10, pady=10, sticky="nswe")
-        
-        self.top_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: - \nSize - ")
-        self.top_result_label.grid(row=2, column=0, sticky="nswe")
-        
-        # Bottom part UI
-        bottom_label = ctk.CTkLabel(left_frame, text="Bottom Image")
-        bottom_label.grid(row=3, column=0)
-        
-        self.bottom_canvas = tk.Canvas(left_frame, width=300, height=200)
-        self.bottom_canvas.grid(row=4, column=0)
-        
-        self.bottom_result_label = ctk.CTkLabel(left_frame, text="Ripeness: -\nBruises: - \nSize - ")
-        self.bottom_result_label.grid(row=5, column=0)
-    
-    def setup_control_frame(self):
-        """Setup the right frame for buttons and controls"""
-        right_frame = ctk.CTkFrame(self.root, fg_color="#B3B792")
-        right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-        
-        # Action buttons
-        self.start_button = ctk.CTkButton(right_frame, text="Start", fg_color="#8AD879", 
-                                         command=self.start_processing)
-        self.start_button.grid(row=0, column=0, padx=10, pady=10, sticky="ns")
-        
-        self.stop_button = ctk.CTkButton(right_frame, text="Exit", fg_color="#F3533A",
-                                       command=self.stop_processing)
-        self.stop_button.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
-        
-        self.reset_button = ctk.CTkButton(right_frame, text="Reset", fg_color="#5CACF9",
-                                        command=self.reset_system)
-        self.reset_button.grid(row=1, column=0, padx=10, pady=10, sticky="ns")
-        
-        self.help_button = ctk.CTkButton(right_frame, text="Help", fg_color="#f85cf9",
-                                       command=self.show_help)
-        self.help_button.grid(row=1, column=1, padx=10, pady=10, sticky="ns")
-        
-        # Toggle Button
-        self.check_var = ctk.StringVar(value="off")
-        checkbox = ctk.CTkCheckBox(right_frame, text="Default", command=self.checkbox_event,
-                                   variable=self.check_var, onvalue="on", offvalue="off")
-        checkbox.grid(row=2, column=1, padx=10, pady=10, sticky="ns")
-        
-        # Score displays
-        self.top_score = ctk.CTkLabel(right_frame, text="Top Score - ")
-        self.top_score.grid(row=3, column=0)
-        
-        self.bottom_score = ctk.CTkLabel(right_frame, text="Bottom Score - ")
-        self.bottom_score.grid(row=4, column=0)
-        
-        self.grade_score = ctk.CTkLabel(right_frame, text="Grade - ")
-        self.grade_score.grid(row=5, column=0)
-        
-        # User priority section
-        self.setup_user_priority_frame(right_frame)
-    
-    def setup_user_priority_frame(self, parent_frame):
-        """Setup the user priority section with combo boxes"""
-        frame_choices = ctk.CTkFrame(parent_frame, fg_color="#809671")
-        frame_choices.grid(row=8, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
-        frame_choices.columnconfigure(0, weight=2)
-        
-        # User Priority heading
-        priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
-        priority_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
-        
-        # Ripeness combo
-        ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness Score (0-3):")
-        ripeness_label.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
-        
-        self.ripeness_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.ripeness_combo.grid(row=2, column=0)
-        
-        # Bruises combo
-        bruises_label = ctk.CTkLabel(frame_choices, text="Bruises Score (0-3):")
-        bruises_label.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
-        
-        self.bruises_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.bruises_combo.grid(row=4, column=0)
-        
-        # Size combo
-        size_label = ctk.CTkLabel(frame_choices, text="Size Score (0-3):")
-        size_label.grid(row=5, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
-        
-        self.size_combo = ttk.Combobox(frame_choices, values=[0.0, 1.0, 2.0, 3.0])
-        self.size_combo.grid(row=6, column=0, padx=10, pady=(0, 20))
-    
-    def setup_video_frame(self):
+
+    def video_frame(self):
         """Setup the video feed frame"""
-        video_frame = ctk.CTkFrame(self.root, fg_color="#B3B792")
-        video_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+        row_index=0
+        paddingx=7
+        paddingy=7
+        video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
-        video_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        video_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        self.video_canvas = tk.Canvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ns")
+        results_label = ctk.CTkLabel(video_frame, text="Overall Results")
+        results_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        
+        row_index += 1
+        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.video_canvas.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
+        results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        
+        
+        row_index += 1
+        self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
+        self.side1_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_label = ctk.CTkLabel(video_frame, text="Side 2")
+        self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        
+        row_index += 1
+        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side1_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        
+        row_index += 1
+        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side1_results.grid(row=row_index, column=0, padx=paddingx, pady=paddingy,  sticky="nswe")
+        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side2_results.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        
+        
+        
+        return video_frame
+    
+    def user_priority_frame(self, main_frame):
+        """Setup the user priority section with combo boxes"""
+        index_row=6
+        padding=7
+        width_combobox=120
+        col=0
+        frame_choices = ctk.CTkFrame(main_frame)
+        frame_choices.grid(row=index_row, column=0, padx=padding, pady=padding, sticky="nswe")
+        frame_choices.columnconfigure(0, weight=1)
+        frame_choices.columnconfigure(1, weight=1) 
+        frame_choices.columnconfigure(2, weight=1)
+        # User Priority heading
+        priority_label = ctk.CTkLabel(frame_choices, text="User Priority")
+        priority_label.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=3)
+        index_row+=1
+        
+        # Ripeness combo
+        ripeness_label = ctk.CTkLabel(frame_choices, text="Ripeness:")
+        ripeness_label.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
+        
+        # col+=1
+        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
+        self.ripeness_combo.set("0.0")  # Set default value
+        self.ripeness_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
 
-        # Progress bar
-        self.progress_label = ctk.CTkLabel(video_frame, text="Progress:")
-        self.progress_label.grid(row=2, column=0, sticky="w", padx=10)
+        # Bruises combo
+        col+=1
+        bruises_label = ctk.CTkLabel(frame_choices, text="Bruises:")
+        bruises_label.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
         
-        self.progress_bar = ctk.CTkProgressBar(video_frame, width=200, mode="determinate")
-        self.progress_bar.grid(row=2, column=0, columnspan=2, padx=10, pady=(30, 10), sticky="ew")
-        self.progress_bar.set(0)  # Initialize at 0
+        # col+=1
+        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
+        self.bruises_combo.set("0.0")  # Set default value
+        self.bruises_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
         
-    def start_processing(self):
-        """Start the processing with a loading bar"""
-        if (self.ripeness_combo.get() == "" or self.bruises_combo.get() == "" or self.size_combo.get() == ""):
-            messagebox.showerror("Error", "Please select values for Ripeness, Bruises, and Size")
-            return
-        if not self.processing:
-            self.processing = True
-            self.stop_requested = False
-            # Disable input from user priority
-            self.ripeness_combo.configure(state="disabled")  # or "readonly"
-            self.bruises_combo.configure(state="disabled")
-            self.size_combo.configure(state="disabled")
-            
-            # Update button states
-            self.start_button.configure(state="disabled")
-            # Change text to "Stop" during processing
-            self.stop_button.configure(text="Stop", state="normal")
-            self.reset_button.configure(state="disabled")
-            
-            # Reset progress bar
-            self.progress_bar.set(0)
-            
-            # Start processing in a separate thread
-            self.process_thread = threading.Thread(target=self.update_gui)
-            self.process_thread.daemon = True
-            self.process_thread.start()
-    
-    def update_gui(self):
-        """Updates the GUI by capturing images and analyzing the mango."""
-        try:
-            # Get the current date and time
-            now = datetime.now()
-            formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-            
-            # Progress: 0% - Starting
-            self.update_progress_safe(0.05, "Capturing background...")
-            if self.stop_requested: return
-            
-            # Capture background
-            top_background = self.capture_image()
-            top_background.save(f"{formatted_date_time}_background.png")
-            
-            # Progress: 10% - Moving motor for top capture
-            self.update_progress_safe(0.1, "Moving motor for top capture...")
-            if self.stop_requested: return
-            
-            self.simulate_motor_movement()
-            
-            # Progress from 10% to 20% during 5 second sleep
-            for i in range(15):
-                if self.stop_requested: return
-                progress = 0.1 + (i * 0.01)
-                self.update_progress_safe(progress, "Positioning for top capture...")
-                time.sleep(0.5)  # Sleep for 0.5 seconds, 10 times = 5 seconds
-            
-            self.simulate_motor_stop()
-            
-            # Progress: 20% - Capturing top part
-            self.update_progress_safe(0.2, "Capturing top part...")
-            if self.stop_requested: return
-            
-            top_image = self.capture_image()
-            top_image.save(f"{formatted_date_time}_top.png")
-            
-            # Progress: 25% - Analyzing top part
-            self.update_progress_safe(0.25, "Analyzing top part...")
-            if self.stop_requested: return
-            
-            top_class_ripeness = self.classify_image(top_image, "ripeness")
-            top_class_bruises = self.classify_image(top_image, "bruises")
-            top_width, top_length = self.calculate_size(top_image)
-            print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
-            top_size_class = self.determine_size(top_width, top_length) 
-            # Update UI with top results
-            self.update_top_results(top_image, top_class_ripeness, top_class_bruises, top_size_class)
-            
-            # Progress: 30% - Moving motor for bottom capture
-            self.update_progress_safe(0.3, "Moving motor for bottom capture...")
-            if self.stop_requested: return
-            
-            self.simulate_motor_movement()
-            
-            # Progress from 30% to 40% during 5 second sleep
-            for i in range(10):
-                if self.stop_requested: return
-                progress = 0.3 + (i * 0.01)
-                self.update_progress_safe(progress, "Positioning for bottom capture...")
-                time.sleep(0.5)  # Sleep for 0.5 seconds, 10 times = 5 seconds
-            
-            self.simulate_motor_stop()
-            
-            # Progress: 40% - Capturing bottom part
-            self.update_progress_safe(0.4, "Capturing bottom part...")
-            if self.stop_requested: return
-            
-            bottom_image = self.capture_image()
-            bottom_image.save(f"{formatted_date_time}_bottom.png")
-            
-            # Progress: 50% - Analyzing bottom part
-            self.update_progress_safe(0.5, "Analyzing bottom part...")
-            if self.stop_requested: return
-            
-            bottom_class_ripeness = self.classify_image(bottom_image, "ripeness")
-            bottom_class_bruises = self.classify_image(bottom_image, "bruises")
-            bottom_width, bottom_length = self.calculate_size(bottom_image)
-            print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
-            bottom_size_class = self.determine_size(bottom_width, bottom_length)
-            # Update UI with bottom results
-            self.update_bottom_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
-            
-            # Progress: 60% - Computing scores
-            self.update_progress_safe(0.6, "Computing scores...")
-            if self.stop_requested: return
-            
-            # Progress: 70% - Computing grade
-            self.update_progress_safe(0.7, "Computing grade...")
-            if self.stop_requested: return
-            
-            top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
-            bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
-            average_final_grade = (top_final_grade + bottom_final_grade) / 2
-            letter_grade = self.find_grade(average_final_grade)
-            
-            # Progress: 75% - Final motor movement
-            self.update_progress_safe(0.75, "Final positioning...")
-            if self.stop_requested: return
-            
-            self.simulate_motor_movement()
-            
-            # Progress from 75% to 100% during 15 second sleep
-            for i in range(15):
-                if self.stop_requested: return
-                progress = 0.75 + (i * 0.005)  # Increment by 0.5% each time (0.005 * 50 = 0.25 = 25%)
-                self.update_progress_safe(progress, "Completing process...")
-                time.sleep(0.3)  # Sleep for 0.3 seconds, 50 times = 15 seconds
-            
-            self.simulate_motor_stop()
-            
-            resultArray = [top_class_ripeness, top_class_bruises, 
-                           top_size_class,
-                           top_final_grade,
-                            bottom_class_ripeness, bottom_class_bruises, 
-                            bottom_size_class,
-                            bottom_final_grade,
-                            letter_grade
-                           ]
-            
-            # Process complete
-            self.update_progress_safe(1.0, "Process complete!")
-            # Enable input from user priority
-            self.ripeness_combo.configure(state="normal")  # or "readonly"
-            self.bruises_combo.configure(state="normal")
-            self.size_combo.configure(state="normal")
-            
-            self.root.after(0, lambda: self.processing_completed(resultArray))
-            
-        except Exception as e:
-            print(f"Error in update_gui: {str(e)}")
-            self.root.after(0, lambda: self.processing_stopped(f"Error: {str(e)}"))
-            
-    def update_progress_safe(self, progress, message):
-        """Update progress from a background thread safely"""
-        self.current_progress = progress
-        self.root.after(0, lambda: self.update_progress_ui(progress, message))
-    
-    def update_progress_ui(self, progress, message):
-        """Update the UI elements related to progress"""
-        self.progress_bar.set(progress)
-        # Format as percentage
-        percent = int(progress * 100)
-        self.progress_label.configure(text=f"{message} {percent}%")
+        # Size combo
+        col+=1
+        size_label = ctk.CTkLabel(frame_choices, text="Size:")
+        size_label.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
         
-    def update_top_results(self, image, ripeness, bruises, size):
-        """Update the UI with top results"""
-        def update():
-            self.top_result_label.configure(
-                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
-            )
-            top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
-            self.top_canvas.create_image(0, 0, anchor=tk.NW, image=top_photo)
-            self.top_canvas.image = top_photo  # Keep a reference
-        self.root.after(0, update)
-    
-    def update_bottom_results(self, image, ripeness, bruises, size):
-        """Update the UI with bottom results"""
-        def update():
-            self.bottom_result_label.configure(
-                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
-            )
-            bottom_photo = ImageTk.PhotoImage(image.resize((300, 200)))
-            self.bottom_canvas.create_image(0, 0, anchor=tk.NW, image=bottom_photo)
-            self.bottom_canvas.image = bottom_photo  # Keep a reference
-        self.root.after(0, update)
-    
-    # Method stubs that would be implemented in the actual code
-    def validate_inputs(self):
-        # Check that combo boxes have selections
-        if not self.ripeness_combo.get() or not self.bruises_combo.get() or not self.size_combo.get():
-            # Show an error message
-            tk.messagebox.showerror("Input Error", "Please select values for Ripeness, Bruises, and Size")
-            return False
-        return True
+        # index_row+=1
+        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
+        self.size_combo.set("0.0")  # Set default value
+        self.size_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
         
-    def capture_image(self):
-        """Capture an image from the webcam"""
-        ret, frame = self.camera.read()
-        if not ret:
-            # If camera read fails, create a dummy image
-            img = Image.new('RGB', (640, 480), color=(200, 200, 200))
-            return img
+        self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority)
+        self.button_enter.grid(row=index_row+2, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
         
-        # Convert from BGR to RGB
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(frame_rgb)
-        return image
-    
-    def classify_image(self, image, model_type):
-        """Classify an image using the appropriate model"""
-        if self.use_dummy_models:
-            # Return dummy results if models aren't loaded
-            import random
-            if model_type == "ripeness":
-                return random.choice(self.class_labels_ripeness)
-            else:  # bruises
-                return random.choice(self.class_labels_bruises)
+        self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.help_page)
+        self.button_help.grid(row=index_row+3, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
         
-        # Use actual models if available
-        image_tensor = self.transform(image).unsqueeze(0).to(self.device)
+        return frame_choices
+    def help_page(self):
+        print("Help page")
+    def enter_priority(self):
+        ripeness = self.ripeness_combo.get()
+        bruises = self.bruises_combo.get()
+        size = self.size_combo.get()
+        print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
+        self.ripeness_combo.configure(state="disabled")
+        self.bruises_combo.configure(state="disabled")
+        self.size_combo.configure(state="disabled")
         
-        if model_type == "ripeness":
-            output = self.model_ripeness(image_tensor)
-        else:  # bruises
-            output = self.model_bruises(image_tensor)
-            
-        _, predicted = torch.max(output, 1)
-        
-        if model_type == "ripeness":
-            return self.class_labels_ripeness[predicted.item()]
-        else:  # bruises
-            return self.class_labels_bruises[predicted.item()]
-    
-    def calculate_size(self, image):
-        """Calculate size of mango in the image (simplified version)"""
-        # In a real application, this would use computer vision to detect the mango
-        # and calculate its dimensions. Here we'll just return random reasonable values
-        import random
-        width = random.uniform(5.0, 12.0)  # cm
-        length = random.uniform(10.0, 18.0)  # cm
-        return width, length
-    
-    def determine_size(self, width, length):
-        """Determine size category based on dimensions"""
-        # Calculate area as a simple metric
-        area = width * length
-        
-        if area < 80:
-            return "small"
-        elif area < 150:
-            return "medium"
-        else:
-            return "large"
-    
-    def final_grade(self, r, b, s):
-        """Calculate final grade based on selected priorities"""
-        r_priority = float(self.ripeness_combo.get())
-        b_priority = float(self.bruises_combo.get())
-        s_priority = float(self.size_combo.get())
-        resulting_grade = r_priority * self.ripeness_scores[r] + b_priority * self.bruiseness_scores[b] + s_priority * self.size_scores[s]
-        print(f"Resulting Grade: {resulting_grade}")
-        return resulting_grade
-    
-    def find_grade(self, input_grade):
-        """Determine letter grade based on score"""
-        r_priority = float(self.ripeness_combo.get())
-        b_priority = float(self.bruises_combo.get())
-        s_priority = float(self.size_combo.get())
-        max_gradeA = r_priority*self.ripeness_scores['green'] + b_priority*self.bruiseness_scores['unbruised'] + s_priority*self.size_scores['large']
-        min_gradeC = r_priority*self.ripeness_scores['yellow'] + b_priority*self.bruiseness_scores['bruised'] + s_priority*self.size_scores['small']
-        difference = (max_gradeA - min_gradeC)/3
-        min_gradeA = max_gradeA - difference
-        max_gradeB = min_gradeA
-        min_gradeB = max_gradeB - difference
-        max_gradeC = min_gradeB
-        min_gradeC = max_gradeC - difference
-        print("Calculated Grade Range")
-        print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {max_gradeA-min_gradeA}")
-        print(f"Max Grade B: {max_gradeB}, Min Grade B: {min_gradeB}, Difference: {max_gradeB-min_gradeB}")
-        print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
-        
-        if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
-            self.move_to_position(self.position1)
-            return "A"
-        elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
-            self.move_to_position(self.position2)
-            return "B"
-        else:
-            self.move_to_position(self.position3)
-            return "C"
-    
-    def move_to_position(self, target):
-        """Simulate moving to a specific position"""
-        steps_needed = target - self.current_position
-        
-        if steps_needed == 0:
-            return  # Already at position
-        
-        print(f"Moving from position {self.current_position} to position {target}")
-        # Simulate movement delay
-        time.sleep(0.5)
-        
-        # Update current position
-        self.current_position = target
-        print(f"Now at position {self.current_position}")
-    
-    def simulate_motor_movement(self):
-        """Simulate motor movement"""
-        print("Motor movement started")
-    
-    def simulate_motor_stop(self):
-        """Simulate stopping the motor"""
-        print("Motor stopped")
-        
-    def update_progress(self, progress):
-        """Update the progress bar"""
-        self.progress_bar.set(progress)
-        
-        # Format as percentage
-        percent = int(progress * 100)
-        self.progress_label.configure(text=f"Progress: {percent}%")
-    
-    def processing_completed(self, resultArray):
-        """Called when processing completes successfully"""
-        self.processing = False
-        self.progress_label.configure(text="Processing completed")
-        
-        # Re-enable buttons
-        self.start_button.configure(state="normal")
-        self.stop_button.configure(text="Exit")  # Change text back to "Exit"
-        self.reset_button.configure(state="normal")
-        
-        self.update_results(resultArray[0], resultArray[1], resultArray[2], 
-                            resultArray[3], resultArray[4], resultArray[5], 
-                            resultArray[6], resultArray[7], resultArray[8])
-                            
-    def stop_processing(self):
-        """Stop the processing or exit the program"""
-        exit_text = self.stop_button.cget("text")  # Get the button text
-        if exit_text == "Exit":
-            print("Exiting program...")
-            self.exit_program()
-            return
-            
-        if self.processing:
-            self.simulate_motor_stop()
-            # If processing is active, stop it
-            self.stop_requested = True
-            self.reset_button.configure(state="normal")
-            # Update button text back to "Exit" for when processing finishes
-            self.stop_button.configure(text="Exit")
-        else:
-            # If not processing, exit the program
-            self.exit_program()
-
-    def processing_stopped(self, error_message=None):
-        """Called when processing is stopped by user"""
-        self.processing = False
-        if error_message:
-            self.progress_label.configure(text=error_message)
-            messagebox.showerror("Processing Error", error_message)
-        else:
-            self.progress_label.configure(text="Processing stopped")
-        
-        # Re-enable buttons
-        self.start_button.configure(state="normal")
-        self.stop_button.configure(text="Exit")  # Change text back to "Exit"
-        self.reset_button.configure(state="normal")
-        
-        # Re-enable combos
-        self.ripeness_combo.configure(state="normal")
-        self.bruises_combo.configure(state="normal")
-        self.size_combo.configure(state="normal")
-    
-    def reset_system(self):
-        """Reset the system to its initial state"""
-        # Release camera
-        self.camera.release()
-        
-        # Restart the application
+    def reset_program(self):
+        print("Resetting")
+        GPIO.cleanup()  # Reset GPIO settings
+        self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
-    
-    def update_results(self, top_ripeness, top_bruises, top_size, top_score_val,
-                     bottom_ripeness, bottom_bruises, bottom_size, bottom_score_val, grade):
-        """Update result labels with analysis data"""
-        self.top_result_label.configure(text=f"Ripeness: {top_ripeness}\nBruises: {top_bruises}\nSize: {top_size}")
-        self.bottom_result_label.configure(text=f"Ripeness: {bottom_ripeness}\nBruises: {bottom_bruises}\nSize: {bottom_size}")
+
+    def exit_program(self):
+        print("Goodbye")
+        GPIO.cleanup()  # Reset GPIO settings
+        self.picam2.stop()
+        sys.exit(0)
+
+    def picture_side1(self):
+        """Handle capturing side 1 image"""
+        print("Process and pictured side 1")
+        self.buttonSide1.configure(state="disabled")
+        self.buttonSide2.configure(state="normal")
         
-        self.top_score.configure(text=f"Top Score - {top_score_val}")
-        self.bottom_score.configure(text=f"Bottom Score - {bottom_score_val}")
-        self.grade_score.configure(text=f"Grade - {grade}")
-    
-    def show_help(self):
-        """Display help information in a scrollable, styled window"""
-        help_window = ctk.CTkToplevel(self.root, fg_color="#e5e0d8")
-        help_window.title("Help Guide")
-        help_window.geometry("800x500")
-        help_window.minsize(600, 400)
-        help_window.grid_columnconfigure(0, weight=1)
-        help_window.grid_rowconfigure(0, weight=1)
-
-        # Create main frame for better layout control
-        main_frame = ctk.CTkFrame(help_window, fg_color="#B3B792")
-        main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        main_frame.grid_columnconfigure(0, weight=1)
-        main_frame.grid_rowconfigure(1, weight=1)
-
-        # Add header
-        header_label = ctk.CTkLabel(
-            main_frame,
-            text="Help Guide",
-            font=("Arial Bold", 16),
-            anchor="w"
-        )
-        header_label.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="ew")
-
-        # Create scrollable textbox
-        help_textbox = ctk.CTkTextbox(
-            main_frame,
-            wrap="word",
-            font=("Arial", 13),
-            fg_color=("#d5dade"),
-            scrollbar_button_color=("#3B8ED0", "#1F6AA5"),
-            scrollbar_button_hover_color=("#36719F", "#184E73"),
-            padx=10,
-            pady=10
-        )
-        help_textbox.grid(row=1, column=0, sticky="nsew")
-
-        # Insert help text
-        help_text = hp()
-        help_textbox.insert("1.0", help_text)
-        help_textbox.configure(state="disabled")  # Make read-only
-
-        # Add close button
-        close_button = ctk.CTkButton(
-            main_frame,
-            text="Close",
-            command=help_window.destroy,
-            width=100,
-            fg_color="#F3533A",
-            hover_color="#db4b35"
-        )
-        close_button.grid(row=2, column=0, padx=10, pady=(15, 10), sticky="e")
-
-        # Make window stay on top
-        help_window.attributes('-topmost', True)
-        help_window.after(200, lambda: help_window.attributes('-topmost', False))
+    def picture_side2(self):
+        """Handle capturing side 2 image"""
+        print("Process and pictured side 2")
+        self.buttonSide1.configure(state="normal")
+        self.buttonSide2.configure(state="disabled")
         
-    def checkbox_event(self):
-        """Handle checkbox state changes"""
-        state = self.check_var.get()
-        if state == "on":
-            # Set default priority values
-            self.ripeness_combo.set(3.0)
-            self.bruises_combo.set(3.0)
-            self.size_combo.set(3.0)
+    def move_motor(self, motor_array):
+        """Control motor movement based on array values"""
+        GPIO.output(self.relay1, motor_array[0])  
+        GPIO.output(self.relay2, motor_array[1])   
+        GPIO.output(self.relay3, motor_array[2])  
+        GPIO.output(self.relay4, motor_array[3])   
         
-    
-    def update_video_feed(self):
+        if motor_array[0] == 1:
+            print("Motor 1 is moving in Clockwise")
+        if motor_array[1] == 1:
+            print("Motor 1 is moving in Counter Clockwise")
+        if motor_array[2] == 1:
+            print("Motor 2 is moving in Clockwise")
+        if motor_array[3] == 1:
+            print("Motor 2 is moving in Counter Clockwise")
+
+    def get_number_from_textbox(self, textbox):
+        """Extract and validate number from textbox"""
+        try:
+            text = textbox.get("1.0", "end-1c").strip()
+            if text:  # Check if not empty
+                return float(text)  # or int(text) for integer
+            else:
+                return None  # default value for empty textbox
+        except ValueError:
+            print("Please enter a valid number")
+            return None
+        
+    def countdown_thread(self, start_count, buttontorun, textbox):
+        """Countdown in separate thread"""
+        button_list = [self.buttonCWC1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
+        
+        for i in range(start_count, 0, -1):
+            print(i)
+            time.sleep(1)
+
+        # Use app.after to safely update GUI from thread
+        self.app.after(0, lambda: self._finish_motor_run_threaded(buttontorun, textbox, button_list))
+
+    def _finish_motor_run_threaded(self, buttontorun, textbox, button_list):
+        """Finish motor run - called from main thread"""
+        buttontorun.configure(text="Run C1/C2", state="normal")
+        print("Done Running!")
+        self.stop_motors()
+        
+        for button in button_list:
+            button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
+        
+        textbox.delete("0.0", "end")
+        textbox.configure(state="normal")
+
+    def button_callback(self, button):
+        """Create callback function for button color toggle"""
+        def toggle_color():
+            # Get current color
+            current_color = button.cget("fg_color")
+            # Toggle between blue and green
+            if current_color == "#1F6AA5" or current_color == "#3B8ED0":  # Default blue
+                button.configure(fg_color="green", hover_color="#0B662B")
+            else:
+                button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
+        return toggle_color
+
+    def button_run(self, buttontorun, textbox):
+        """Handle the run button functionality with threading"""
+        run_time = self.get_number_from_textbox(textbox)
+        textbox.configure(state="disabled")
+        
+        button_color = [
+            self.buttonCWC1.cget("fg_color"), 
+            self.buttonCCWC1.cget("fg_color"), 
+            self.buttonCWC2.cget("fg_color"), 
+            self.buttonCCWC2.cget("fg_color")
+        ]
+        
+        if run_time is None:
+            print("Input a value")
+            textbox.configure(state="normal")
+        elif 'green' in button_color:
+            if ((button_color[0] == 'green' and button_color[1] == 'green') or 
+                (button_color[2] == 'green' and button_color[3] == 'green')):
+                print("ERROR Unselect one of the buttons for C1/C2")
+                textbox.configure(state="normal")
+            else:
+                button_state_array = [1 if 'green' in color else 0 for color in button_color]
+                self.move_motor(button_state_array)
+                buttontorun.configure(text="Running...", state="disabled")
+                
+                # Start countdown in separate thread
+                countdown_thread = threading.Thread(
+                    target=self.countdown_thread, 
+                    args=(int(run_time), buttontorun, textbox)
+                )
+                countdown_thread.daemon = True  # Thread will close when main program closes
+                countdown_thread.start()
+                textbox.configure(state="normal")
+                textbox.delete("0.0", "end")  # delete all text
+        else: 
+            print("Select One of the Buttons")
+            textbox.configure(state="normal")
+
+    def video_feed(self):
         """Updates the video feed on the Tkinter canvas."""
         
         # Capture frame from the camera
-        # frame = self.picam2.capture_array()
-        # frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
+        frame = self.picam2.capture_array()
+        frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
         
         # Resize and convert to PhotoImage
         frame = frame.resize((300, 200))
         frame = ImageTk.PhotoImage(frame)
         
         # Update the video canvas with the new frame
-        self.video_canvas.create_image(0, 0, anchor=tk.NW, image=frame)
+        self.video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
         
         # Schedule the next update
-        root.after(10, self.update_video_feed)
-    
-    def exit_program(self):
-        """Clean up and exit the application"""
-        if self.processing:
-            self.stop_requested = True
-        # self.picam2.stop()
-        self.root.destroy()
-        sys.exit(0)
-# UML Diagram
-# pyreverse -o html run.py
-# pyreverse -o png run.py
-# Main application
+        app.after(10, self.video_feed)
+
+    def run(self):
+        """Start the application main loop"""
+        self.app.mainloop()
+
+
+# Create and run the application
 if __name__ == "__main__":
-    root = ctk.CTk(fg_color="#e5e0d8")
-    app = MangoGraderApp(root)
-    # Make sure the exit_program is called when closing the window
-    root.protocol("WM_DELETE_WINDOW", app.exit_program)
-    root.mainloop()
+    app = ctk.CTk(fg_color="#e5e0d8")
+    controller = ConveyorController(app)
+    controller.run()
