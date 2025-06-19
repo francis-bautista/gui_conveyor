@@ -1,4 +1,5 @@
-import torch, time, sys, os, threading, datetime
+import torch, time, sys, os, threading
+from datetime import datetime
 import torchvision.transforms as transforms
 import customtkinter as ctk
 from efficientnet_pytorch import EfficientNet
@@ -18,7 +19,7 @@ class ConveyorController:
         # Initialize the main application
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1100x620")
+        self.app.geometry("1100x700")
         self.app.fg_color = "#e5e0d8"
         
         self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
@@ -27,6 +28,8 @@ class ConveyorController:
         self.ripeness_scores = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
         self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
         self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
+        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
         # Load Training and Testing Models
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # Ripeness model
@@ -201,12 +204,12 @@ class ConveyorController:
         self.buttonBackground = ctk.CTkButton(
             left_frame, 
             text="Capture Background", 
-            width=self.button_width//2, 
+            width=self.button_width * 2 + 40, 
             height=self.button_height, 
             fg_color="#1FA3A5", 
             hover_color="#177E80"
         )
-        self.buttonBackground.configure(command=self.picture_side1)
+        self.buttonBackground.configure(command=self.picture_background)
         self.buttonBackground.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
         
         row_index += 1
@@ -232,7 +235,8 @@ class ConveyorController:
             width=self.button_width, 
             height=self.button_height, 
             fg_color="#1FA3A5", 
-            hover_color="#177E80"
+            hover_color="#177E80",
+            state="disabled"
         )
         self.buttonSide1.configure(command=self.picture_side1)
         self.buttonSide1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
@@ -248,8 +252,7 @@ class ConveyorController:
         )
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
-        
-
+    
     def video_frame(self):
         """Setup the video feed frame"""
         row_index=0
@@ -288,8 +291,6 @@ class ConveyorController:
         self.side1_results.grid(row=row_index, column=0, padx=paddingx, pady=paddingy,  sticky="nswe")
         self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side2_results.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
-        
-        
         
         return video_frame
     
@@ -347,6 +348,24 @@ class ConveyorController:
         return frame_choices
     def help_page(self):
         print("Help page")
+        
+    def classify_image(self, image, model, class_labels):
+        # This would be implemented to classify the image
+        # Placeholder implementation
+        image = self.transform(image).unsqueeze(0).to(self.device)
+        output = model(image)
+        _, predicted = torch.max(output, 1)
+        return class_labels[predicted.item()]
+    
+    def picture_background(self):
+        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
+        background_img = self.capture_image(self.picam2)
+        background_img.save(f"background_{self.recorded_time}.jpg")
+        
+        self.buttonBackground.configure(state="disabled")
+        self.buttonSide1.configure(state="normal")
+        
     def enter_priority(self):
         ripeness = self.ripeness_combo.get()
         bruises = self.bruises_combo.get()
@@ -371,15 +390,23 @@ class ConveyorController:
     def picture_side1(self):
         """Handle capturing side 1 image"""
         print("Process and pictured side 1")
+        top_image = self.capture_image(self.picam2)
+        top_image.save(f"{self.recorded_time}_top.png")
+        formatted_date_time = self.recorded_time
+        top_class_ripeness = self.classify_image(top_image, self.model_ripeness, self.class_labels_ripeness)
+        top_class_bruises = self.classify_image(top_image, self.model_bruises, self.class_labels_bruises)
+        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", 
+                                                      f"{formatted_date_time}_background.png", 
+                                                      formatted_date_time, True,
+                                                      self.DISTANCE_CAMERA_TO_OBJECT, 
+                                                      self.FOCAL_LENGTH_PIXELS
+                                                      )
+        print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
+        top_size_class = determine_size(top_width, top_length) 
+        self.update_side1_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class)
+            
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
-        now = datetime.now()
-        formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-        print(formatted_date_time)
-        # Capture background
-        # goto function capture_image
-        top_background = self.capture_image(self.picam2)
-        top_background.save(f"{formatted_date_time}_background.png")
         
     def capture_image(self, picam2):
         # This would be implemented to capture an image from the camera
@@ -387,12 +414,26 @@ class ConveyorController:
         image = picam2.capture_array()
         image = Image.fromarray(image).convert("RGB")
         return image
-    
+
+    def update_side1_box_results(self, image, ripeness, bruises, size):
+        """Update the UI with top results"""
+        def update():
+            self.top_result_label.configure(
+                text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}"
+            )
+            top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
+            self.side1_box.create_image(0, 0, anchor=ctk.NW, image=top_photo)
+            self.side1_box.image = top_photo  # Keep a reference
+        self.app.after(0, update)
+
     def picture_side2(self):
         """Handle capturing side 2 image"""
         print("Process and pictured side 2")
-        self.buttonSide1.configure(state="normal")
+        bottom_background = self.capture_image(self.picam2)
+        bottom_background.save(f"{self.recorded_time}_bottom.png")
+        
         self.buttonSide2.configure(state="disabled")
+        self.buttonBackground.configure(state="normal")
         
     def move_motor(self, motor_array):
         """Control motor movement based on array values"""

@@ -96,7 +96,7 @@ class FakePicamera2:
         
         # Generate fake RGB image data
         fake_image = np.random.randint(0, 255, (size[1], size[0], 3), dtype=np.uint8)
-        print(f"[Fake] capture_array('{name}') -> shape {fake_image.shape}")
+        # print(f"[Fake] capture_array('{name}') -> shape {fake_image.shape}")
         return fake_image
     
     def capture_file(self, name, format=None, wait=True):
