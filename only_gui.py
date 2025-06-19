@@ -1,4 +1,4 @@
-import torch, time, sys, os, threading
+import torch, time, sys, os, threading, datetime
 import torchvision.transforms as transforms
 import customtkinter as ctk
 from efficientnet_pytorch import EfficientNet
@@ -197,6 +197,20 @@ class ConveyorController:
 
         row_index += 1
 
+        # Camera control buttons
+        self.buttonBackground = ctk.CTkButton(
+            left_frame, 
+            text="Capture Background", 
+            width=self.button_width//2, 
+            height=self.button_height, 
+            fg_color="#1FA3A5", 
+            hover_color="#177E80"
+        )
+        self.buttonBackground.configure(command=self.picture_side1)
+        self.buttonBackground.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        
+        row_index += 1
+        
         # Run button
         self.buttonRun = ctk.CTkButton(
             left_frame, 
@@ -359,7 +373,21 @@ class ConveyorController:
         print("Process and pictured side 1")
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
+        now = datetime.now()
+        formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+        print(formatted_date_time)
+        # Capture background
+        # goto function capture_image
+        top_background = self.capture_image(self.picam2)
+        top_background.save(f"{formatted_date_time}_background.png")
         
+    def capture_image(self, picam2):
+        # This would be implemented to capture an image from the camera
+        # Placeholder implementation
+        image = picam2.capture_array()
+        image = Image.fromarray(image).convert("RGB")
+        return image
+    
     def picture_side2(self):
         """Handle capturing side 2 image"""
         print("Process and pictured side 2")
