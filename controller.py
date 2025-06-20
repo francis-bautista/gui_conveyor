@@ -275,7 +275,7 @@ class ConveyorController:
         self.video_canvas.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
         results_frame = ctk.CTkFrame(video_frame)
-        results_frame.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
+        results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
         results_label = ctk.CTkLabel(results_frame, text="Average Results", justify="center")
         results_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
