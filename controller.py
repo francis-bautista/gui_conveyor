@@ -277,13 +277,13 @@ class ConveyorController:
         results_frame = ctk.CTkFrame(video_frame)
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
         results_label = ctk.CTkLabel(results_frame, text="List of Results", justify="center")
-        results_label.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        results_label.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         row_index += 1
         dynamic_results_frame = ctk.CTkFrame(video_frame)
         dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
         self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", justify="center")
-        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         
         row_index = 0
