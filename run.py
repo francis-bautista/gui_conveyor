@@ -6,16 +6,23 @@ import time
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import ttk  # For combo boxes
-from picamera2 import Picamera2
 from datetime import datetime
 from scipy.spatial import distance as dist
 import sys
 import os
 from tkinter import ttk, messagebox
-import RPi.GPIO as GPIO
 import threading
 from get_size import calculate_size, determine_size
 from help_page import hp
+try:
+    import RPi.GPIO as GPIO
+    from picamera2 import Picamera2
+    print("Running on Raspberry Pi - using real GPIO")
+except ImportError:
+    from fake_gpio import GPIO
+    from fake_picamera2 import Picamera2
+    print("Running on non-RPi system - using mock GPIO")
+
 class MangoGraderApp:
     def __init__(self, root):
         self.root = root
