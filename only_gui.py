@@ -19,7 +19,7 @@ class ConveyorController:
         # Initialize the main application
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1100x700")
+        self.app.geometry("1100x670")
         self.app.fg_color = "#e5e0d8"
         
         self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
@@ -61,6 +61,7 @@ class ConveyorController:
         self.relay2 = 13   # Motor 1 Reverse
         self.relay3 = 19  # Motor 2 Forward
         self.relay4 = 26  # Motor 2 Reverse
+        GPIO.cleanup()  # Reset GPIO settings
         GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
         GPIO.setup(self.relay1, GPIO.OUT)
         GPIO.setup(self.relay2, GPIO.OUT)
