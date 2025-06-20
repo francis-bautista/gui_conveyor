@@ -292,9 +292,9 @@ class ConveyorController:
         self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
-        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, fg_color="#FFFFFF")
+        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
         self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, fg_color="#FFFFFF")
+        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
         self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
