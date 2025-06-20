@@ -1,15 +1,60 @@
+import torch, time, sys, os, threading
+from datetime import datetime
+import torchvision.transforms as transforms
 import customtkinter as ctk
-import time, sys, os, threading
-import RPi.GPIO as GPIO   
-from picamera2 import Picamera2
+from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
+from get_size import calculate_size, determine_size
+try:
+    import RPi.GPIO as GPIO
+    from picamera2 import Picamera2
+    print("Running on Raspberry Pi - using real GPIO")
+except ImportError:
+    from fake_gpio import GPIO
+    from fake_picamera2 import Picamera2
+    print("Running on non-RPi system - using mock GPIO")
+
 class ConveyorController:
     def __init__(self, app):
         # Initialize the main application
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1100x620")
+        self.app.geometry("1100x670")
         self.app.fg_color = "#e5e0d8"
+        ctk.set_appearance_mode("light")
+        # Set consistent button dimensions
+        self.button_width = 180
+        self.button_height = 40
+        self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
+        self.class_labels_bruises = ['bruised', 'unbruised']
+        self.class_labels_size = ['small', 'medium', 'large']
+        self.ripeness_scores = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
+        self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
+        self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
+        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.top_final_score = 0
+        self.bottom_final_score = 0
+        # Load Training and Testing Models
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Ripeness model
+        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_ripeness))
+        self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
+        self.model_ripeness.eval()
+        self.model_ripeness.to(self.device)
+        # Bruises model
+        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.class_labels_bruises))
+        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
+        self.model_bruises.eval()
+        self.model_bruises.to(self.device)
+        # Define transformations
+        self.transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+        # Size calculation parameters
+        self.FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
+        self.DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
         
         # Set consistent button dimensions
         self.button_width = 180
@@ -19,6 +64,7 @@ class ConveyorController:
         self.relay2 = 13   # Motor 1 Reverse
         self.relay3 = 19  # Motor 2 Forward
         self.relay4 = 26  # Motor 2 Reverse
+        GPIO.cleanup()  # Reset GPIO settings
         GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
         GPIO.setup(self.relay1, GPIO.OUT)
         GPIO.setup(self.relay2, GPIO.OUT)
@@ -30,13 +76,17 @@ class ConveyorController:
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
         GPIO.setwarnings(False)
-        # Initialize UI components
 
         # Initialize camera
-        self.picam2 = Picamera2()
-        self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
-        self.picam2.configure(self.camera_config)
-        self.picam2.start()
+        try:
+            self.picam2 = Picamera2()
+            self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
+            self.picam2.configure(self.camera_config)
+            self.picam2.start()
+            print("Camera initialized successfully")
+        except Exception as e:
+            print(f"Error initializing camera: {e}")
+            self.picam2 = None
         
         self.init_ui()
     
@@ -57,9 +107,12 @@ class ConveyorController:
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
         
+        self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="nswe")
+        
         self.user_priority_frame(self.main_frame)
         self.control_frame(self.main_frame)
-        self.video_frame()
+        self.video_frame(self.view_frame)
         self.video_feed()
         
 
@@ -155,6 +208,20 @@ class ConveyorController:
 
         row_index += 1
 
+        # Camera control buttons
+        self.buttonBackground = ctk.CTkButton(
+            left_frame, 
+            text="Capture Background", 
+            width=self.button_width * 2 + 40, 
+            height=self.button_height, 
+            fg_color="#1FA3A5", 
+            hover_color="#177E80"
+        )
+        self.buttonBackground.configure(command=self.picture_background)
+        self.buttonBackground.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        
+        row_index += 1
+        
         # Run button
         self.buttonRun = ctk.CTkButton(
             left_frame, 
@@ -176,7 +243,8 @@ class ConveyorController:
             width=self.button_width, 
             height=self.button_height, 
             fg_color="#1FA3A5", 
-            hover_color="#177E80"
+            hover_color="#177E80",
+            state="disabled"
         )
         self.buttonSide1.configure(command=self.picture_side1)
         self.buttonSide1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
@@ -192,14 +260,13 @@ class ConveyorController:
         )
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
-        
-
-    def video_frame(self):
+    
+    def video_frame(self, frame):
         """Setup the video feed frame"""
         row_index=0
         paddingx=7
         paddingy=7
-        video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
@@ -211,29 +278,30 @@ class ConveyorController:
         row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
-        results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
-        results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        self.results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
+        self.results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
         
         
-        row_index += 1
-        self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
+        row_index = 0
+        side_frame = ctk.CTkFrame(frame)
+        side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        
+        self.side1_label = ctk.CTkLabel(side_frame, text="Side 1")
         self.side1_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_label = ctk.CTkLabel(video_frame, text="Side 2")
+        self.side2_label = ctk.CTkLabel(side_frame, text="Side 2")
         self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
-        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
         self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.side1_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
+        self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
-        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side1_results = ctk.CTkLabel(side_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side1_results.grid(row=row_index, column=0, padx=paddingx, pady=paddingy,  sticky="nswe")
-        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side2_results = ctk.CTkLabel(side_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side2_results.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
-        
-        
         
         return video_frame
     
@@ -291,6 +359,24 @@ class ConveyorController:
         return frame_choices
     def help_page(self):
         print("Help page")
+        
+    def classify_image(self, image, model, class_labels):
+        # This would be implemented to classify the image
+        # Placeholder implementation
+        image = self.transform(image).unsqueeze(0).to(self.device)
+        output = model(image)
+        _, predicted = torch.max(output, 1)
+        return class_labels[predicted.item()]
+    
+    def picture_background(self):
+        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
+        background_img = self.capture_image(self.picam2)
+        background_img.save(f"{self.recorded_time}_background.png")
+        
+        self.buttonBackground.configure(state="disabled")
+        self.buttonSide1.configure(state="normal")
+        
     def enter_priority(self):
         ripeness = self.ripeness_combo.get()
         bruises = self.bruises_combo.get()
@@ -315,14 +401,102 @@ class ConveyorController:
     def picture_side1(self):
         """Handle capturing side 1 image"""
         print("Process and pictured side 1")
+        top_image = self.capture_image(self.picam2)
+        top_image.save(f"{self.recorded_time}_top.png")
+        formatted_date_time = self.recorded_time
+        top_class_ripeness = self.classify_image(top_image, self.model_ripeness, self.class_labels_ripeness)
+        top_class_bruises = self.classify_image(top_image, self.model_bruises, self.class_labels_bruises)
+        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", f"{formatted_date_time}_background.png", 
+        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
+        
+        print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
+        top_size_class = determine_size(top_width, top_length) 
+        top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+        self.top_final_score=top_final_grade
+        top_letter_grade = self.find_letter_grade(top_final_grade)
+        self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
+        
         self.buttonSide1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
-        
+
     def picture_side2(self):
         """Handle capturing side 2 image"""
         print("Process and pictured side 2")
-        self.buttonSide1.configure(state="normal")
+        bottom_image = self.capture_image(self.picam2)
+        bottom_image.save(f"{self.recorded_time}_bottom.png")
+        formatted_date_time = self.recorded_time
+        bottom_class_ripeness = self.classify_image(bottom_image, self.model_ripeness, self.class_labels_ripeness)
+        bottom_class_bruises = self.classify_image(bottom_image, self.model_bruises, self.class_labels_bruises)
+        bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", f"{formatted_date_time}_background.png", 
+        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
+        
+        print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
+        bottom_size_class = determine_size(bottom_width, bottom_length) 
+        bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
+        self.bottom_final_score=bottom_final_grade
+        bottom_letter_grade = self.find_letter_grade(bottom_final_grade)
+        self.update_side_box_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class, bottom_final_grade, bottom_letter_grade, False)
+        
+        average_score = (self.top_final_score + self.bottom_final_score) / 2
+        average_letter = self.find_letter_grade(average_score)
+        
+        self.results_data.configure(text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
+        
         self.buttonSide2.configure(state="disabled")
+        self.buttonBackground.configure(state="normal")
+     
+    def find_letter_grade(self,input_grade):
+        r_priority = float(self.ripeness_combo.get())
+        b_priority = float(self.bruises_combo.get())
+        s_priority = float(self.size_combo.get())
+        max_gradeA = r_priority*self.ripeness_scores['green'] + b_priority*self.bruiseness_scores['unbruised'] + s_priority*self.size_scores['large']
+        min_gradeC = r_priority*self.ripeness_scores['yellow'] + b_priority*self.bruiseness_scores['bruised'] + s_priority*self.size_scores['small']
+        difference = (max_gradeA - min_gradeC)/3
+        min_gradeA = max_gradeA - difference
+        max_gradeB = min_gradeA
+        min_gradeB = max_gradeB - difference
+        max_gradeC = min_gradeB
+        min_gradeC = max_gradeC - difference
+        print("Calculated Grade Range")
+        print(f"Max Grade A: {max_gradeA}, Min Grade A: {min_gradeA}, Difference: {max_gradeA-min_gradeA}")
+        print(f"Max Grade B: {max_gradeB}, Min Grade B: {min_gradeB}, Difference: {max_gradeB-min_gradeB}")
+        print(f"Max Grade C: {max_gradeC}, Min Grade C: {min_gradeC}, Difference: {max_gradeC-min_gradeC}")
+        if (input_grade >= min_gradeA) and (input_grade <= max_gradeA):
+            return "A"
+        elif (input_grade >= min_gradeB) and (input_grade < max_gradeB):
+            return "B"
+        else:
+            return "C"        
+
+    def final_grade(self,r,b,s):
+        r_priority = float(self.ripeness_combo.get())
+        b_priority = float(self.bruises_combo.get())
+        s_priority = float(self.size_combo.get())
+        resulting_grade = r_priority*self.ripeness_scores[r] + b_priority*self.bruiseness_scores[b] + s_priority*self.size_scores[s]
+        print(f"Resulting Grade: {resulting_grade}")
+        return resulting_grade
+    
+    def capture_image(self, picam2):
+        # This would be implemented to capture an image from the camera
+        # Placeholder implementation
+        image = picam2.capture_array()
+        image = Image.fromarray(image).convert("RGB")
+        return image
+
+    def update_side_box_results(self, image, ripeness, bruises, size, score, letter, isTop):
+        """Update the UI with top results"""
+        def update():
+            if isTop:
+                self.side1_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
+                top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
+                self.side1_box.create_image(0, 0, anchor=ctk.NW, image=top_photo)
+                self.side1_box.image = top_photo  # Keep a reference
+            else:
+                self.side2_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
+                bottom_photo = ImageTk.PhotoImage(image.resize((300, 200)))
+                self.side2_box.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
+                self.side2_box.image = bottom_photo  # Keep a reference
+        self.app.after(0, update) # either video_frame or app
         
     def move_motor(self, motor_array):
         """Control motor movement based on array values"""
