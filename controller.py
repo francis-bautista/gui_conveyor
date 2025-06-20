@@ -7,12 +7,15 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 try:
     import RPi.GPIO as GPIO
-    from picamera2 import Picamera2
     print("Running on Raspberry Pi - using real GPIO")
 except ImportError:
     from fake_gpio import GPIO
-    from fake_picamera2 import Picamera2
     print("Running on non-RPi system - using mock GPIO")
+try:
+    from picamera2 import Picamera2
+    print("Running on Raspberry Pi - using real picamera2")
+except ImportError:
+    from fake_picamera2 import Picamera2
 
 class ConveyorController:
     def __init__(self, app):
