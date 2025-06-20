@@ -21,7 +21,10 @@ class ConveyorController:
         self.app.title("Conveyor Controller")
         self.app.geometry("1100x670")
         self.app.fg_color = "#e5e0d8"
-        
+        ctk.set_appearance_mode("light")
+        # Set consistent button dimensions
+        self.button_width = 180
+        self.button_height = 40
         self.class_labels_ripeness = ['green', 'yellow_green', 'yellow']
         self.class_labels_bruises = ['bruised', 'unbruised']
         self.class_labels_size = ['small', 'medium', 'large']
@@ -104,9 +107,12 @@ class ConveyorController:
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
         
+        self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="nswe")
+        
         self.user_priority_frame(self.main_frame)
         self.control_frame(self.main_frame)
-        self.video_frame()
+        self.video_frame(self.view_frame)
         self.video_feed()
         
 
@@ -255,12 +261,12 @@ class ConveyorController:
         self.buttonSide2.configure(command=self.picture_side2)
         self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
     
-    def video_frame(self):
+    def video_frame(self, frame):
         """Setup the video feed frame"""
         row_index=0
         paddingx=7
         paddingy=7
-        video_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
@@ -276,22 +282,25 @@ class ConveyorController:
         self.results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
         
         
-        row_index += 1
-        self.side1_label = ctk.CTkLabel(video_frame, text="Side 1")
+        row_index = 0
+        side_frame = ctk.CTkFrame(frame)
+        side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        
+        self.side1_label = ctk.CTkLabel(side_frame, text="Side 1")
         self.side1_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_label = ctk.CTkLabel(video_frame, text="Side 2")
+        self.side2_label = ctk.CTkLabel(side_frame, text="Side 2")
         self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
-        self.side1_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200)
         self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_box = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200)
         self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
-        self.side1_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side1_results = ctk.CTkLabel(side_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side1_results.grid(row=row_index, column=0, padx=paddingx, pady=paddingy,  sticky="nswe")
-        self.side2_results = ctk.CTkLabel(video_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
+        self.side2_results = ctk.CTkLabel(side_frame, text="Ripeness: \nBruises: \nSize: \nScore: ")
         self.side2_results.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         return video_frame
