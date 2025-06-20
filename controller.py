@@ -269,17 +269,21 @@ class ConveyorController:
         video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
-        video_label = ctk.CTkLabel(video_frame, text="Live Video Feed")
+        video_label = ctk.CTkLabel(video_frame, text="Live Video Feed", justify="center")
         video_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.video_canvas.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        results_label = ctk.CTkLabel(video_frame, text="Overall Results")
-        results_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        results_frame = ctk.CTkFrame(video_frame)
+        results_frame.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
+        results_label = ctk.CTkLabel(results_frame, text="Average Results", justify="center")
+        results_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
         row_index += 1
-        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
-        self.results_data = ctk.CTkLabel(video_frame, text="Average Score: \nPredicted Grade:")
-        self.results_data.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="ns")
+        dynamic_results_frame = ctk.CTkFrame(video_frame)
+        dynamic_results_frame.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
+        self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", justify="center")
+        self.results_data.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
         
         row_index = 0
