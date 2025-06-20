@@ -280,14 +280,14 @@ class ConveyorController:
         results_label.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         row_index += 1
-        dynamic_results_frame = ctk.CTkFrame(video_frame)
+        dynamic_results_frame = ctk.CTkFrame(video_frame, width=300, height=200)
         dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
         self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", justify="center")
         self.results_data.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
         
         row_index = 0
-        side_frame = ctk.CTkFrame(frame)
+        side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
         self.side1_label = ctk.CTkLabel(side_frame, text="Side 1")
