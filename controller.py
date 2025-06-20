@@ -269,18 +269,26 @@ class ConveyorController:
         video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
         
-        video_label = ctk.CTkLabel(video_frame, text="Live Video Feed", justify="center")
-        video_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
-        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        # video_label = ctk.CTkLabel(video_frame, text="Live Video Feed", justify="center")
+        # video_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        results_frame = ctk.CTkFrame(video_frame)
-        results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
-        results_label = ctk.CTkLabel(results_frame, text="List of Results", justify="center")
-        results_label.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
+        results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
+        results_vid_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy/2, sticky="nsew")
+        
+        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300//2, height=self.button_height, hover="disabled")
+        video_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy/2, sticky="ns")
+        
+        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
+        self.video_canvas.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy/2, sticky="ns")
+        
+        results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
+        results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy/2, sticky="nsew")
+        
+        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300//2, height=self.button_height, hover="disabled")
+        results_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy/2, stick="nswe")
         
         row_index += 1
-        dynamic_results_frame = ctk.CTkFrame(video_frame, width=300, height=200)
+        dynamic_results_frame = ctk.CTkFrame(video_frame)
         dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
         self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", justify="center")
         self.results_data.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
@@ -290,10 +298,16 @@ class ConveyorController:
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        self.side1_label = ctk.CTkLabel(side_frame, text="Side 1")
-        self.side1_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_label = ctk.CTkLabel(side_frame, text="Side 2")
-        self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        # self.side1_label = ctk.CTkLabel(side_frame, text="Side 1")
+        # self.side1_label.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        # self.side2_label = ctk.CTkLabel(side_frame, text="Side 2")
+        # self.side2_label.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        
+        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.button_height, hover="disabled")
+        self.side1_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.button_height, hover="disabled")
+        self.side2_button.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        
         
         row_index += 1
         self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
