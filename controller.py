@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 try:
     import RPi.GPIO as GPIO
-    from picamera2 import Picamera2
+    from fake_picamera2 import Picamera2 #picamera2
     print("Running on Raspberry Pi - using real GPIO")
 except ImportError:
     from fake_gpio import GPIO
@@ -107,10 +107,10 @@ class ConveyorController:
         # self.app.grid_columnconfigure(2, weight=1)
         
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="nswe")
+        self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="ns")
         
         self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
-        self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="nswe")
+        self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="ns")
         
         self.user_priority_frame(self.main_frame)
         self.control_frame(self.main_frame)
