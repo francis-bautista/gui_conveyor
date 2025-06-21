@@ -5,12 +5,12 @@
 - Version 1: run.py
 - Version 2: controller.py
 
-## Version 2
+### Version 2
 - user controlled conveyor belt
 - improved user interface
 - same features such as picture of side 1 and 2 view and live video feed
 
-## Version 1
+### Version 1
 - fully automated where the conveyor moves based on static time assigned
 - side 1 and side 2 mango view
 - live video feed
@@ -31,7 +31,7 @@ clone this first
 ```bash
   git clone https://github.com/francis-bautista/gui_conveyor.git
 ```
-## How to PUSH and COMMIT changes 
+### How to PUSH and COMMIT changes 
 Add File
 ```bash
   git add .
