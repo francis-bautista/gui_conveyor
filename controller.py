@@ -35,6 +35,7 @@ class ConveyorController:
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.top_final_score = 0
         self.bottom_final_score = 0
+        self.priority_enabled = True
         # Load Training and Testing Models
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # Ripeness model
@@ -136,31 +137,31 @@ class ConveyorController:
         row_index += 1
 
         # Motor control buttons
-        self.buttonCWC1 = ctk.CTkButton(left_frame, text="Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#1F6AA5"
+        self.buttonCWC1 = ctk.CTkButton(left_frame, text="Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                         ,font=self.defaultBold)
         self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
         self.buttonCWC1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonCCWC1 = ctk.CTkButton(left_frame, text="Counter Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#1F6AA5"
+        self.buttonCCWC1 = ctk.CTkButton(left_frame, text="Counter Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                          ,font=self.defaultBold)
         self.buttonCCWC1.configure(command=self.button_callback(self.buttonCCWC1))
         self.buttonCCWC1.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
-        self.buttonCWC2 = ctk.CTkButton(left_frame, text="Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#1F6AA5"
+        self.buttonCWC2 = ctk.CTkButton(left_frame, text="Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                         ,font=self.defaultBold)
         self.buttonCWC2.configure(command=self.button_callback(self.buttonCWC2))
         self.buttonCWC2.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonCCWC2 = ctk.CTkButton(left_frame, text="Counter Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#1F6AA5"
+        self.buttonCCWC2 = ctk.CTkButton(left_frame, text="Counter Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                          ,font=self.defaultBold)
         self.buttonCCWC2.configure(command=self.button_callback(self.buttonCCWC2))
         self.buttonCCWC2.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
         
-        self.timeTxtButton = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.defaultBold, fg_color="#F7F7F7", text_color="#000000") 
+        self.timeTxtButton = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.defaultBold, fg_color="#f9f9fa", text_color="#000000") 
         self.timeTxtButton.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
         
         row_index += 1
@@ -178,8 +179,8 @@ class ConveyorController:
         row_index += 1
         
         # Run button
-        self.buttonRun = ctk.CTkButton(left_frame, text="Run C1/C2", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
-                                       ,font=self.defaultBold)
+        self.buttonRun = ctk.CTkButton(left_frame, text="Run Conveyor(s) (C1/C2)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
+                                       ,font=self.defaultBold, state="disabled")
         self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
         self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
 
@@ -207,7 +208,7 @@ class ConveyorController:
         results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_vid_frame.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
         
-        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#F7F7F7", 
+        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
                                      text_color="#000000")
         video_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="ns")
         
@@ -217,7 +218,7 @@ class ConveyorController:
         results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
         
-        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#F7F7F7", 
+        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
                                        text_color="#000000")
         results_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, stick="nswe")
         
@@ -232,18 +233,18 @@ class ConveyorController:
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#F7F7F7", 
+        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
                                           text_color="#000000")
         self.side1_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#F7F7F7", 
+        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
                                           text_color="#000000")
         self.side2_button.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
         
-        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
+        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
         self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#FFFFFF")
+        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
         self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
         row_index += 1
@@ -272,12 +273,12 @@ class ConveyorController:
         frame_choices.columnconfigure(1, weight=1) 
         frame_choices.columnconfigure(2, weight=1)
         # User Priority heading
-        priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority", hover="disabled", font=self.defaultBold, fg_color="#F7F7F7", text_color="#000000")
+        priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority", hover="disabled", font=self.defaultBold, fg_color="#f9f9fa", text_color="#000000")
         priority_txt.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=3)   
         index_row+=1
         
         # Ripeness combo
-        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#F7F7F7", text_color="#000000")
+        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#f9f9fa", text_color="#000000")
         ripeness_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
         
         self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
@@ -286,7 +287,7 @@ class ConveyorController:
 
         # Bruises combo
         col+=1
-        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#F7F7F7", text_color="#000000")
+        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#f9f9fa", text_color="#000000")
         bruises_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
         self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
         self.bruises_combo.set("3.0")  # Set default value
@@ -294,7 +295,7 @@ class ConveyorController:
         
         # Size combo
         col+=1
-        size_txt = ctk.CTkButton(frame_choices, text="Size", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#F7F7F7", text_color="#000000")
+        size_txt = ctk.CTkButton(frame_choices, text="Size", width=txt_width, hover="disabled", font=self.defaultBold, fg_color="#f9f9fa", text_color="#000000")
         size_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
         
         self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
@@ -310,6 +311,7 @@ class ConveyorController:
         self.button_help.grid(row=index_row+3, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
         
         return frame_choices
+        
     def help_page(self):
         print("Help page")
         
@@ -322,22 +324,68 @@ class ConveyorController:
         return class_labels[predicted.item()]
     
     def picture_background(self):
-        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        if self.priority_enabled == False:
+            self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            
+            background_img = self.capture_image(self.picam2)
+            background_img.save(f"{self.recorded_time}_background.png")
+            
+            self.buttonBackground.configure(state="disabled")
+            self.buttonRun.configure(state="normal")
+            self.buttonSide1.configure(state="normal")
+            self.button_enter.configure(state="disabled")
+        else:
+            topParent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(topParent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
+    
+    def show_error_popup(self, parent, title="Error", message="An error occurred"):
+        # Create popup window
+        popup = ctk.CTkToplevel(parent)
+        popup.title(title)
+        popup.geometry("300x150")
+        popup.fg_color = "#e5e0d8"
+        popup.resizable(False, False)
         
-        background_img = self.capture_image(self.picam2)
-        background_img.save(f"{self.recorded_time}_background.png")
+        # Center the popup
+        popup.transient(parent)
+        popup.grab_set()  # Make popup modal
         
-        self.buttonBackground.configure(state="disabled")
-        self.buttonSide1.configure(state="normal")
+        # Add error message
+        label = ctk.CTkLabel(popup, text=message, wraplength=250, font=self.defaultBold, text_color="#000000")
+        label.pack(pady=20, padx=20)
         
+        # Add OK button
+        ok_button = ctk.CTkButton(popup, text="Ok", command=popup.destroy, fg_color="#979da2", hover_color="#6e7174", font=self.defaultBold)
+        ok_button.pack(pady=10)
+        
+        # Center the popup on parent window
+        popup.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() // 2) - (popup.winfo_width() // 2)
+        y = parent.winfo_y() + (parent.winfo_height() // 2) - (popup.winfo_height() // 2)
+        popup.geometry(f"+{x}+{y}")
+    
     def enter_priority(self):
         ripeness = self.ripeness_combo.get()
         bruises = self.bruises_combo.get()
         size = self.size_combo.get()
         print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
-        self.ripeness_combo.configure(state="disabled")
-        self.bruises_combo.configure(state="disabled")
-        self.size_combo.configure(state="disabled")
+        if self.priority_enabled == False:
+            # unlock the user priority input and clear the fields to default and set it to enter text
+            self.ripeness_combo.configure(state="normal")
+            self.bruises_combo.configure(state="normal")
+            self.size_combo.configure(state="normal")
+            self.ripeness_combo.set("3.0")  # Set default value
+            self.bruises_combo.set("3.0")  # Set default value
+            self.size_combo.set("3.0")  # Set default value
+            self.button_enter.configure(text="Enter")
+            self.priority_enabled = True
+        else:
+            # lock the user priority then set it to cancel text
+            self.ripeness_combo.configure(state="disabled")
+            self.bruises_combo.configure(state="disabled")
+            self.size_combo.configure(state="disabled")
+            self.button_enter.configure(text="Cancel")
+            self.priority_enabled = False
         
     def reset_program(self):
         print("Resetting")
@@ -397,6 +445,7 @@ class ConveyorController:
         
         self.buttonSide2.configure(state="disabled")
         self.buttonBackground.configure(state="normal")
+        self.button_enter.configure(state="normal")
      
     def find_letter_grade(self, input_grade):
         """
@@ -539,6 +588,8 @@ class ConveyorController:
                 return None  # default value for empty textbox
         except ValueError:
             print("Please enter a valid number")
+            topParent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(topParent, "ERROR: Value Error", "Please enter a valid number.")
             return None
         
     def countdown_thread(self, start_count, buttontorun, textbox):
@@ -554,12 +605,12 @@ class ConveyorController:
 
     def _finish_motor_run_threaded(self, buttontorun, textbox, button_list):
         """Finish motor run - called from main thread"""
-        buttontorun.configure(text="Run Conveyor(s) (C1/C2)", state="normal")
+        buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
         print("Done Running!")
         self.stop_motors()
         
         for button in button_list:
-            button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
+            button.configure(fg_color="#979da2", hover_color="#3B8ED0")
         
         textbox.delete("0.0", "end")
         textbox.configure(state="normal")
@@ -570,10 +621,10 @@ class ConveyorController:
             # Get current color
             current_color = button.cget("fg_color")
             # Toggle between blue and green
-            if current_color == "#1F6AA5" or current_color == "#3B8ED0":  # Default blue
+            if current_color == "#979da2" or current_color == "#3B8ED0":  # Default blue
                 button.configure(fg_color="green", hover_color="#0B662B")
             else:
-                button.configure(fg_color="#1F6AA5", hover_color="#3B8ED0")
+                button.configure(fg_color="#979da2", hover_color="#3B8ED0")
         return toggle_color
 
     def button_run(self, buttontorun, textbox):
@@ -581,20 +632,17 @@ class ConveyorController:
         run_time = self.get_number_from_textbox(textbox)
         textbox.configure(state="disabled")
         
-        button_color = [
-            self.buttonCWC1.cget("fg_color"), 
-            self.buttonCCWC1.cget("fg_color"), 
-            self.buttonCWC2.cget("fg_color"), 
-            self.buttonCCWC2.cget("fg_color")
-        ]
+        button_color = [self.buttonCWC1.cget("fg_color"), self.buttonCCWC1.cget("fg_color"), self.buttonCWC2.cget("fg_color"), self.buttonCCWC2.cget("fg_color")]
         
         if run_time is None:
-            print("Input a value")
+            topParent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(topParent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
             textbox.configure(state="normal")
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
-                print("ERROR Unselect one of the buttons for C1/C2")
+                topParent = self.buttonBackground.winfo_toplevel()
+                self.show_error_popup(topParent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
                 textbox.configure(state="normal")
             else:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
@@ -602,16 +650,14 @@ class ConveyorController:
                 buttontorun.configure(text="Running...", state="disabled")
                 
                 # Start countdown in separate thread
-                countdown_thread = threading.Thread(
-                    target=self.countdown_thread, 
-                    args=(int(run_time), buttontorun, textbox)
-                )
+                countdown_thread = threading.Thread(target=self.countdown_thread, args=(int(run_time), buttontorun, textbox))
                 countdown_thread.daemon = True  # Thread will close when main program closes
                 countdown_thread.start()
                 textbox.configure(state="normal")
                 textbox.delete("0.0", "end")  # delete all text
         else: 
-            print("Select One of the Buttons")
+            topParent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(topParent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
             textbox.configure(state="normal")
 
     def video_feed(self):
