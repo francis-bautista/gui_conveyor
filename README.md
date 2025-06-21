@@ -18,6 +18,7 @@
 
 
 ## Kenan's TODO List
+- what to put on the list of results
 - ~~make the controller buttons and gpio~~
 - ~~add the rpi camera with live video feed~~
 - ~~add the top part picturing~~
