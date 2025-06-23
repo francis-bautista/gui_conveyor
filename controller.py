@@ -78,7 +78,16 @@ class ConveyorController:
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
         GPIO.setwarnings(False)
-
+        # Define pin connections (using BOARD numbering)
+        self.dir_pin = 21    # Physical pin 21
+        self.step_pin = 20   # Physical pin 20
+        self.steps_per_revolution = 200
+        # Define absolute positions (steps from home)
+        self.position1 = 50
+        self.position2 = 100
+        self.position3 = 150
+        self.current_position = 0  # Track current position
+        self.step_delay = 0.001    # 1ms delay between steps (adjust for speed)
         # Initialize camera
         try:
             self.picam2 = Picamera2()
@@ -98,6 +107,26 @@ class ConveyorController:
         GPIO.output(self.relay3, GPIO.LOW)
         GPIO.output(self.relay4, GPIO.LOW)
         print("Motors stopped!")
+    # moving the stepper motor
+    def move_to_position(self,target):
+        steps_needed = target - self.current_position
+        
+        if steps_needed == 0:
+            return  # Already at position
+        
+        # Set direction
+        direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
+        GPIO.output(self.dir_pin, direction)
+        
+        # Move required steps
+        for _ in range(abs(steps_needed)):
+            GPIO.output(self.step_pin, GPIO.HIGH)
+            time.sleep(self.step_delay)
+            GPIO.output(self.step_pin, GPIO.LOW)
+            time.sleep(self.step_delay)
+        
+        # Update current position
+        self.current_position = target
 
     def init_ui(self):
         """Initialize all UI components"""
