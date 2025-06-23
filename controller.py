@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 try:
     import RPi.GPIO as GPIO
-    from fake_picamera2 import Picamera2 #picamera2
+    from picamera2 import Picamera2 #picamera2
     print("Running on Raspberry Pi - using real GPIO")
 except ImportError:
     from fake_gpio import GPIO
