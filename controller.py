@@ -137,24 +137,24 @@ class ConveyorController:
         row_index += 1
 
         # Motor control buttons
-        self.buttonCWC1 = ctk.CTkButton(left_frame, text="Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#979da2"
+        self.buttonCWC1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                         ,font=self.defaultBold)
         self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
         self.buttonCWC1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonCCWC1 = ctk.CTkButton(left_frame, text="Counter Clockwise C1", width=self.button_width, height=self.button_height, fg_color="#979da2"
+        self.buttonCCWC1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                          ,font=self.defaultBold)
         self.buttonCCWC1.configure(command=self.button_callback(self.buttonCCWC1))
         self.buttonCCWC1.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
-        self.buttonCWC2 = ctk.CTkButton(left_frame, text="Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#979da2"
+        self.buttonCWC2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                         ,font=self.defaultBold)
         self.buttonCWC2.configure(command=self.button_callback(self.buttonCWC2))
         self.buttonCWC2.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonCCWC2 = ctk.CTkButton(left_frame, text="Counter Clockwise C2", width=self.button_width, height=self.button_height, fg_color="#979da2"
+        self.buttonCCWC2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                          ,font=self.defaultBold)
         self.buttonCCWC2.configure(command=self.button_callback(self.buttonCCWC2))
         self.buttonCCWC2.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
@@ -179,7 +179,7 @@ class ConveyorController:
         row_index += 1
         
         # Run button
-        self.buttonRun = ctk.CTkButton(left_frame, text="Run Conveyor(s) (C1/C2)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
+        self.buttonRun = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.defaultBold, state="disabled")
         self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
         self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
