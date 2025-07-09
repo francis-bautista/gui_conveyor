@@ -362,8 +362,8 @@ class ConveyorController:
             self.buttonSide1.configure(state="normal")
             self.button_enter.configure(state="disabled")
         else:
-            topParent = self.buttonBackground.winfo_toplevel()
-            self.show_error_popup(topParent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
+            top_parent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(top_parent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
     
     def show_error_popup(self, parent, title="Error", message="An error occurred"):
         # Create popup window
@@ -615,8 +615,8 @@ class ConveyorController:
                 return None  # default value for empty textbox
         except ValueError:
             print("Please enter a valid number")
-            topParent = self.buttonBackground.winfo_toplevel()
-            self.show_error_popup(topParent, "ERROR: Value Error", "Please enter a valid number.")
+            top_parent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(top_parent, "ERROR: Value Error", "Please enter a valid number.")
             return None
         
     def countdown_thread(self, start_count, buttontorun, textbox):
@@ -662,14 +662,14 @@ class ConveyorController:
         button_color = [self.buttonCWC1.cget("fg_color"), self.buttonCCWC1.cget("fg_color"), self.buttonCWC2.cget("fg_color"), self.buttonCCWC2.cget("fg_color")]
         
         if run_time is None:
-            topParent = self.buttonBackground.winfo_toplevel()
-            self.show_error_popup(topParent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
+            top_parent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(top_parent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
             textbox.configure(state="normal")
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
-                topParent = self.buttonBackground.winfo_toplevel()
-                self.show_error_popup(topParent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
+                top_parent = self.buttonBackground.winfo_toplevel()
+                self.show_error_popup(top_parent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
                 textbox.configure(state="normal")
             else:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
@@ -683,8 +683,8 @@ class ConveyorController:
                 textbox.configure(state="normal")
                 textbox.delete("0.0", "end")  # delete all text
         else: 
-            topParent = self.buttonBackground.winfo_toplevel()
-            self.show_error_popup(topParent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
+            top_parent = self.buttonBackground.winfo_toplevel()
+            self.show_error_popup(top_parent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
             textbox.configure(state="normal")
 
     def video_feed(self):
