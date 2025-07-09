@@ -188,8 +188,8 @@ class ConveyorController:
 
         row_index += 1
         
-        self.timeTxtButton = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.default_bold, fg_color="#f9f9fa", text_color="#000000") 
-        self.timeTxtButton.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.time_txt_button = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.default_bold, fg_color="#f9f9fa", text_color="#000000") 
+        self.time_txt_button.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
         
         row_index += 1
         self.textbox = ctk.CTkTextbox(left_frame, width=self.button_width, height=self.button_height)
@@ -198,10 +198,10 @@ class ConveyorController:
         row_index += 1
 
         # Camera control buttons
-        self.buttonBackground = ctk.CTkButton(left_frame, text="Capture Background", width=self.button_width * 2 + 40, height=self.button_height, 
+        self.button_background = ctk.CTkButton(left_frame, text="Capture Background", width=self.button_width * 2 + 40, height=self.button_height, 
                                               fg_color="#979da2", hover_color="#6e7174", font=self.default_bold)
-        self.buttonBackground.configure(command=self.picture_background)
-        self.buttonBackground.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_background.configure(command=self.picture_background)
+        self.button_background.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
         
         row_index += 1
         
@@ -357,12 +357,12 @@ class ConveyorController:
             background_img = self.capture_image(self.picam2)
             background_img.save(f"{self.recorded_time}_background.png")
             
-            self.buttonBackground.configure(state="disabled")
+            self.button_background.configure(state="disabled")
             self.buttonRun.configure(state="normal")
             self.buttonSide1.configure(state="normal")
             self.button_enter.configure(state="disabled")
         else:
-            top_parent = self.buttonBackground.winfo_toplevel()
+            top_parent = self.button_background.winfo_toplevel()
             self.show_error_popup(top_parent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
     
     def show_error_popup(self, parent, title="Error", message="An error occurred"):
@@ -471,7 +471,7 @@ class ConveyorController:
         self.results_data.configure(text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
         
         self.buttonSide2.configure(state="disabled")
-        self.buttonBackground.configure(state="normal")
+        self.button_background.configure(state="normal")
         self.button_enter.configure(state="normal")
      
     def find_letter_grade(self, input_grade):
@@ -615,7 +615,7 @@ class ConveyorController:
                 return None  # default value for empty textbox
         except ValueError:
             print("Please enter a valid number")
-            top_parent = self.buttonBackground.winfo_toplevel()
+            top_parent = self.button_background.winfo_toplevel()
             self.show_error_popup(top_parent, "ERROR: Value Error", "Please enter a valid number.")
             return None
         
@@ -662,13 +662,13 @@ class ConveyorController:
         button_color = [self.button_cwc1.cget("fg_color"), self.button_ccwc1.cget("fg_color"), self.button_cwc2.cget("fg_color"), self.button_ccwc2.cget("fg_color")]
         
         if run_time is None:
-            top_parent = self.buttonBackground.winfo_toplevel()
+            top_parent = self.button_background.winfo_toplevel()
             self.show_error_popup(top_parent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
             textbox.configure(state="normal")
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
-                top_parent = self.buttonBackground.winfo_toplevel()
+                top_parent = self.button_background.winfo_toplevel()
                 self.show_error_popup(top_parent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
                 textbox.configure(state="normal")
             else:
@@ -683,7 +683,7 @@ class ConveyorController:
                 textbox.configure(state="normal")
                 textbox.delete("0.0", "end")  # delete all text
         else: 
-            top_parent = self.buttonBackground.winfo_toplevel()
+            top_parent = self.button_background.winfo_toplevel()
             self.show_error_popup(top_parent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
             textbox.configure(state="normal")
 
