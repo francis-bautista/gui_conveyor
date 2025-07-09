@@ -156,10 +156,10 @@ class ConveyorController:
         self.button_exit.configure(command=self.exit_program)
         self.button_exit.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonReset = ctk.CTkButton(left_frame, text="Reset", width=self.button_width, height=self.button_height, fg_color="#979da2", hover_color="#CC0000"
+        self.button_reset = ctk.CTkButton(left_frame, text="Reset", width=self.button_width, height=self.button_height, fg_color="#979da2", hover_color="#CC0000"
                                          ,font=self.default_bold)
-        self.buttonReset.configure(command=self.reset_program)
-        self.buttonReset.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_reset.configure(command=self.reset_program)
+        self.button_reset.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
