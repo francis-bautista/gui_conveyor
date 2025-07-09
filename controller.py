@@ -28,65 +28,53 @@ class ConveyorController:
         self.CLASS_LABEL_BRUISES = ['bruised', 'unbruised']
         self.CLASS_LABEL_SIZE = ['small', 'medium', 'large']
         self.RIPENESS_SCORES = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
-        self.bruiseness_scores = {'bruised': 1.5, 'unbruised': 3.0}
-        self.size_scores = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
+        self.BRUISES_SCORES = {'bruised': 1.5, 'unbruised': 3.0}
+        self.SIZE_SCORES = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.top_final_score = 0
         self.bottom_final_score = 0
         self.priority_enabled = True
-        # Load Training and Testing Models
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # Ripeness model
         self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_RIPENESS))
         self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
         self.model_ripeness.eval()
         self.model_ripeness.to(self.device)
-        # Bruises model
         self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_BRUISES))
         self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)
-        # Define transformations
         self.transform = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
-        # Size calculation parameters
-        self.FOCAL_LENGTH_PIXELS = 3500  # Example value, replace with your camera's focal length
-        self.DISTANCE_CAMERA_TO_OBJECT = 40  # 20.5 cm according to don
-        
-        # Set consistent button dimensions
+        self.FOCAL_LENGTH_PIXELS = 3500
+        self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
-
-        self.relay1 = 6   # Motor 1 Forward
-        self.relay2 = 13   # Motor 1 Reverse
-        self.relay3 = 19  # Motor 2 Forward
-        self.relay4 = 26  # Motor 2 Reverse
-        GPIO.cleanup()  # Reset GPIO settings
-        GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-        GPIO.setup(self.relay1, GPIO.OUT)
-        GPIO.setup(self.relay2, GPIO.OUT)
-        GPIO.setup(self.relay3, GPIO.OUT)
-        GPIO.setup(self.relay4, GPIO.OUT)
-        # Initialize relays to OFF state
-        GPIO.output(self.relay1, GPIO.LOW)
-        GPIO.output(self.relay2, GPIO.LOW)
-        GPIO.output(self.relay3, GPIO.LOW)
-        GPIO.output(self.relay4, GPIO.LOW)
+        self.RELAY1 = 6
+        self.RELAY2 = 13
+        self.RELAY3 = 19
+        self.RELAY4 = 26
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.RELAY1, GPIO.OUT)
+        GPIO.setup(self.RELAY2, GPIO.OUT)
+        GPIO.setup(self.RELAY3, GPIO.OUT)
+        GPIO.setup(self.RELAY4, GPIO.OUT)
+        GPIO.output(self.RELAY1, GPIO.LOW)
+        GPIO.output(self.RELAY2, GPIO.LOW)
+        GPIO.output(self.RELAY3, GPIO.LOW)
+        GPIO.output(self.RELAY4, GPIO.LOW)
         GPIO.setwarnings(False)
-        # Define pin connections (using BOARD numbering)
-        self.dir_pin = 21    # Physical pin 21
-        self.step_pin = 20   # Physical pin 20
+        self.DIR_PIN = 21
+        self.STEP_PIN = 20
         self.steps_per_revolution = 200
-        # Define absolute positions (steps from home)
         self.position1 = 50
         self.position2 = 100
         self.position3 = 150
-        self.current_position = 0  # Track current position
-        self.step_delay = 0.001    # 1ms delay between steps (adjust for speed)
-        # Initialize camera
+        self.current_position = 0
+        self.step_delay = 0.001
         try:
             self.picam2 = Picamera2()
             self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
@@ -96,46 +84,38 @@ class ConveyorController:
         except Exception as e:
             print(f"Error initializing camera: {e}")
             self.picam2 = None
-        
+
         self.init_ui()
     
     def stop_motors(self):
-        GPIO.output(self.relay1, GPIO.LOW)
-        GPIO.output(self.relay2, GPIO.LOW)
-        GPIO.output(self.relay3, GPIO.LOW)
-        GPIO.output(self.relay4, GPIO.LOW)
+        GPIO.output(self.RELAY1, GPIO.LOW)
+        GPIO.output(self.RELAY2, GPIO.LOW)
+        GPIO.output(self.RELAY3, GPIO.LOW)
+        GPIO.output(self.RELAY4, GPIO.LOW)
         print("Motors stopped!")
-    # moving the stepper motor
+
     def move_to_position(self,target):
         steps_needed = target - self.current_position
-        
         if steps_needed == 0:
-            return  # Already at position
+            return  
         
-        # Set direction
         direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
-        GPIO.output(self.dir_pin, direction)
-        
-        # Move required steps
+        GPIO.output(self.DIR_PIN, direction)
         for _ in range(abs(steps_needed)):
-            GPIO.output(self.step_pin, GPIO.HIGH)
+            GPIO.output(self.STEP_PIN, GPIO.HIGH)
             time.sleep(self.step_delay)
-            GPIO.output(self.step_pin, GPIO.LOW)
+            GPIO.output(self.STEP_PIN, GPIO.LOW)
             time.sleep(self.step_delay)
         
-        # Update current position
         self.current_position = target
 
     def init_ui(self):
         """Initialize all UI components"""
-        # Configure grid layout
-        self.app.grid_columnconfigure(0, weight=1)  # Control column (analysis results)
-        self.app.grid_columnconfigure(1, weight=1)  # Right column (controls)
-        # self.app.grid_columnconfigure(2, weight=1)
+        self.app.grid_columnconfigure(0, weight=1)
+        self.app.grid_columnconfigure(1, weight=1)
         
         self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.main_frame.grid(row=0, column=1, padx=7, pady=7, sticky="ns")
-        
         self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="ns")
         
@@ -148,191 +128,178 @@ class ConveyorController:
     def control_frame(self, main_frame):
         left_frame = ctk.CTkFrame(main_frame)
         left_frame.grid(row=0, column=0, padx=7, pady=7)
-        button_padx=7
-        button_pady=7
+        BUTTON_PADDING_X=7
+        BUTTON_PADDING_X=7
         row_index=0
         self.button_exit = ctk.CTkButton(left_frame, text="Exit", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#CC0000"
                                         ,font=self.DEFAULT_BOLD)
         self.button_exit.configure(command=self.exit_program)
-        self.button_exit.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_exit.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         self.button_reset = ctk.CTkButton(left_frame, text="Reset", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#CC0000"
                                          ,font=self.DEFAULT_BOLD)
         self.button_reset.configure(command=self.reset_program)
-        self.button_reset.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_reset.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
-
-        # Motor control buttons
         self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
         self.button_cwc1.configure(command=self.button_callback(self.button_cwc1))
-        self.button_cwc1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
-
+        self.button_cwc1.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         self.button_ccwc1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
         self.button_ccwc1.configure(command=self.button_callback(self.button_ccwc1))
-        self.button_ccwc1.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_ccwc1.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
-
         self.button_cwc2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
         self.button_cwc2.configure(command=self.button_callback(self.button_cwc2))
-        self.button_cwc2.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
-
+        self.button_cwc2.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         self.button_ccwc2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
         self.button_ccwc2.configure(command=self.button_callback(self.button_ccwc2))
-        self.button_ccwc2.grid(row=row_index, column=1, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_ccwc2.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
-        
         self.time_txt_button = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000") 
-        self.time_txt_button.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
-        
+        self.time_txt_button.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
+
         row_index += 1
         self.textbox = ctk.CTkTextbox(left_frame, width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT)
-        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
-
         self.button_background = ctk.CTkButton(left_frame, text="Capture Background", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, 
                                               fg_color="#979da2", hover_color="#6e7174", font=self.DEFAULT_BOLD)
         self.button_background.configure(command=self.picture_background)
-        self.button_background.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_background.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         
         row_index += 1
-        
         self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.DEFAULT_BOLD, state="disabled")
         self.button_run.configure(command=lambda: self.button_run(self.button_run, self.textbox))
-        self.button_run.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_run.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
-
         self.button_side1 = ctk.CTkButton(left_frame, text="Capture Side 1", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.DEFAULT_BOLD)
         self.button_side1.configure(command=self.picture_side1)
-        self.button_side1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_side1.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         self.button_side2 = ctk.CTkButton(left_frame, text="Capture Side 2", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.DEFAULT_BOLD)
         self.button_side2.configure(command=self.picture_side2)
-        self.button_side2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
+        self.button_side2.grid(row=row_index, column=1, padx= BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
     
     def video_frame(self, frame):
-        """Setup the video feed frame"""
         row_index=0
-        paddingx=7
-        paddingy=7
+        PADDING_X=7
+        PADDING_Y=7
         video_frame = ctk.CTkFrame(frame)
-        video_frame.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
+        video_frame.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         
         results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
-        results_vid_frame.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
+        results_vid_frame.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
         
         video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                      text_color="#000000")
-        video_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="ns")
+        video_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
         
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index+1, column=0, padx=paddingx/2, pady=paddingy/2, sticky="ns")
+        self.video_canvas.grid(row=row_index+1, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
         
         results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
-        results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
+        results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
         
         results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                        text_color="#000000")
-        results_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, stick="nswe")
+        results_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, stick="nswe")
         
         row_index += 1
         dynamic_results_frame = ctk.CTkFrame(video_frame)
-        dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx, pady=paddingy, sticky="nsew")
+        dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", compound="left", justify="left")
-        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=paddingx, pady=paddingy, sticky="nsew")
+        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         
         
         row_index = 0
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
-        side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
+        side_frame.grid(row=row_index+1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
         
         self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                           text_color="#000000")
-        self.side1_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side1_button.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                           text_color="#000000")
-        self.side2_button.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_button.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         
         row_index += 1
         
         self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
-        self.side1_box.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side1_box.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
-        self.side2_box.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_box.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         
         row_index += 1
         results_txt_frame1 = ctk.CTkFrame(side_frame)
-        results_txt_frame1.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
+        results_txt_frame1.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         self.side1_results = ctk.CTkLabel(results_txt_frame1, text="Ripeness: null\nBruises: null\nSize: null\nScore: null", compound="left", justify="left")
-        self.side1_results.grid(row=0, column=0, padx=paddingx, pady=paddingy,  sticky="nswe")
+        self.side1_results.grid(row=0, column=0, padx=PADDING_X, pady=PADDING_Y,  sticky="nswe")
         
         results_txt_frame2 = ctk.CTkFrame(side_frame)
-        results_txt_frame2.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        results_txt_frame2.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         self.side2_results = ctk.CTkLabel(results_txt_frame2, text="Ripeness: null\nBruises: null\nSize: null\nScore: null", compound="left", justify="left")
-        self.side2_results.grid(row=0, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
+        self.side2_results.grid(row=0, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         
         return video_frame
     
     def user_priority_frame(self, main_frame):
         """Setup the user priority section with combo boxes"""
         index_row=6
-        padding=7
-        width_combobox=120
-        txt_width=80
-        col=0
+        index_col=0
+        PADDING_X_Y=7
+        WIDTH_COMBOBOX=120
+        TXT_WIDTH=80
         frame_choices = ctk.CTkFrame(main_frame)
-        frame_choices.grid(row=index_row, column=0, padx=padding, pady=padding, sticky="nswe")
+        frame_choices.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         frame_choices.columnconfigure(0, weight=1)
         frame_choices.columnconfigure(1, weight=1) 
         frame_choices.columnconfigure(2, weight=1)
-        # User Priority heading
+
         priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority", hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        priority_txt.grid(row=6, column=col, padx=padding, pady=padding, sticky="nswe", columnspan=3)   
+        priority_txt.grid(row=6, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)   
         index_row+=1
         
-        # Ripeness combo
-        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=txt_width, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        ripeness_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
+        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
+        ripeness_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
         
-        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
-        self.ripeness_combo.set("3.0")  # Set default value
-        self.ripeness_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
+        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
+        self.ripeness_combo.set("3.0")
+        self.ripeness_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
 
-        # Bruises combo
-        col+=1
-        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=txt_width, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        bruises_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
-        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
-        self.bruises_combo.set("3.0")  # Set default value
-        self.bruises_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
+        index_col+=1
+        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
+        bruises_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
+        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
+        self.bruises_combo.set("3.0")
+        self.bruises_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         
-        # Size combo
-        col+=1
-        size_txt = ctk.CTkButton(frame_choices, text="Size", width=txt_width, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        size_txt.grid(row=index_row, column=col, padx=padding, pady=padding, sticky="ew")
+        index_col+=1
+        size_txt = ctk.CTkButton(frame_choices, text="Size", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
+        size_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
         
-        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=width_combobox)
-        self.size_combo.set("3.0")  # Set default value
-        self.size_combo.grid(row=index_row+1, column=col, padx=padding, pady=padding, sticky="nswe")
+        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
+        self.size_combo.set("3.0")
+        self.size_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority, fg_color="#979da2", hover_color="#6e7174"
                                           ,font=self.DEFAULT_BOLD)
-        self.button_enter.grid(row=index_row+2, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
+        self.button_enter.grid(row=index_row+2, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
         self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.help_page, fg_color="#979da2", hover_color="#6e7174"
                                          ,font=self.DEFAULT_BOLD)
-        self.button_help.grid(row=index_row+3, column=0, padx=padding, pady=padding, sticky="nswe", columnspan=3)
+        self.button_help.grid(row=index_row+3, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
         return frame_choices
         
@@ -340,8 +307,6 @@ class ConveyorController:
         print("Help page")
         
     def classify_image(self, image, model, class_labels):
-        # This would be implemented to classify the image
-        # Placeholder implementation
         image = self.transform(image).unsqueeze(0).to(self.device)
         output = model(image)
         _, predicted = torch.max(output, 1)
@@ -363,26 +328,21 @@ class ConveyorController:
             self.show_error_popup(top_parent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
     
     def show_error_popup(self, parent, title="Error", message="An error occurred"):
-        # Create popup window
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
         popup.geometry("300x150")
         popup.fg_color = "#e5e0d8"
         popup.resizable(False, False)
         
-        # Center the popup
         popup.transient(parent)
-        popup.grab_set()  # Make popup modal
+        popup.grab_set()
         
-        # Add error message
         label = ctk.CTkLabel(popup, text=message, wraplength=250, font=self.DEFAULT_BOLD, text_color="#000000")
         label.pack(pady=20, padx=20)
         
-        # Add OK button
         ok_button = ctk.CTkButton(popup, text="Ok", command=popup.destroy, fg_color="#979da2", hover_color="#6e7174", font=self.DEFAULT_BOLD)
         ok_button.pack(pady=10)
         
-        # Center the popup on parent window
         popup.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (popup.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (popup.winfo_height() // 2)
@@ -394,17 +354,15 @@ class ConveyorController:
         size = self.size_combo.get()
         print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
         if self.priority_enabled == False:
-            # unlock the user priority input and clear the fields to default and set it to enter text
             self.ripeness_combo.configure(state="normal")
             self.bruises_combo.configure(state="normal")
             self.size_combo.configure(state="normal")
-            self.ripeness_combo.set("3.0")  # Set default value
-            self.bruises_combo.set("3.0")  # Set default value
-            self.size_combo.set("3.0")  # Set default value
+            self.ripeness_combo.set("3.0")
+            self.bruises_combo.set("3.0")
+            self.size_combo.set("3.0")
             self.button_enter.configure(text="Enter")
             self.priority_enabled = True
         else:
-            # lock the user priority then set it to cancel text
             self.ripeness_combo.configure(state="disabled")
             self.bruises_combo.configure(state="disabled")
             self.size_combo.configure(state="disabled")
@@ -413,18 +371,17 @@ class ConveyorController:
         
     def reset_program(self):
         print("Resetting")
-        GPIO.cleanup()  # Reset GPIO settings
+        GPIO.cleanup()
         self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
-        GPIO.cleanup()  # Reset GPIO settings
+        GPIO.cleanup()
         self.picam2.stop()
         sys.exit(0)
 
     def picture_side1(self):
-        """Handle capturing side 1 image"""
         print("Process and pictured side 1")
         top_image = self.capture_image(self.picam2)
         top_image.save(f"{self.recorded_time}_top.png")
@@ -445,7 +402,6 @@ class ConveyorController:
         self.button_side2.configure(state="normal")
 
     def picture_side2(self):
-        """Handle capturing side 2 image"""
         print("Process and pictured side 2")
         bottom_image = self.capture_image(self.picam2)
         bottom_image.save(f"{self.recorded_time}_bottom.png")
@@ -472,29 +428,13 @@ class ConveyorController:
         self.button_enter.configure(state="normal")
      
     def find_letter_grade(self, input_grade):
-        """
-        Determines letter grade (A, B, or C) based on input score and priority weights.
-        
-        Args:
-            input_grade (float): The calculated grade score to classify
-            
-        Returns:
-            str: Letter grade ('A', 'B', or 'C')
-        """
-        # Get priority weights from UI components
         priorities = self._get_priority_weights()
-        
-        # Calculate grade boundaries
         boundaries = self._calculate_grade_boundaries(priorities)
-        
-        # Debug output
         self._print_grade_ranges(boundaries)
         
-        # Determine letter grade
         return self._classify_grade(input_grade, boundaries)
 
     def _get_priority_weights(self):
-        """Extract priority weights from combo boxes."""
         return {
             'ripeness': float(self.ripeness_combo.get()),
             'bruises': float(self.bruises_combo.get()),
@@ -502,25 +442,14 @@ class ConveyorController:
         }
 
     def _calculate_grade_boundaries(self, priorities):
-        """
-        Calculate grade boundaries based on priority weights.
-        
-        Args:
-            priorities (dict): Priority weights for each attribute
-            
-        Returns:
-            dict: Grade boundaries with min/max values for each grade
-        """
-        # Calculate theoretical max (Grade A) and min (Grade C) scores
         max_score = (priorities['ripeness'] * self.RIPENESS_SCORES['green'] + 
-                    priorities['bruises'] * self.bruiseness_scores['unbruised'] + 
-                    priorities['size'] * self.size_scores['large'])
+                    priorities['bruises'] * self.BRUISES_SCORES['unbruised'] + 
+                    priorities['size'] * self.SIZE_SCORES['large'])
         
         min_score = (priorities['ripeness'] * self.RIPENESS_SCORES['yellow'] + 
-                    priorities['bruises'] * self.bruiseness_scores['bruised'] + 
-                    priorities['size'] * self.size_scores['small'])
+                    priorities['bruises'] * self.BRUISES_SCORES['bruised'] + 
+                    priorities['size'] * self.SIZE_SCORES['small'])
         
-        # Divide range into three equal segments
         segment_size = (max_score - min_score) / 3
         
         return {
@@ -530,7 +459,6 @@ class ConveyorController:
         }
 
     def _print_grade_ranges(self, boundaries):
-        """Print grade ranges for debugging purposes."""
         print("Calculated Grade Range")
         for grade in ['A', 'B', 'C']:
             min_val = boundaries[grade]['min']
@@ -539,16 +467,6 @@ class ConveyorController:
             print(f"Grade {grade}: {max_val:.2f} - {min_val:.2f}, Range: {range_size:.2f}")
 
     def _classify_grade(self, input_grade, boundaries):
-        """
-        Classify input grade into letter grade category.
-        
-        Args:
-            input_grade (float): Score to classify
-            boundaries (dict): Grade boundaries
-            
-        Returns:
-            str: Letter grade
-        """
         if boundaries['A']['min'] <= input_grade <= boundaries['A']['max']:
             return "A"
         elif boundaries['B']['min'] <= input_grade < boundaries['B']['max']:
@@ -560,7 +478,7 @@ class ConveyorController:
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
         s_priority = float(self.size_combo.get())
-        resulting_grade = r_priority*self.RIPENESS_SCORES[r] + b_priority*self.bruiseness_scores[b] + s_priority*self.size_scores[s]
+        resulting_grade = r_priority*self.RIPENESS_SCORES[r] + b_priority*self.BRUISES_SCORES[b] + s_priority*self.SIZE_SCORES[s]
         print(f"Resulting Grade: {resulting_grade}")
         return resulting_grade
     
@@ -570,7 +488,6 @@ class ConveyorController:
         return image
 
     def update_side_box_results(self, image, ripeness, bruises, size, score, letter, is_top):
-        """Update the UI with top results"""
         def update():
             if is_top:
                 self.side1_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
@@ -585,11 +502,10 @@ class ConveyorController:
         self.app.after(0, update) # either video_frame or app
         
     def move_motor(self, motor_array):
-        """Control motor movement based on array values"""
-        GPIO.output(self.relay1, motor_array[0])  
-        GPIO.output(self.relay2, motor_array[1])   
-        GPIO.output(self.relay3, motor_array[2])  
-        GPIO.output(self.relay4, motor_array[3])   
+        GPIO.output(self.RELAY1, motor_array[0])  
+        GPIO.output(self.RELAY2, motor_array[1])   
+        GPIO.output(self.RELAY3, motor_array[2])  
+        GPIO.output(self.RELAY4, motor_array[3])   
         
         if motor_array[0] == 1:
             print("Motor 1 is moving in Clockwise")
@@ -601,7 +517,6 @@ class ConveyorController:
             print("Motor 2 is moving in Counter Clockwise")
 
     def get_number_from_textbox(self, textbox):
-        """Extract and validate number from textbox"""
         try:
             text = textbox.get("1.0", "end-1c").strip()
             if text:  # Check if not empty
@@ -615,45 +530,34 @@ class ConveyorController:
             return None
         
     def countdown_thread(self, start_count, buttontorun, textbox):
-        """Countdown in separate thread"""
         button_list = [self.button_cwc1, self.button_ccwc1, self.button_cwc2, self.button_ccwc2]
-        
         for i in range(start_count, 0, -1):
             print(i)
             time.sleep(1)
-
-        # Use app.after to safely update GUI from thread
         self.app.after(0, lambda: self._finish_motor_run_threaded(buttontorun, textbox, button_list))
 
     def _finish_motor_run_threaded(self, buttontorun, textbox, button_list):
-        """Finish motor run - called from main thread"""
         buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
         print("Done Running!")
         self.stop_motors()
-        
         for button in button_list:
             button.configure(fg_color="#979da2", hover_color="#3B8ED0")
-        
         textbox.delete("0.0", "end")
         textbox.configure(state="normal")
 
     def button_callback(self, button):
-        """Create callback function for button color toggle"""
         def toggle_color():
-            # Get current color
             current_color = button.cget("fg_color")
-            # Toggle between blue and green
-            if current_color == "#979da2" or current_color == "#3B8ED0":  # Default blue
+            if current_color == "#979da2" or current_color == "#3B8ED0":
                 button.configure(fg_color="green", hover_color="#0B662B")
             else:
                 button.configure(fg_color="#979da2", hover_color="#3B8ED0")
+
         return toggle_color
 
     def button_run(self, buttontorun, textbox):
-        """Handle the run button functionality with threading"""
         run_time = self.get_number_from_textbox(textbox)
         textbox.configure(state="disabled")
-        
         button_color = [self.button_cwc1.cget("fg_color"), self.button_ccwc1.cget("fg_color"), self.button_cwc2.cget("fg_color"), self.button_ccwc2.cget("fg_color")]
         
         if run_time is None:
@@ -670,42 +574,28 @@ class ConveyorController:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
                 self.move_motor(button_state_array)
                 buttontorun.configure(text="Running...", state="disabled")
-                
-                # Start countdown in separate thread
                 countdown_thread = threading.Thread(target=self.countdown_thread, args=(int(run_time), buttontorun, textbox))
-                countdown_thread.daemon = True  # Thread will close when main program closes
+                countdown_thread.daemon = True  
                 countdown_thread.start()
                 textbox.configure(state="normal")
-                textbox.delete("0.0", "end")  # delete all text
+                textbox.delete("0.0", "end")  
         else: 
             top_parent = self.button_background.winfo_toplevel()
             self.show_error_popup(top_parent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
             textbox.configure(state="normal")
 
     def video_feed(self):
-        """Updates the video feed on the Tkinter canvas."""
-        
-        # Capture frame from the camera
         frame = self.picam2.capture_array()
-        frame = Image.fromarray(frame).convert("RGB")  # Convert RGBA to RGB
-        
-        # Resize and convert to PhotoImage
+        frame = Image.fromarray(frame).convert("RGB")
         frame = frame.resize((300, 200))
         frame = ImageTk.PhotoImage(frame)
-        
-        # Update the video canvas with the new frame
         self.video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
-        
-        # Schedule the next update
         app.after(10, self.video_feed)
 
     def run(self):
-        """Start the application main loop"""
         self.app.mainloop()
 
-
-# Create and run the application
 if __name__ == "__main__":
     app = ctk.CTk(fg_color="#e5e0d8")
     controller = ConveyorController(app)
