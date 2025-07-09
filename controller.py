@@ -20,7 +20,7 @@ class ConveyorController:
         self.app.geometry("1200x670")
         self.app.fg_color = "#e5e0d8"
         self.default_bold = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
-        self.titleFont = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=20,weight="bold")
+        self.title_font = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=20,weight="bold")
         ctk.set_appearance_mode("light")
         self.button_width = 180
         self.button_height = 40
@@ -197,7 +197,6 @@ class ConveyorController:
 
         row_index += 1
 
-        # Camera control buttons
         self.button_background = ctk.CTkButton(left_frame, text="Capture Background", width=self.button_width * 2 + 40, height=self.button_height, 
                                               fg_color="#979da2", hover_color="#6e7174", font=self.default_bold)
         self.button_background.configure(command=self.picture_background)
@@ -205,7 +204,6 @@ class ConveyorController:
         
         row_index += 1
         
-        # Run button
         self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.default_bold, state="disabled")
         self.button_run.configure(command=lambda: self.button_run(self.button_run, self.textbox))
@@ -213,7 +211,6 @@ class ConveyorController:
 
         row_index += 1
 
-        # Camera control buttons
         self.button_side1 = ctk.CTkButton(left_frame, text="Capture Side 1", width=self.button_width, height=self.button_height, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.default_bold)
         self.button_side1.configure(command=self.picture_side1)
@@ -235,7 +232,7 @@ class ConveyorController:
         results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_vid_frame.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
         
-        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
+        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.button_height, hover="disabled", font=self.title_font, fg_color="#f9f9fa", 
                                      text_color="#000000")
         video_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, sticky="ns")
         
@@ -245,7 +242,7 @@ class ConveyorController:
         results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=paddingx/2, pady=paddingy/2, sticky="nsew")
         
-        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
+        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.button_height, hover="disabled", font=self.title_font, fg_color="#f9f9fa", 
                                        text_color="#000000")
         results_button.grid(row=row_index, column=0, padx=paddingx/2, pady=paddingy/2, stick="nswe")
         
@@ -260,10 +257,10 @@ class ConveyorController:
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=paddingx, pady=paddingy, sticky="ns")
         
-        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
+        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.button_height, hover="disabled", font=self.title_font, fg_color="#f9f9fa", 
                                           text_color="#000000")
         self.side1_button.grid(row=row_index, column=0, padx=paddingx, pady=paddingy, sticky="nswe")
-        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.button_height, hover="disabled", font=self.titleFont, fg_color="#f9f9fa", 
+        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300//2, height=self.button_height, hover="disabled", font=self.title_font, fg_color="#f9f9fa", 
                                           text_color="#000000")
         self.side2_button.grid(row=row_index, column=1, padx=paddingx, pady=paddingy, sticky="nswe")
         
@@ -568,16 +565,14 @@ class ConveyorController:
         return resulting_grade
     
     def capture_image(self, picam2):
-        # This would be implemented to capture an image from the camera
-        # Placeholder implementation
         image = picam2.capture_array()
         image = Image.fromarray(image).convert("RGB")
         return image
 
-    def update_side_box_results(self, image, ripeness, bruises, size, score, letter, isTop):
+    def update_side_box_results(self, image, ripeness, bruises, size, score, letter, is_top):
         """Update the UI with top results"""
         def update():
-            if isTop:
+            if is_top:
                 self.side1_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
                 top_photo = ImageTk.PhotoImage(image.resize((300, 200)))
                 self.side1_box.create_image(0, 0, anchor=ctk.NW, image=top_photo)
