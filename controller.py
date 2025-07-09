@@ -219,10 +219,10 @@ class ConveyorController:
         self.button_side1.configure(command=self.picture_side1)
         self.button_side1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
-        self.buttonSide2 = ctk.CTkButton(left_frame, text="Capture Side 2", width=self.button_width, height=self.button_height, fg_color="#979da2", 
+        self.button_side2 = ctk.CTkButton(left_frame, text="Capture Side 2", width=self.button_width, height=self.button_height, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.default_bold)
-        self.buttonSide2.configure(command=self.picture_side2)
-        self.buttonSide2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
+        self.button_side2.configure(command=self.picture_side2)
+        self.button_side2.grid(row=row_index, column=1, padx= button_padx, pady=button_pady, sticky="nswe")
     
     def video_frame(self, frame):
         """Setup the video feed frame"""
@@ -445,7 +445,7 @@ class ConveyorController:
         self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
         
         self.button_side1.configure(state="disabled")
-        self.buttonSide2.configure(state="normal")
+        self.button_side2.configure(state="normal")
 
     def picture_side2(self):
         """Handle capturing side 2 image"""
@@ -470,7 +470,7 @@ class ConveyorController:
         
         self.results_data.configure(text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
         
-        self.buttonSide2.configure(state="disabled")
+        self.button_side2.configure(state="disabled")
         self.button_background.configure(state="normal")
         self.button_enter.configure(state="normal")
      
