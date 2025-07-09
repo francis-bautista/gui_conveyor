@@ -206,10 +206,10 @@ class ConveyorController:
         row_index += 1
         
         # Run button
-        self.buttonRun = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
+        self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.button_width * 2 + 40, height=self.button_height, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.default_bold, state="disabled")
-        self.buttonRun.configure(command=lambda: self.button_run(self.buttonRun, self.textbox))
-        self.buttonRun.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_run.configure(command=lambda: self.button_run(self.button_run, self.textbox))
+        self.button_run.grid(row=row_index, column=0, columnspan=2, padx=button_padx, pady=button_pady, sticky="nswe")
 
         row_index += 1
 
@@ -358,7 +358,7 @@ class ConveyorController:
             background_img.save(f"{self.recorded_time}_background.png")
             
             self.button_background.configure(state="disabled")
-            self.buttonRun.configure(state="normal")
+            self.button_run.configure(state="normal")
             self.buttonSide1.configure(state="normal")
             self.button_enter.configure(state="disabled")
         else:
