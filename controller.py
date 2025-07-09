@@ -164,10 +164,10 @@ class ConveyorController:
         row_index += 1
 
         # Motor control buttons
-        self.buttonCWC1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
+        self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                         ,font=self.default_bold)
-        self.buttonCWC1.configure(command=self.button_callback(self.buttonCWC1))
-        self.buttonCWC1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_cwc1.configure(command=self.button_callback(self.button_cwc1))
+        self.button_cwc1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonCCWC1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt", width=self.button_width, height=self.button_height, fg_color="#979da2"
                                          ,font=self.default_bold)
@@ -621,7 +621,7 @@ class ConveyorController:
         
     def countdown_thread(self, start_count, buttontorun, textbox):
         """Countdown in separate thread"""
-        button_list = [self.buttonCWC1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
+        button_list = [self.button_cwc1, self.buttonCCWC1, self.buttonCWC2, self.buttonCCWC2]
         
         for i in range(start_count, 0, -1):
             print(i)
@@ -659,7 +659,7 @@ class ConveyorController:
         run_time = self.get_number_from_textbox(textbox)
         textbox.configure(state="disabled")
         
-        button_color = [self.buttonCWC1.cget("fg_color"), self.buttonCCWC1.cget("fg_color"), self.buttonCWC2.cget("fg_color"), self.buttonCCWC2.cget("fg_color")]
+        button_color = [self.button_cwc1.cget("fg_color"), self.buttonCCWC1.cget("fg_color"), self.buttonCWC2.cget("fg_color"), self.buttonCCWC2.cget("fg_color")]
         
         if run_time is None:
             top_parent = self.buttonBackground.winfo_toplevel()
