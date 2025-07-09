@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 try:
     import RPi.GPIO as GPIO
-    from picamera2 import Picamera2 #picamera2
+    from picamera2 import Picamera2
     print("Running on Raspberry Pi - using real GPIO")
 except ImportError:
     from fake_gpio import GPIO
@@ -198,20 +198,17 @@ class ConveyorController:
         PADDING_Y=7
         video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
-        
         results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_vid_frame.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
         
         video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                      text_color="#000000")
         video_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
-        
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
         self.video_canvas.grid(row=row_index+1, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
         
         results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
-        
         results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                        text_color="#000000")
         results_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, stick="nswe")
@@ -222,11 +219,9 @@ class ConveyorController:
         self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", compound="left", justify="left")
         self.results_data.grid(row=row_index, columnspan=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         
-        
         row_index = 0
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
-        
         self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300//2, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                           text_color="#000000")
         self.side1_button.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
@@ -235,7 +230,6 @@ class ConveyorController:
         self.side2_button.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         
         row_index += 1
-        
         self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
         self.side1_box.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
         self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
@@ -255,7 +249,6 @@ class ConveyorController:
         return video_frame
     
     def user_priority_frame(self, main_frame):
-        """Setup the user priority section with combo boxes"""
         index_row=6
         index_col=0
         PADDING_X_Y=7
@@ -519,10 +512,10 @@ class ConveyorController:
     def get_number_from_textbox(self, textbox):
         try:
             text = textbox.get("1.0", "end-1c").strip()
-            if text:  # Check if not empty
-                return float(text)  # or int(text) for integer
+            if text:
+                return float(text)
             else:
-                return None  # default value for empty textbox
+                return None
         except ValueError:
             print("Please enter a valid number")
             top_parent = self.button_background.winfo_toplevel()
