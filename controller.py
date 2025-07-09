@@ -214,10 +214,10 @@ class ConveyorController:
         row_index += 1
 
         # Camera control buttons
-        self.buttonSide1 = ctk.CTkButton(left_frame, text="Capture Side 1", width=self.button_width, height=self.button_height, fg_color="#979da2", 
+        self.button_side1 = ctk.CTkButton(left_frame, text="Capture Side 1", width=self.button_width, height=self.button_height, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.default_bold)
-        self.buttonSide1.configure(command=self.picture_side1)
-        self.buttonSide1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
+        self.button_side1.configure(command=self.picture_side1)
+        self.button_side1.grid(row=row_index, column=0, padx=button_padx, pady=button_pady, sticky="nswe")
 
         self.buttonSide2 = ctk.CTkButton(left_frame, text="Capture Side 2", width=self.button_width, height=self.button_height, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.default_bold)
@@ -359,7 +359,7 @@ class ConveyorController:
             
             self.button_background.configure(state="disabled")
             self.button_run.configure(state="normal")
-            self.buttonSide1.configure(state="normal")
+            self.button_side1.configure(state="normal")
             self.button_enter.configure(state="disabled")
         else:
             top_parent = self.button_background.winfo_toplevel()
@@ -444,7 +444,7 @@ class ConveyorController:
         top_letter_grade = self.find_letter_grade(top_final_grade)
         self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
         
-        self.buttonSide1.configure(state="disabled")
+        self.button_side1.configure(state="disabled")
         self.buttonSide2.configure(state="normal")
 
     def picture_side2(self):
