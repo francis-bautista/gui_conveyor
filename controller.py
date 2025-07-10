@@ -513,13 +513,13 @@ class ConveyorController:
         GPIO.output(self.RELAY3, motor_array[2])  
         GPIO.output(self.RELAY4, motor_array[3])   
         
-        if motor_array[0] == 1:
+        if motor_array[0]:
             print("Motor 1 is moving in Clockwise")
-        if motor_array[1] == 1:
+        if motor_array[1]:
             print("Motor 1 is moving in Counter Clockwise")
-        if motor_array[2] == 1:
+        if motor_array[2]:
             print("Motor 2 is moving in Clockwise")
-        if motor_array[3] == 1:
+        if motor_array[3]:
             print("Motor 2 is moving in Counter Clockwise")
 
     def get_number_from_textbox(self, textbox):
