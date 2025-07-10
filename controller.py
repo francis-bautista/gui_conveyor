@@ -42,10 +42,17 @@ class ConveyorController:
         self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)
+        RESIZE_PIXELS = 224
+        MEAN_RED_CHANNEL = 0.485
+        MEAN_GREEN_CHANNEL = 0.456
+        MEAN_BLUE_CHANNEL = 0.406
+        SD_RED_CHANNEL = 0.229
+        SD_GREEN_CHANNEL = 0.224
+        SD_BLUE_CHANNEL=0.225
         self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
+            transforms.Resize((RESIZE_PIXELS, RESIZE_PIXELS)),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            transforms.Normalize([MEAN_RED_CHANNEL, MEAN_GREEN_CHANNEL, MEAN_BLUE_CHANNEL], [SD_RED_CHANNEL, SD_GREEN_CHANNEL, SD_BLUE_CHANNEL])
         ])
         self.FOCAL_LENGTH_PIXELS = 3500
         self.DISTANCE_CAMERA_TO_OBJECT = 40
