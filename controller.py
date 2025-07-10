@@ -87,14 +87,14 @@ class ConveyorController:
 
         self.init_ui()
     
-    def stop_motors(self):
+    def set_to_stop_dc_motors(self):
         GPIO.output(self.RELAY1, GPIO.LOW)
         GPIO.output(self.RELAY2, GPIO.LOW)
         GPIO.output(self.RELAY3, GPIO.LOW)
         GPIO.output(self.RELAY4, GPIO.LOW)
         print("Motors stopped!")
 
-    def move_to_position(self,target):
+    def set_to_position_step_motor(self,target):
         steps_needed = target - self.current_position
         if steps_needed == 0:
             return  
@@ -119,13 +119,13 @@ class ConveyorController:
         self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
         self.view_frame.grid(row=0, column=0, padx=7, pady=7, sticky="ns")
         
-        self.user_priority_frame(self.main_frame)
-        self.control_frame(self.main_frame)
-        self.video_frame(self.view_frame)
-        self.video_feed()
+        self.init_user_priority_frame(self.main_frame)
+        self.init_control_frame(self.main_frame)
+        self.init_video_frame(self.view_frame)
+        self.get_video_feed()
         
 
-    def control_frame(self, main_frame):
+    def init_control_frame(self, main_frame):
         left_frame = ctk.CTkFrame(main_frame)
         left_frame.grid(row=0, column=0, padx=7, pady=7)
         BUTTON_PADDING_X=7
@@ -144,21 +144,21 @@ class ConveyorController:
         row_index += 1
         self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
-        self.button_cwc1.configure(command=self.button_callback(self.button_cwc1))
+        self.button_cwc1.configure(command=self.toggle_button_color(self.button_cwc1))
         self.button_cwc1.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         self.button_ccwc1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
-        self.button_ccwc1.configure(command=self.button_callback(self.button_ccwc1))
+        self.button_ccwc1.configure(command=self.toggle_button_color(self.button_ccwc1))
         self.button_ccwc1.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
         self.button_cwc2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
-        self.button_cwc2.configure(command=self.button_callback(self.button_cwc2))
+        self.button_cwc2.configure(command=self.toggle_button_color(self.button_cwc2))
         self.button_cwc2.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         self.button_ccwc2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
-        self.button_ccwc2.configure(command=self.button_callback(self.button_ccwc2))
+        self.button_ccwc2.configure(command=self.toggle_button_color(self.button_ccwc2))
         self.button_ccwc2.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
@@ -172,13 +172,13 @@ class ConveyorController:
         row_index += 1
         self.button_background = ctk.CTkButton(left_frame, text="Capture Background", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, 
                                               fg_color="#979da2", hover_color="#6e7174", font=self.DEFAULT_BOLD)
-        self.button_background.configure(command=self.picture_background)
+        self.button_background.configure(command=self.set_background_image)
         self.button_background.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
         
         row_index += 1
         self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.DEFAULT_BOLD, state="disabled")
-        self.button_run.configure(command=lambda: self.button_run(self.button_run, self.textbox))
+        self.button_run.configure(command=lambda: self.init_run_conveyor(self.button_run, self.textbox))
         self.button_run.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
 
         row_index += 1
@@ -192,7 +192,7 @@ class ConveyorController:
         self.button_side2.configure(command=self.picture_side2)
         self.button_side2.grid(row=row_index, column=1, padx= BUTTON_PADDING_X, pady=BUTTON_PADDING_X, sticky="nswe")
     
-    def video_frame(self, frame):
+    def init_video_frame(self, frame):
         row_index=0
         PADDING_X=7
         PADDING_Y=7
@@ -248,7 +248,7 @@ class ConveyorController:
         
         return video_frame
     
-    def user_priority_frame(self, main_frame):
+    def init_user_priority_frame(self, main_frame):
         index_row=6
         index_col=0
         PADDING_X_Y=7
@@ -290,26 +290,27 @@ class ConveyorController:
                                           ,font=self.DEFAULT_BOLD)
         self.button_enter.grid(row=index_row+2, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
-        self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.help_page, fg_color="#979da2", hover_color="#6e7174"
+        self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.get_help_page_info, fg_color="#979da2", hover_color="#6e7174"
                                          ,font=self.DEFAULT_BOLD)
         self.button_help.grid(row=index_row+3, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
         return frame_choices
         
-    def help_page(self):
+    def get_help_page_info(self):
+        //TODO: Fill up the todo list
         print("Help page")
         
-    def classify_image(self, image, model, class_labels):
+    def get_predicted_class(self, image, model, class_labels):
         image = self.transform(image).unsqueeze(0).to(self.device)
         output = model(image)
         _, predicted = torch.max(output, 1)
         return class_labels[predicted.item()]
     
-    def picture_background(self):
+    def set_background_image(self):
         if self.priority_enabled == False:
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             
-            background_img = self.capture_image(self.picam2)
+            background_img = self.get_image(self.picam2)
             background_img.save(f"{self.recorded_time}_background.png")
             
             self.button_background.configure(state="disabled")
@@ -318,9 +319,9 @@ class ConveyorController:
             self.button_enter.configure(state="disabled")
         else:
             top_parent = self.button_background.winfo_toplevel()
-            self.show_error_popup(top_parent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
+            self.set_error_pop_up(top_parent, "ERROR: No User Priority", "Please enter your selected values for the user priority.")
     
-    def show_error_popup(self, parent, title="Error", message="An error occurred"):
+    def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
         popup.geometry("300x150")
@@ -376,43 +377,43 @@ class ConveyorController:
 
     def picture_side1(self):
         print("Process and pictured side 1")
-        top_image = self.capture_image(self.picam2)
+        top_image = self.get_image(self.picam2)
         top_image.save(f"{self.recorded_time}_top.png")
         formatted_date_time = self.recorded_time
-        top_class_ripeness = self.classify_image(top_image, self.model_ripeness, self.CLASS_LABEL_RIPENESS)
-        top_class_bruises = self.classify_image(top_image, self.model_bruises, self.CLASS_LABEL_BRUISES)
+        top_class_ripeness = self.get_predicted_class(top_image, self.model_ripeness, self.CLASS_LABEL_RIPENESS)
+        top_class_bruises = self.get_predicted_class(top_image, self.model_bruises, self.CLASS_LABEL_BRUISES)
         top_width, top_length = calculate_size(f"{formatted_date_time}_top.png", f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
         
         print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
         top_size_class = determine_size(top_width, top_length) 
-        top_final_grade = self.final_grade(top_class_ripeness, top_class_bruises, top_size_class)
+        top_final_grade = self.get_overall_grade(top_class_ripeness, top_class_bruises, top_size_class)
         self.top_final_score=top_final_grade
-        top_letter_grade = self.find_letter_grade(top_final_grade)
-        self.update_side_box_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
+        top_letter_grade = self.get_grade_letter(top_final_grade)
+        self.set_textbox_results(top_image, top_class_ripeness, top_class_bruises, top_size_class, top_final_grade, top_letter_grade, True)
         
         self.button_side1.configure(state="disabled")
         self.button_side2.configure(state="normal")
 
     def picture_side2(self):
         print("Process and pictured side 2")
-        bottom_image = self.capture_image(self.picam2)
+        bottom_image = self.get_image(self.picam2)
         bottom_image.save(f"{self.recorded_time}_bottom.png")
         formatted_date_time = self.recorded_time
-        bottom_class_ripeness = self.classify_image(bottom_image, self.model_ripeness, self.CLASS_LABEL_RIPENESS)
-        bottom_class_bruises = self.classify_image(bottom_image, self.model_bruises, self.CLASS_LABEL_BRUISES)
+        bottom_class_ripeness = self.get_predicted_class(bottom_image, self.model_ripeness, self.CLASS_LABEL_RIPENESS)
+        bottom_class_bruises = self.get_predicted_class(bottom_image, self.model_bruises, self.CLASS_LABEL_BRUISES)
         bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png", f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
         
         print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
         bottom_size_class = determine_size(bottom_width, bottom_length) 
-        bottom_final_grade = self.final_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
+        bottom_final_grade = self.get_overall_grade(bottom_class_ripeness, bottom_class_bruises, bottom_size_class)
         self.bottom_final_score=bottom_final_grade
-        bottom_letter_grade = self.find_letter_grade(bottom_final_grade)
-        self.update_side_box_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class, bottom_final_grade, bottom_letter_grade, False)
+        bottom_letter_grade = self.get_grade_letter(bottom_final_grade)
+        self.set_textbox_results(bottom_image, bottom_class_ripeness, bottom_class_bruises, bottom_size_class, bottom_final_grade, bottom_letter_grade, False)
         
         average_score = (self.top_final_score + self.bottom_final_score) / 2
-        average_letter = self.find_letter_grade(average_score)
+        average_letter = self.get_grade_letter(average_score)
         
         self.results_data.configure(text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
         
@@ -420,21 +421,21 @@ class ConveyorController:
         self.button_background.configure(state="normal")
         self.button_enter.configure(state="normal")
      
-    def find_letter_grade(self, input_grade):
-        priorities = self._get_priority_weights()
-        boundaries = self._calculate_grade_boundaries(priorities)
-        self._print_grade_ranges(boundaries)
+    def get_grade_letter(self, input_grade):
+        priorities = self.get_input_priorities()
+        boundaries = self.get_grade_formula(priorities)
+        self.print_grade_formula(boundaries)
         
-        return self._classify_grade(input_grade, boundaries)
+        return self.get_grade_with_formula(input_grade, boundaries)
 
-    def _get_priority_weights(self):
+    def get_input_priorities(self):
         return {
             'ripeness': float(self.ripeness_combo.get()),
             'bruises': float(self.bruises_combo.get()),
             'size': float(self.size_combo.get())
         }
 
-    def _calculate_grade_boundaries(self, priorities):
+    def get_grade_formula(self, priorities):
         max_score = (priorities['ripeness'] * self.RIPENESS_SCORES['green'] + 
                     priorities['bruises'] * self.BRUISES_SCORES['unbruised'] + 
                     priorities['size'] * self.SIZE_SCORES['large'])
@@ -451,7 +452,7 @@ class ConveyorController:
             'C': {'min': min_score, 'max': max_score - 2 * segment_size}
         }
 
-    def _print_grade_ranges(self, boundaries):
+    def print_grade_formula(self, boundaries):
         print("Calculated Grade Range")
         for grade in ['A', 'B', 'C']:
             min_val = boundaries[grade]['min']
@@ -459,7 +460,7 @@ class ConveyorController:
             range_size = max_val - min_val
             print(f"Grade {grade}: {max_val:.2f} - {min_val:.2f}, Range: {range_size:.2f}")
 
-    def _classify_grade(self, input_grade, boundaries):
+    def get_grade_with_formula(self, input_grade, boundaries):
         if boundaries['A']['min'] <= input_grade <= boundaries['A']['max']:
             return "A"
         elif boundaries['B']['min'] <= input_grade < boundaries['B']['max']:
@@ -467,7 +468,7 @@ class ConveyorController:
         else:
             return "C"    
 
-    def final_grade(self,r,b,s):
+    def get_overall_grade(self,r,b,s):
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
         s_priority = float(self.size_combo.get())
@@ -475,12 +476,12 @@ class ConveyorController:
         print(f"Resulting Grade: {resulting_grade}")
         return resulting_grade
     
-    def capture_image(self, picam2):
+    def get_image(self, picam2):
         image = picam2.capture_array()
         image = Image.fromarray(image).convert("RGB")
         return image
 
-    def update_side_box_results(self, image, ripeness, bruises, size, score, letter, is_top):
+    def set_textbox_results(self, image, ripeness, bruises, size, score, letter, is_top):
         def update():
             if is_top:
                 self.side1_results.configure(text=f"Ripeness: {ripeness}\nBruises: {bruises}\nSize: {size}\nScore: {letter} or {score} ")
@@ -492,9 +493,9 @@ class ConveyorController:
                 bottom_photo = ImageTk.PhotoImage(image.resize((300, 200)))
                 self.side2_box.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
                 self.side2_box.image = bottom_photo  # Keep a reference
-        self.app.after(0, update) # either video_frame or app
+        self.app.after(0, update)
         
-    def move_motor(self, motor_array):
+    def set_motors(self, motor_array):
         GPIO.output(self.RELAY1, motor_array[0])  
         GPIO.output(self.RELAY2, motor_array[1])   
         GPIO.output(self.RELAY3, motor_array[2])  
@@ -519,26 +520,26 @@ class ConveyorController:
         except ValueError:
             print("Please enter a valid number")
             top_parent = self.button_background.winfo_toplevel()
-            self.show_error_popup(top_parent, "ERROR: Value Error", "Please enter a valid number.")
+            self.set_error_pop_up(top_parent, "ERROR: Value Error", "Please enter a valid number.")
             return None
         
-    def countdown_thread(self, start_count, buttontorun, textbox):
+    def set_countdown_thread(self, start_count, buttontorun, textbox):
         button_list = [self.button_cwc1, self.button_ccwc1, self.button_cwc2, self.button_ccwc2]
         for i in range(start_count, 0, -1):
             print(i)
             time.sleep(1)
-        self.app.after(0, lambda: self._finish_motor_run_threaded(buttontorun, textbox, button_list))
+        self.app.after(0, lambda: self.set_motor_to_finished(buttontorun, textbox, button_list))
 
-    def _finish_motor_run_threaded(self, buttontorun, textbox, button_list):
+    def set_motor_to_finished(self, buttontorun, textbox, button_list):
         buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
         print("Done Running!")
-        self.stop_motors()
+        self.set_to_stop_dc_motors()
         for button in button_list:
             button.configure(fg_color="#979da2", hover_color="#3B8ED0")
         textbox.delete("0.0", "end")
         textbox.configure(state="normal")
 
-    def button_callback(self, button):
+    def toggle_button_color(self, button):
         def toggle_color():
             current_color = button.cget("fg_color")
             if current_color == "#979da2" or current_color == "#3B8ED0":
@@ -548,43 +549,43 @@ class ConveyorController:
 
         return toggle_color
 
-    def button_run(self, buttontorun, textbox):
+    def init_run_conveyor(self, buttontorun, textbox):
         run_time = self.get_number_from_textbox(textbox)
         textbox.configure(state="disabled")
         button_color = [self.button_cwc1.cget("fg_color"), self.button_ccwc1.cget("fg_color"), self.button_cwc2.cget("fg_color"), self.button_ccwc2.cget("fg_color")]
         
         if run_time is None:
             top_parent = self.button_background.winfo_toplevel()
-            self.show_error_popup(top_parent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
+            self.set_error_pop_up(top_parent, "ERROR: No Time Input", "Please enter the time to run conveyor(s).")
             textbox.configure(state="normal")
         elif 'green' in button_color:
             if ((button_color[0] == 'green' and button_color[1] == 'green') or 
                 (button_color[2] == 'green' and button_color[3] == 'green')):
                 top_parent = self.button_background.winfo_toplevel()
-                self.show_error_popup(top_parent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
+                self.set_error_pop_up(top_parent, "ERROR: Input Error", "Please click only one direction for each conveyor.")
                 textbox.configure(state="normal")
             else:
                 button_state_array = [1 if 'green' in color else 0 for color in button_color]
-                self.move_motor(button_state_array)
+                self.set_motors(button_state_array)
                 buttontorun.configure(text="Running...", state="disabled")
-                countdown_thread = threading.Thread(target=self.countdown_thread, args=(int(run_time), buttontorun, textbox))
-                countdown_thread.daemon = True  
-                countdown_thread.start()
+                set_countdown_thread = threading.Thread(target=self.set_countdown_thread, args=(int(run_time), buttontorun, textbox))
+                set_countdown_thread.daemon = True  
+                set_countdown_thread.start()
                 textbox.configure(state="normal")
                 textbox.delete("0.0", "end")  
         else: 
             top_parent = self.button_background.winfo_toplevel()
-            self.show_error_popup(top_parent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
+            self.set_error_pop_up(top_parent, "ERROR: No Input Error", "Please select one of the buttons for the direction of the conveyor(s).")
             textbox.configure(state="normal")
 
-    def video_feed(self):
+    def get_video_feed(self):
         frame = self.picam2.capture_array()
         frame = Image.fromarray(frame).convert("RGB")
         frame = frame.resize((300, 200))
         frame = ImageTk.PhotoImage(frame)
         self.video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
-        app.after(10, self.video_feed)
+        app.after(10, self.get_video_feed)
 
     def run(self):
         self.app.mainloop()
