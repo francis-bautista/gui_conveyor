@@ -290,18 +290,21 @@ class ConveyorController:
         index_col+=1
         size_txt = ctk.CTkButton(frame_choices, text="Size", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
         size_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
-        
+ 
+        index_row+=1
         self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
         self.size_combo.set("3.0")
-        self.size_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
-        
+        self.size_combo.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+
+        index_row+=1
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority, fg_color="#979da2", hover_color="#6e7174"
                                           ,font=self.DEFAULT_BOLD)
-        self.button_enter.grid(row=index_row+2, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
-        
+        self.button_enter.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
+
+        index_row+=1
         self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.get_help_page_info, fg_color="#979da2", hover_color="#6e7174"
                                          ,font=self.DEFAULT_BOLD)
-        self.button_help.grid(row=index_row+3, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
+        self.button_help.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
         return frame_choices
         
@@ -534,10 +537,13 @@ class ConveyorController:
         
     def set_countdown_thread(self, start_count, buttontorun, textbox):
         button_list = [self.button_cwc1, self.button_ccwc1, self.button_cwc2, self.button_ccwc2]
-        for i in range(start_count, 0, -1):
+        SLEEP_TIME = 1
+        STOP_TIME = 0
+        STEP_TIME = -1
+        for i in range(start_count, STOP_TIME, STEP_TIME):
             print(i)
-            time.sleep(1)
-        self.app.after(0, lambda: self.set_motor_to_finished(buttontorun, textbox, button_list))
+            time.sleep(SLEEP_TIME)
+        self.app.after(STOP_TIME, lambda: self.set_motor_to_finished(buttontorun, textbox, button_list))
 
     def set_motor_to_finished(self, buttontorun, textbox, button_list):
         buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
@@ -588,13 +594,18 @@ class ConveyorController:
             textbox.configure(state="normal")
 
     def get_video_feed(self):
+        FRAME_LENGTH = 300
+        FRAME_WIDTH = 200
+        BUFFER_TIME = 10
+        X_LOCATION = 0
+        Y_LOCATION = 0
         frame = self.picam2.capture_array()
         frame = Image.fromarray(frame).convert("RGB")
-        frame = frame.resize((300, 200))
+        frame = frame.resize((FRAME_LENGTH, FRAME_WIDTH))
         frame = ImageTk.PhotoImage(frame)
-        self.video_canvas.create_image(0, 0, anchor=ctk.NW, image=frame)
+        self.video_canvas.create_image(X_LOCATION, Y_LOCATION, anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
-        app.after(10, self.get_video_feed)
+        app.after(BUFFER_TIME, self.get_video_feed)
 
     def run(self):
         self.app.mainloop()
