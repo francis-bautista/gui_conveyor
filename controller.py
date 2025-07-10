@@ -259,6 +259,7 @@ class ConveyorController:
         return video_frame
     
     def init_user_priority_frame(self, main_frame):
+        """TODO: add constant to column"""        
         row_index=6
         col_index=0
         PADDING_X_Y=7
