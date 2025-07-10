@@ -258,53 +258,53 @@ class ConveyorController:
         return video_frame
     
     def init_user_priority_frame(self, main_frame):
-        index_row=6
-        index_col=0
+        row_index=6
+        col_index=0
         PADDING_X_Y=7
         WIDTH_COMBOBOX=120
         TXT_WIDTH=80
         frame_choices = ctk.CTkFrame(main_frame)
-        frame_choices.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        frame_choices.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         frame_choices.columnconfigure(0, weight=1)
         frame_choices.columnconfigure(1, weight=1) 
         frame_choices.columnconfigure(2, weight=1)
 
         priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority", hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        priority_txt.grid(row=6, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)   
-        index_row+=1
+        priority_txt.grid(row=6, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)   
+        row_index+=1
         
         ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        ripeness_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
+        ripeness_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
         
         self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
         self.ripeness_combo.set("3.0")
-        self.ripeness_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        self.ripeness_combo.grid(row=row_index+1, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
 
-        index_col+=1
+        col_index+=1
         bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        bruises_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
+        bruises_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
         self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
         self.bruises_combo.set("3.0")
-        self.bruises_combo.grid(row=index_row+1, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        self.bruises_combo.grid(row=row_index+1, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         
-        index_col+=1
+        col_index+=1
         size_txt = ctk.CTkButton(frame_choices, text="Size", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        size_txt.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
+        size_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
  
-        index_row+=1
+        row_index+=1
         self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
         self.size_combo.set("3.0")
-        self.size_combo.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        self.size_combo.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
 
-        index_row+=1
+        row_index+=1
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority, fg_color="#979da2", hover_color="#6e7174"
                                           ,font=self.DEFAULT_BOLD)
-        self.button_enter.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
+        self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
 
-        index_row+=1
+        row_index+=1
         self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.get_help_page_info, fg_color="#979da2", hover_color="#6e7174"
                                          ,font=self.DEFAULT_BOLD)
-        self.button_help.grid(row=index_row, column=index_col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
+        self.button_help.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         
         return frame_choices
         
