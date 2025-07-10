@@ -21,7 +21,6 @@ class ConveyorController:
         self.app.fg_color = "#e5e0d8"
         self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=20,weight="bold")
-        ctk.set_appearance_mode("light")
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.CLASS_LABEL_RIPENESS = ['green', 'yellow_green', 'yellow']
@@ -591,6 +590,7 @@ class ConveyorController:
         self.app.mainloop()
 
 if __name__ == "__main__":
+    ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color="#e5e0d8")
     controller = ConveyorController(app)
     controller.run()
