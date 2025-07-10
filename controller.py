@@ -20,7 +20,8 @@ class ConveyorController:
         self.app.geometry("1200x670")
         self.app.fg_color = "#e5e0d8"
         self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
-        self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=20,weight="bold")
+        TITLE_FONT_SIZE = 20
+        self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=TITLE_FONT_SIZE,weight="bold")
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.CLASS_LABEL_RIPENESS = ['green', 'yellow_green', 'yellow']
@@ -134,73 +135,78 @@ class ConveyorController:
         
 
     def init_control_frame(self, main_frame):
-        """TODO: add constant to column"""
         BUTTON_PADDING_X=7
         BUTTON_PADDING_Y=7
         left_frame = ctk.CTkFrame(main_frame)
         left_frame.grid(row=0, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
-
+        col_index=0
         row_index=0
-        self.button_exit = ctk.CTkButton(left_frame, text="Exit", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#CC0000"
-                                        ,font=self.DEFAULT_BOLD)
-        self.button_exit.configure(command=self.exit_program)
-        self.button_exit.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
-
         self.button_reset = ctk.CTkButton(left_frame, text="Reset", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#CC0000"
                                          ,font=self.DEFAULT_BOLD)
         self.button_reset.configure(command=self.reset_program)
-        self.button_reset.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_reset.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        col_index += 1
+        self.button_exit = ctk.CTkButton(left_frame, text="Exit", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#CC0000"
+                                        ,font=self.DEFAULT_BOLD)
+        self.button_exit.configure(command=self.exit_program)
+        self.button_exit.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
+        col_index = 0
         self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
         self.button_cwc1.configure(command=self.toggle_button_color(self.button_cwc1))
-        self.button_cwc1.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_cwc1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        col_index += 1
         self.button_ccwc1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
         self.button_ccwc1.configure(command=self.toggle_button_color(self.button_ccwc1))
-        self.button_ccwc1.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_ccwc1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
         self.button_cwc2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                         ,font=self.DEFAULT_BOLD)
         self.button_cwc2.configure(command=self.toggle_button_color(self.button_cwc2))
-        self.button_cwc2.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        col_index = 0
+        self.button_cwc2.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
         self.button_ccwc2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2"
                                          ,font=self.DEFAULT_BOLD)
+        col_index += 1
         self.button_ccwc2.configure(command=self.toggle_button_color(self.button_ccwc2))
-        self.button_ccwc2.grid(row=row_index, column=1, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_ccwc2.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
+        col_index = 0
         self.time_txt_button = ctk.CTkButton(left_frame, text="Time to Move (in seconds)", hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000") 
-        self.time_txt_button.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.time_txt_button.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
         self.textbox = ctk.CTkTextbox(left_frame, width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT)
-        self.textbox.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.textbox.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
         self.button_background = ctk.CTkButton(left_frame, text="Capture Background", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, 
                                               fg_color="#979da2", hover_color="#6e7174", font=self.DEFAULT_BOLD)
         self.button_background.configure(command=self.set_background_image)
-        self.button_background.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_background.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
         
         row_index += 1
         self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", width=self.BUTTON_WIDTH * 2 + 40, height=self.BUTTON_HEIGHT, fg_color="#979da2", hover_color="#6e7174"
                                        ,font=self.DEFAULT_BOLD, state="disabled")
         self.button_run.configure(command=lambda: self.init_run_conveyor(self.button_run, self.textbox))
-        self.button_run.grid(row=row_index, column=0, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_run.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
         self.button_side1 = ctk.CTkButton(left_frame, text="Capture Side 1", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.DEFAULT_BOLD)
         self.button_side1.configure(command=self.picture_side1)
-        self.button_side1.grid(row=row_index, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        self.button_side1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         self.button_side2 = ctk.CTkButton(left_frame, text="Capture Side 2", width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, fg_color="#979da2", 
                                          hover_color="#6e7174", state="disabled",font=self.DEFAULT_BOLD)
         self.button_side2.configure(command=self.picture_side2)
-        self.button_side2.grid(row=row_index, column=1, padx= BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
+        col_index += 1
+        self.button_side2.grid(row=row_index, column=col_index, padx= BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
     
     def init_video_frame(self, frame):
         row_index=0
@@ -214,9 +220,11 @@ class ConveyorController:
         video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
                                      text_color="#000000")
         video_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
+        row_index += 1
         self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index+1, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
-        
+        self.video_canvas.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
+
+        row_index = 0
         results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
         results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
@@ -299,6 +307,7 @@ class ConveyorController:
         self.size_combo.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
 
         row_index+=1
+        col_index=0
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority, fg_color="#979da2", hover_color="#6e7174"
                                           ,font=self.DEFAULT_BOLD)
         self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
