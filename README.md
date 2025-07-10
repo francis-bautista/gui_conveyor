@@ -19,6 +19,8 @@
 
 ## Kenan's TODO List
 - what to put on the list of results
+- check for magic numbers and inconsistent var naming
+- start the help page
 - ~~make the controller buttons and gpio~~
 - ~~add the rpi camera with live video feed~~
 - ~~add the top part picturing~~
