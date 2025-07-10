@@ -134,6 +134,7 @@ class ConveyorController:
         
 
     def init_control_frame(self, main_frame):
+        """TODO: add constant to column"""
         BUTTON_PADDING_X=7
         BUTTON_PADDING_Y=7
         left_frame = ctk.CTkFrame(main_frame)
