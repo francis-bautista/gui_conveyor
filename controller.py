@@ -297,7 +297,7 @@ class ConveyorController:
         return frame_choices
         
     def get_help_page_info(self):
-        //TODO: Fill up the todo list
+        """TODO: Add help page info"""
         print("Help page")
         
     def get_predicted_class(self, image, model, class_labels):
