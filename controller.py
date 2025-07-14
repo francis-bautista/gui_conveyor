@@ -325,7 +325,11 @@ class ConveyorController:
     def get_help_page_info(self):
         """TODO: Add help page info"""
         popup = ctk.CTkToplevel()
-        popup.geometry(f"{self.app.LENGTH - 20}x{self.app.WIDTH - 20}")
+        length = self.app.LENGTH
+        width = self.app.WIDTH
+        popup.geometry(f"{length}x{width}")
+        close_button = ctk.CTkButton(popup, text="Close", command=popup.destroy)
+        close_button.pack(pady=10)
         
     def get_predicted_class(self, image, model, class_labels):
         image = self.transform(image).unsqueeze(0).to(self.device)
