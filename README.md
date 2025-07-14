@@ -34,6 +34,13 @@ clone this first
 ```bash
   git clone https://github.com/francis-bautista/gui_conveyor.git
 ```
+setting up your venv
+```bash
+  cd path/to/project
+  python -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+```
 ### How to PUSH and COMMIT changes 
 Add File
 ```bash
