@@ -324,7 +324,8 @@ class ConveyorController:
         
     def get_help_page_info(self):
         """TODO: Add help page info"""
-        print("Help page")
+        popup = ctk.CTkToplevel()
+        popup.geometry(f"{self.app.LENGTH - 20}x{self.app.WIDTH - 20}")
         
     def get_predicted_class(self, image, model, class_labels):
         image = self.transform(image).unsqueeze(0).to(self.device)
@@ -401,9 +402,6 @@ class ConveyorController:
         self.picam2.stop()
         sys.exit(0)
 
-    def help_popup(self):
-        popup = ctk.CTkToplevel()
-        popup.geometry(f"{self.app.LENGTH - 20}x{self.app.WIDTH - 20}")
 
     def picture_side1(self):
         print("Process and pictured side 1")
