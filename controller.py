@@ -13,11 +13,14 @@ except ImportError:
     from fake_gpio import GPIO
     from fake_picamera2 import Picamera2
     print("Running on non-RPi system - using mock GPIO")
+    
 class ConveyorController:
     def __init__(self, app):
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.geometry("1200x670")
+        self.app.LENGTH = 1200
+        self.app.WIDTH = 670
+        self.app.geometry(f"{self.app.LENGTH}x{self.app.WIDTH}")
         self.app.fg_color = "#e5e0d8"
         self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
         TITLE_FONT_SIZE = 20
@@ -397,6 +400,10 @@ class ConveyorController:
         GPIO.cleanup()
         self.picam2.stop()
         sys.exit(0)
+
+    def help_popup(self):
+        popup = ctk.CTkToplevel()
+        popup.geometry(f"{self.app.LENGTH - 20}x{self.app.WIDTH - 20}")
 
     def picture_side1(self):
         print("Process and pictured side 1")
