@@ -406,7 +406,6 @@ class ConveyorController:
         self.picam2.stop()
         sys.exit(0)
 
-
     def picture_side1(self):
         print("Process and pictured side 1")
         top_image = self.get_image(self.picam2)
