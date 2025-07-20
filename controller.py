@@ -4,7 +4,7 @@ import torchvision.transforms as transforms
 import customtkinter as ctk
 from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
-from get_size import calculate_size, determine_size
+from get_size import calculate_size, determine_size # custom libraries
 try:
     import RPi.GPIO as GPIO
     from picamera2 import Picamera2
