@@ -229,6 +229,7 @@ class ConveyorController:
         self.button_side2 = create_button(
             left_frame, "Capture Side 2", self.picture_side2, 7, 1, state="disabled"
         )
+
     def init_video_frame(self, frame):
         """Initialize and configure the video frame with all UI elements."""
         
@@ -456,28 +457,55 @@ class ConveyorController:
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (popup.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (popup.winfo_height() // 2)
         popup.geometry(f"+{x}+{y}")
-    
+       
     def enter_priority(self):
-        ripeness = self.ripeness_combo.get()
-        bruises = self.bruises_combo.get()
-        size = self.size_combo.get()
-        print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
-        if self.priority_enabled == False:
-            self.ripeness_combo.configure(state="normal")
-            self.bruises_combo.configure(state="normal")
-            self.size_combo.configure(state="normal")
-            self.ripeness_combo.set("3.0")
-            self.bruises_combo.set("3.0")
-            self.size_combo.set("3.0")
-            self.button_enter.configure(text="Enter")
+        # Constants
+        DEFAULT_PRIORITY_VALUE = "3.0"
+        BUTTON_TEXT = {
+            'enter': "Enter",
+            'cancel': "Cancel"
+        }
+        COMBO_STATES = {
+            'enabled': "normal",
+            'disabled': "disabled"
+        }
+        
+        # Get current priority values
+        priority_values = {
+            'ripeness': self.ripeness_combo.get(),
+            'bruises': self.bruises_combo.get(),
+            'size': self.size_combo.get()
+        }
+        
+        # Log current priority values
+        print(f"Ripeness: {priority_values['ripeness']}, "
+            f"Bruises: {priority_values['bruises']}, "
+            f"Size: {priority_values['size']}")
+        
+        # Get all combo boxes for batch operations
+        combo_boxes = [self.ripeness_combo, self.bruises_combo, self.size_combo]
+        
+        # Toggle priority mode
+        if not self.priority_enabled:
+            # Enable priority input mode
+            self._set_combo_states(combo_boxes, COMBO_STATES['enabled'])
+            self._reset_combo_values(combo_boxes, DEFAULT_PRIORITY_VALUE)
+            self.button_enter.configure(text=BUTTON_TEXT['enter'])
             self.priority_enabled = True
         else:
-            self.ripeness_combo.configure(state="disabled")
-            self.bruises_combo.configure(state="disabled")
-            self.size_combo.configure(state="disabled")
-            self.button_enter.configure(text="Cancel")
+            # Disable priority input mode
+            self._set_combo_states(combo_boxes, COMBO_STATES['disabled'])
+            self.button_enter.configure(text=BUTTON_TEXT['cancel'])
             self.priority_enabled = False
-        
+
+    def _set_combo_states(self, combo_boxes, state):
+        for combo in combo_boxes:
+            combo.configure(state=state)
+
+    def _reset_combo_values(self, combo_boxes, value):
+        for combo in combo_boxes:
+            combo.set(value)
+
     def reset_program(self):
         print("Resetting")
         GPIO.cleanup()
