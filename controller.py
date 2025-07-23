@@ -19,9 +19,23 @@ class ConveyorController:
         self.app = app
         self.app.title("Conveyor Controller")
         self.app.LENGTH = 1200
-        self.app.WIDTH = 670
+        self.app.WIDTH = 700
         self.app.geometry(f"{self.app.LENGTH}x{self.app.WIDTH}")
-        self.app.fg_color = "#e5e0d8"
+        self.colors = {
+            "main_app_background": "#e5e0d8",      # Light beige - main application background
+            "frame_background": "#B3B792",         # Olive green - frame background color
+            "default_button": "#979da2",           # Gray - default button color
+            "hover_red": "#CC0000",                # Red - hover color for reset/exit buttons
+            "hover_gray": "#6e7174",               # Dark gray - general button hover color
+            "text_background": "#f9f9fa",          # Off-white - text/label background color
+            "text_color": "#000000",               # Black - text color
+            "button_hover_blue": "#3B8ED0",        # Blue - button hover color (toggle state)
+            "green_hover": "#0B662B",              # Dark green - green button hover color
+            "transparent": "transparent",          # Transparent - for transparent elements
+            "canvas_background": "#f9f9fa",         # Off-white - canvas background color
+                "green": "#008000"
+        }
+        self.app.fg_color = self.colors["main_app_background"]
         self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
         TITLE_FONT_SIZE = 20
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=TITLE_FONT_SIZE,weight="bold")
@@ -126,9 +140,9 @@ class ConveyorController:
         self.app.grid_columnconfigure(0, weight=INIT_WEIGHT)
         self.app.grid_columnconfigure(1, weight=INIT_WEIGHT)
         
-        self.main_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        self.main_frame = ctk.CTkFrame(self.app, fg_color=self.colors["frame_background"])
         self.main_frame.grid(row=0, column=1, padx=FRAME_PADDING_X, pady=FRAME_PADDING_Y, sticky="ns")
-        self.view_frame = ctk.CTkFrame(self.app, fg_color="#B3B792")
+        self.view_frame = ctk.CTkFrame(self.app, fg_color=self.colors["frame_background"])
         self.view_frame.grid(row=0, column=0, padx=FRAME_PADDING_X, pady=FRAME_PADDING_Y, sticky="ns")
         
         self.init_user_priority_frame(self.main_frame)
@@ -137,30 +151,20 @@ class ConveyorController:
         self.get_video_feed()
 
     def init_control_frame(self, main_frame):
-        """Initialize and configure the control frame with all UI elements."""
-        
-        # Constants
         BUTTON_PADDING_X = 7
         BUTTON_PADDING_Y = 7
-        COLORS = {
-            'default': "#979da2",
-            'hover_red': "#CC0000", 
-            'hover_gray': "#6e7174",
-            'text_bg': "#f9f9fa",
-            'text_color': "#000000"
-        }
         
         # Create main container
         left_frame = ctk.CTkFrame(main_frame)
         left_frame.grid(row=0, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
         
         # Helper function to create standard buttons
-        def create_button(parent, text, command, row, col, hover_color=COLORS['hover_gray'], 
+        def create_button(parent, text, command, row, col, hover_color=self.colors["hover_gray"], 
                         state="normal", columnspan=1, width=None):
             button_width = width or (self.BUTTON_WIDTH * columnspan + 40 if columnspan > 1 else self.BUTTON_WIDTH)
             button = ctk.CTkButton(
                 parent, text=text, width=button_width, height=self.BUTTON_HEIGHT,
-                fg_color=COLORS['default'], hover_color=hover_color,
+                fg_color=self.colors["default_button"], hover_color=hover_color,
                 font=self.DEFAULT_BOLD, state=state
             )
             button.configure(command=command)
@@ -170,10 +174,10 @@ class ConveyorController:
         
         # Row 0: System controls (Reset, Exit)
         self.button_reset = create_button(
-            left_frame, "Reset", self.reset_program, 0, 0, COLORS['hover_red']
+            left_frame, "Reset", self.reset_program, 0, 0, self.colors["hover_red"]
         )
         self.button_exit = create_button(
-            left_frame, "Exit", self.exit_program, 0, 1, COLORS['hover_red']
+            left_frame, "Exit", self.exit_program, 0, 1, self.colors["hover_red"]
         )
         
         # Row 1: Top belt controls
@@ -199,8 +203,8 @@ class ConveyorController:
         # Row 3: Time input label
         self.time_txt_button = ctk.CTkButton(
             left_frame, text="Time to Move (in seconds)", hover="disabled",
-            font=self.DEFAULT_BOLD, fg_color=COLORS['text_bg'], 
-            text_color=COLORS['text_color']
+            font=self.DEFAULT_BOLD, fg_color=self.colors["text_background"], 
+            text_color=self.colors["text_color"]
         )
         self.time_txt_button.grid(row=3, column=0, columnspan=2,
                                 padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
@@ -231,107 +235,71 @@ class ConveyorController:
         )
 
     def init_video_frame(self, frame):
-        """Initialize and configure the video frame with all UI elements."""
-        
-        # Constants
-        PADDING_X = 7
-        PADDING_Y = 7
-        CANVAS_WIDTH = 300
-        CANVAS_HEIGHT = 200
-        COLORS = {
-            'transparent': "transparent",
-            'label_bg': "#f9f9fa",
-            'text_color': "#000000",
-            'canvas_bg': "#f9f9fa"
-        }
-        
-        # Helper function to create label buttons (non-interactive buttons used as labels)
-        def create_label_button(parent, text, row, col, columnspan=1, sticky="nswe"):
-            button = ctk.CTkButton(
-                parent, text=text, width=CANVAS_WIDTH, height=self.BUTTON_HEIGHT,
-                hover="disabled", font=self.TITLE_FONT, fg_color=COLORS['label_bg'],
-                text_color=COLORS['text_color']
-            )
-            button.grid(row=row, column=col, columnspan=columnspan,
-                    padx=PADDING_X/2, pady=PADDING_Y/2, sticky=sticky)
-            return button
-        
-        # Helper function to create canvas elements
-        def create_canvas(parent, row, col, bg_color=COLORS['canvas_bg'], sticky="nswe"):
-            canvas = ctk.CTkCanvas(parent, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg=bg_color)
-            canvas.grid(row=row, column=col, padx=PADDING_X/2, pady=PADDING_Y/2, sticky=sticky)
-            return canvas
-        
-        # Helper function to create result labels
-        def create_result_label(parent, text, row, col, columnspan=1, sticky="nsew"):
-            label = ctk.CTkLabel(parent, text=text, compound="left", justify="left")
-            label.grid(row=row, column=col, columnspan=columnspan,
-                    padx=PADDING_X, pady=PADDING_Y, sticky=sticky)
-            return label
-        
-        # Main video frame container
+        row_index=0
+        PADDING_X=7
+        PADDING_Y=7
+        WIDTH=300
+        HEIGHT=200
+        VIDEO_WIDTH=375
         video_frame = ctk.CTkFrame(frame)
-        video_frame.grid(row=0, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
-        
-        # === LEFT SECTION: Video Feed ===
-        # Video feed frame
-        results_vid_frame = ctk.CTkFrame(video_frame, fg_color=COLORS['transparent'])
-        results_vid_frame.grid(row=0, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
-        
-        # Video feed label button and canvas
-        create_label_button(results_vid_frame, "Video Feed", 0, 0, sticky="ns")
-        self.video_canvas = create_canvas(video_frame, 1, 0, sticky="ns")
-        
-        # === RIGHT SECTION: Results Display ===
-        # Results header frame
-        results_frame = ctk.CTkFrame(video_frame, fg_color=COLORS['transparent'])
-        results_frame.grid(row=0, column=1, columnspan=2, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
-        
-        # Results header button
-        create_label_button(results_frame, "List of Results", 0, 0, sticky="nswe")
-        
-        # Dynamic results frame and label
+        video_frame.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
+        results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
+        results_vid_frame.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
+
+        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=WIDTH, height=self.BUTTON_HEIGHT, 
+                                     hover="disabled", font=self.TITLE_FONT, fg_color=self.colors["canvas_background"], 
+                                     text_color=self.colors["text_color"])
+        video_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
+        row_index += 1
+        self.video_canvas = ctk.CTkCanvas(video_frame, width=VIDEO_WIDTH, height=WIDTH)
+        self.video_canvas.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
+
+        row_index = 0
+        results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
+        results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
+        results_button = ctk.CTkButton(results_frame, text="List of Results", width=WIDTH, height=self.BUTTON_HEIGHT,
+                                       hover="disabled", font=self.TITLE_FONT, fg_color=self.colors["canvas_background"], 
+                                       text_color=self.colors["text_color"])
+        results_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, stick="nswe")
+
+        row_index += 1
         dynamic_results_frame = ctk.CTkFrame(video_frame)
-        dynamic_results_frame.grid(row=1, column=1, columnspan=2, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
-        
-        self.results_data = create_result_label(
-            dynamic_results_frame, 
-            "Average Score: null \nPredicted Grade: null ",
-            0, 0, columnspan=2
-        )
-        
-        # === BOTTOM SECTION: Side Images ===
-        # Side images container frame
-        side_frame = ctk.CTkFrame(frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
-        side_frame.grid(row=1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
-        
-        # Side image header buttons
-        self.side1_button = create_label_button(side_frame, "Side 1 Image", 0, 0)
-        self.side2_button = create_label_button(side_frame, "Side 2 Image", 0, 1)
-        
-        # Side image canvases
-        self.side1_box = create_canvas(side_frame, 1, 0)
-        self.side2_box = create_canvas(side_frame, 1, 1)
-        
-        # Side image results frames and labels
+        dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
+        self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ",
+                                         compound="left", justify="left")
+        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
+
+        row_index = 0
+        side_frame = ctk.CTkFrame(frame, width=WIDTH, height=200)
+        side_frame.grid(row=row_index+1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
+        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=WIDTH, height=self.BUTTON_HEIGHT, 
+                                          hover="disabled", font=self.TITLE_FONT, fg_color=self.colors["canvas_background"], 
+                                            text_color=self.colors["text_color"])
+        self.side1_button.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=WIDTH, height=self.BUTTON_HEIGHT,
+                                          hover="disabled", font=self.TITLE_FONT, fg_color=self.colors["canvas_background"], 
+                                            text_color=self.colors["text_color"])
+        self.side2_button.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+
+        row_index += 1
+        self.side1_box = ctk.CTkCanvas(side_frame, width=WIDTH, height=HEIGHT, bg=self.colors["canvas_background"])
+        self.side1_box.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        self.side2_box = ctk.CTkCanvas(side_frame, width=WIDTH, height=HEIGHT, bg=self.colors["canvas_background"])
+        self.side2_box.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+
+        row_index += 1
         results_txt_frame1 = ctk.CTkFrame(side_frame)
-        results_txt_frame1.grid(row=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        
-        self.side1_results = create_result_label(
-            results_txt_frame1,
-            "Ripeness: null\nBruises: null\nSize: null\nScore: null",
-            0, 0
-        )
-        
+        results_txt_frame1.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        self.side1_results = ctk.CTkLabel(results_txt_frame1, text="Ripeness: null\nBruises: null\nSize: null\nScore: null",
+                                          compound="left", justify="left")
+        self.side1_results.grid(row=0, column=0, padx=PADDING_X, pady=PADDING_Y,  sticky="nswe")
+
         results_txt_frame2 = ctk.CTkFrame(side_frame)
-        results_txt_frame2.grid(row=2, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        
-        self.side2_results = create_result_label(
-            results_txt_frame2,
-            "Ripeness: null\nBruises: null\nSize: null\nScore: null",
-            0, 1
-        )
-        
+        results_txt_frame2.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        self.side2_results = ctk.CTkLabel(results_txt_frame2, text="Ripeness: null\nBruises: null\nSize: null\nScore: null",
+                                          compound="left", justify="left")
+        self.side2_results.grid(row=0, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+
         return video_frame
 
     def init_user_priority_frame(self, main_frame):
@@ -340,20 +308,15 @@ class ConveyorController:
         TXT_WIDTH = 80
         PRIORITY_VALUES = ["0.0", "1.0", "2.0", "3.0"]
         DEFAULT_VALUE = "3.0"
-        COLORS = {
-            'label_bg': "#f9f9fa",
-            'text_color': "#000000",
-            'button_bg': "#979da2",
-            'button_hover': "#6e7174"
-        }
+        
         def create_label_button(parent, text, row, col, width=None, columnspan=1, sticky="nswe"):
             # Create button with optional width parameter
             button_kwargs = {
                 'text': text,
                 'hover': "disabled",
                 'font': self.DEFAULT_BOLD,
-                'fg_color': COLORS['label_bg'],
-                'text_color': COLORS['text_color']
+                'fg_color': self.colors["canvas_background"],
+                'text_color': self.colors["text_color"]
             }
             if width is not None:
                 button_kwargs['width'] = width
@@ -370,7 +333,7 @@ class ConveyorController:
         def create_action_button(parent, text, command, row, col, columnspan=3, sticky="nswe"):
             button = ctk.CTkButton(
                 parent, text=text, command=command,
-                fg_color=COLORS['button_bg'], hover_color=COLORS['button_hover'],
+                fg_color=self.colors["default_button"], hover_color=self.colors["hover_gray"],
                 font=self.DEFAULT_BOLD
             )
             button.grid(row=row, column=col, columnspan=columnspan,
@@ -441,16 +404,17 @@ class ConveyorController:
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
         popup.geometry("300x150")
-        popup.fg_color = "#e5e0d8"
+        popup.fg_color = self.colors["main_app_background"]
         popup.resizable(False, False)
         
         popup.transient(parent)
         popup.grab_set()
         
-        label = ctk.CTkLabel(popup, text=message, wraplength=250, font=self.DEFAULT_BOLD, text_color="#000000")
+        label = ctk.CTkLabel(popup, text=message, wraplength=250, font=self.DEFAULT_BOLD, text_color=self.colors["text_color"])
         label.pack(pady=20, padx=20)
         
-        ok_button = ctk.CTkButton(popup, text="Ok", command=popup.destroy, fg_color="#979da2", hover_color="#6e7174", font=self.DEFAULT_BOLD)
+        ok_button = ctk.CTkButton(popup, text="Ok", command=popup.destroy, fg_color=self.colors["default_button"], 
+                                  hover_color=self.colors["hover_gray"], font=self.DEFAULT_BOLD)
         ok_button.pack(pady=10)
         
         popup.update_idletasks()
@@ -681,17 +645,17 @@ class ConveyorController:
         print("Done Running!")
         self.set_to_stop_dc_motors()
         for button in button_list:
-            button.configure(fg_color="#979da2", hover_color="#3B8ED0")
+            button.configure(fg_color=self.colors["default_button"], hover_color=self.colors["button_hover_blue"])
         textbox.delete("0.0", "end")
         textbox.configure(state="normal")
 
     def toggle_button_color(self, button):
         def toggle_color():
             current_color = button.cget("fg_color")
-            if current_color == "#979da2" or current_color == "#3B8ED0":
-                button.configure(fg_color="green", hover_color="#0B662B")
+            if current_color == self.colors["default_button"] or current_color == self.colors["button_hover_blue"]:
+                button.configure(fg_color=self.colors["green"], hover_color=self.colors["green_hover"])
             else:
-                button.configure(fg_color="#979da2", hover_color="#3B8ED0")
+                button.configure(fg_color=self.colors["default_button"], hover_color=self.colors["button_hover_blue"])
 
         return toggle_color
 
@@ -725,8 +689,8 @@ class ConveyorController:
             textbox.configure(state="normal")
 
     def get_video_feed(self):
-        FRAME_LENGTH = 300
-        FRAME_WIDTH = 200
+        FRAME_LENGTH = 900 #300
+        FRAME_WIDTH = 600 #200
         BUFFER_TIME = 10
         X_LOCATION = 0
         Y_LOCATION = 0
