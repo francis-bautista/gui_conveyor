@@ -229,117 +229,182 @@ class ConveyorController:
         self.button_side2 = create_button(
             left_frame, "Capture Side 2", self.picture_side2, 7, 1, state="disabled"
         )
-
     def init_video_frame(self, frame):
-        row_index=0
-        PADDING_X=7
-        PADDING_Y=7
+        """Initialize and configure the video frame with all UI elements."""
+        
+        # Constants
+        PADDING_X = 7
+        PADDING_Y = 7
+        CANVAS_WIDTH = 300
+        CANVAS_HEIGHT = 200
+        COLORS = {
+            'transparent': "transparent",
+            'label_bg': "#f9f9fa",
+            'text_color': "#000000",
+            'canvas_bg': "#f9f9fa"
+        }
+        
+        # Helper function to create label buttons (non-interactive buttons used as labels)
+        def create_label_button(parent, text, row, col, columnspan=1, sticky="nswe"):
+            button = ctk.CTkButton(
+                parent, text=text, width=CANVAS_WIDTH, height=self.BUTTON_HEIGHT,
+                hover="disabled", font=self.TITLE_FONT, fg_color=COLORS['label_bg'],
+                text_color=COLORS['text_color']
+            )
+            button.grid(row=row, column=col, columnspan=columnspan,
+                    padx=PADDING_X/2, pady=PADDING_Y/2, sticky=sticky)
+            return button
+        
+        # Helper function to create canvas elements
+        def create_canvas(parent, row, col, bg_color=COLORS['canvas_bg'], sticky="nswe"):
+            canvas = ctk.CTkCanvas(parent, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg=bg_color)
+            canvas.grid(row=row, column=col, padx=PADDING_X/2, pady=PADDING_Y/2, sticky=sticky)
+            return canvas
+        
+        # Helper function to create result labels
+        def create_result_label(parent, text, row, col, columnspan=1, sticky="nsew"):
+            label = ctk.CTkLabel(parent, text=text, compound="left", justify="left")
+            label.grid(row=row, column=col, columnspan=columnspan,
+                    padx=PADDING_X, pady=PADDING_Y, sticky=sticky)
+            return label
+        
+        # Main video frame container
         video_frame = ctk.CTkFrame(frame)
-        video_frame.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
-        results_vid_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
-        results_vid_frame.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
+        video_frame.grid(row=0, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         
-        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
-                                     text_color="#000000")
-        video_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
-        row_index += 1
-        self.video_canvas = ctk.CTkCanvas(video_frame, width=300, height=200)
-        self.video_canvas.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="ns")
-
-        row_index = 0
-        results_frame = ctk.CTkFrame(video_frame, fg_color="transparent")
-        results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
-        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
-                                       text_color="#000000")
-        results_button.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, stick="nswe")
+        # === LEFT SECTION: Video Feed ===
+        # Video feed frame
+        results_vid_frame = ctk.CTkFrame(video_frame, fg_color=COLORS['transparent'])
+        results_vid_frame.grid(row=0, column=0, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
         
-        row_index += 1
+        # Video feed label button and canvas
+        create_label_button(results_vid_frame, "Video Feed", 0, 0, sticky="ns")
+        self.video_canvas = create_canvas(video_frame, 1, 0, sticky="ns")
+        
+        # === RIGHT SECTION: Results Display ===
+        # Results header frame
+        results_frame = ctk.CTkFrame(video_frame, fg_color=COLORS['transparent'])
+        results_frame.grid(row=0, column=1, columnspan=2, padx=PADDING_X/2, pady=PADDING_Y/2, sticky="nsew")
+        
+        # Results header button
+        create_label_button(results_frame, "List of Results", 0, 0, sticky="nswe")
+        
+        # Dynamic results frame and label
         dynamic_results_frame = ctk.CTkFrame(video_frame)
-        dynamic_results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
-        self.results_data = ctk.CTkLabel(dynamic_results_frame, text="Average Score: null \nPredicted Grade: null ", compound="left", justify="left")
-        self.results_data.grid(row=row_index, columnspan=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
+        dynamic_results_frame.grid(row=1, column=1, columnspan=2, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         
-        row_index = 0
-        side_frame = ctk.CTkFrame(frame, width=300, height=200)
-        side_frame.grid(row=row_index+1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
-        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
-                                          text_color="#000000")
-        self.side1_button.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image", width=300, height=self.BUTTON_HEIGHT, hover="disabled", font=self.TITLE_FONT, fg_color="#f9f9fa", 
-                                          text_color="#000000")
-        self.side2_button.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        self.results_data = create_result_label(
+            dynamic_results_frame, 
+            "Average Score: null \nPredicted Grade: null ",
+            0, 0, columnspan=2
+        )
         
-        row_index += 1
-        self.side1_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
-        self.side1_box.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        self.side2_box = ctk.CTkCanvas(side_frame, width=300, height=200, bg="#f9f9fa")
-        self.side2_box.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        # === BOTTOM SECTION: Side Images ===
+        # Side images container frame
+        side_frame = ctk.CTkFrame(frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
+        side_frame.grid(row=1, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="ns")
         
-        row_index += 1
+        # Side image header buttons
+        self.side1_button = create_label_button(side_frame, "Side 1 Image", 0, 0)
+        self.side2_button = create_label_button(side_frame, "Side 2 Image", 0, 1)
+        
+        # Side image canvases
+        self.side1_box = create_canvas(side_frame, 1, 0)
+        self.side2_box = create_canvas(side_frame, 1, 1)
+        
+        # Side image results frames and labels
         results_txt_frame1 = ctk.CTkFrame(side_frame)
-        results_txt_frame1.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        self.side1_results = ctk.CTkLabel(results_txt_frame1, text="Ripeness: null\nBruises: null\nSize: null\nScore: null", compound="left", justify="left")
-        self.side1_results.grid(row=0, column=0, padx=PADDING_X, pady=PADDING_Y,  sticky="nswe")
+        results_txt_frame1.grid(row=2, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        
+        self.side1_results = create_result_label(
+            results_txt_frame1,
+            "Ripeness: null\nBruises: null\nSize: null\nScore: null",
+            0, 0
+        )
         
         results_txt_frame2 = ctk.CTkFrame(side_frame)
-        results_txt_frame2.grid(row=row_index, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
-        self.side2_results = ctk.CTkLabel(results_txt_frame2, text="Ripeness: null\nBruises: null\nSize: null\nScore: null", compound="left", justify="left")
-        self.side2_results.grid(row=0, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        results_txt_frame2.grid(row=2, column=1, padx=PADDING_X, pady=PADDING_Y, sticky="nswe")
+        
+        self.side2_results = create_result_label(
+            results_txt_frame2,
+            "Ripeness: null\nBruises: null\nSize: null\nScore: null",
+            0, 1
+        )
         
         return video_frame
-    
+
     def init_user_priority_frame(self, main_frame):
-        """TODO: add constant to column"""        
-        row_index=6
-        col_index=0
-        PADDING_X_Y=7
-        WIDTH_COMBOBOX=120
-        TXT_WIDTH=80
+        PADDING_X_Y = 7
+        WIDTH_COMBOBOX = 120
+        TXT_WIDTH = 80
+        PRIORITY_VALUES = ["0.0", "1.0", "2.0", "3.0"]
+        DEFAULT_VALUE = "3.0"
+        COLORS = {
+            'label_bg': "#f9f9fa",
+            'text_color': "#000000",
+            'button_bg': "#979da2",
+            'button_hover': "#6e7174"
+        }
+        def create_label_button(parent, text, row, col, width=None, columnspan=1, sticky="nswe"):
+            # Create button with optional width parameter
+            button_kwargs = {
+                'text': text,
+                'hover': "disabled",
+                'font': self.DEFAULT_BOLD,
+                'fg_color': COLORS['label_bg'],
+                'text_color': COLORS['text_color']
+            }
+            if width is not None:
+                button_kwargs['width'] = width
+                
+            button = ctk.CTkButton(parent, **button_kwargs)
+            button.grid(row=row, column=col, columnspan=columnspan,
+                        padx=PADDING_X_Y, pady=PADDING_X_Y, sticky=sticky)
+            return button
+        def create_combobox(parent, row, col, default_value=DEFAULT_VALUE, sticky="nswe"):
+            combo = ctk.CTkComboBox(parent, values=PRIORITY_VALUES, width=WIDTH_COMBOBOX)
+            combo.set(default_value)
+            combo.grid(row=row, column=col, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky=sticky)
+            return combo
+        def create_action_button(parent, text, command, row, col, columnspan=3, sticky="nswe"):
+            button = ctk.CTkButton(
+                parent, text=text, command=command,
+                fg_color=COLORS['button_bg'], hover_color=COLORS['button_hover'],
+                font=self.DEFAULT_BOLD
+            )
+            button.grid(row=row, column=col, columnspan=columnspan,
+                        padx=PADDING_X_Y, pady=PADDING_X_Y, sticky=sticky)
+            return button
         frame_choices = ctk.CTkFrame(main_frame)
-        frame_choices.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
-        frame_choices.columnconfigure(0, weight=1)
-        frame_choices.columnconfigure(1, weight=1) 
-        frame_choices.columnconfigure(2, weight=1)
+        frame_choices.grid(row=6, column=0, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        for col in range(3):
+            frame_choices.columnconfigure(col, weight=1)
 
-        priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority", hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        priority_txt.grid(row=6, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)   
-        row_index+=1
-        
-        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        ripeness_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
-        
-        self.ripeness_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
-        self.ripeness_combo.set("3.0")
-        self.ripeness_combo.grid(row=row_index+1, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        create_label_button(frame_choices, "Input User Priority", 6, 0, columnspan=3)
 
-        col_index+=1
-        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        bruises_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
-        self.bruises_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
-        self.bruises_combo.set("3.0")
-        self.bruises_combo.grid(row=row_index+1, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
-        
-        col_index+=1
-        size_txt = ctk.CTkButton(frame_choices, text="Size", width=TXT_WIDTH, hover="disabled", font=self.DEFAULT_BOLD, fg_color="#f9f9fa", text_color="#000000")
-        size_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
- 
-        row_index+=1
-        self.size_combo = ctk.CTkComboBox(frame_choices, values=["0.0", "1.0", "2.0", "3.0"], width=WIDTH_COMBOBOX)
-        self.size_combo.set("3.0")
-        self.size_combo.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
+        priority_configs = [
+            ("Ripeness", "ripeness_combo", 0),
+            ("Bruises", "bruises_combo", 1), 
+            ("Size", "size_combo", 2)
+        ]
 
-        row_index+=1
-        col_index=0
-        self.button_enter = ctk.CTkButton(frame_choices, text="Enter", command=self.enter_priority, fg_color="#979da2", hover_color="#6e7174"
-                                          ,font=self.DEFAULT_BOLD)
-        self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
+        for label_text, combo_attr, col in priority_configs:
+            # Create label button
+            create_label_button(frame_choices, label_text, 7, col, width=TXT_WIDTH, sticky="ew")
+            
+            # Create combo box and store as instance attribute
+            combo = create_combobox(frame_choices, 8, col)
+            setattr(self, combo_attr, combo)
 
-        row_index+=1
-        self.button_help = ctk.CTkButton(frame_choices, text="Help", command=self.get_help_page_info, fg_color="#979da2", hover_color="#6e7174"
-                                         ,font=self.DEFAULT_BOLD)
-        self.button_help.grid(row=row_index, column=col_index, padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe", columnspan=3)
-        
-        return frame_choices
+        self.button_enter = create_action_button(
+            frame_choices, "Enter", self.enter_priority, 9, 0
+        )
+
+        self.button_help = create_action_button(
+            frame_choices, "Help", self.get_help_page_info, 10, 0
+        )
+
+        return frame_choices   
         
     def get_help_page_info(self):
         """TODO: Add help page info"""
