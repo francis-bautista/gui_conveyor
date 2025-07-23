@@ -16,6 +16,7 @@ except ImportError:
     
 class ConveyorController:
     def __init__(self, app):
+        # TODO: ADD THE CONFIGURED COLOR DICTIONARY
         self.app = app
         self.app.title("Conveyor Controller")
         self.app.LENGTH = 1200
@@ -323,7 +324,7 @@ class ConveyorController:
         return frame_choices
         
     def get_help_page_info(self):
-        """TODO: Add help page info"""
+        #TODO: FILL UP THE HELP PAGE
         popup = ctk.CTkToplevel()
         length = self.app.LENGTH
         width = self.app.WIDTH
