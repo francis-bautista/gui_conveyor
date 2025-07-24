@@ -15,19 +15,8 @@ except ImportError:
     print("Running on non-RPi system - using mock GPIO")
     
 class ConveyorController:
-    def __init__(self, app):
-        self.colors = {
-            "main_app_background": "#e5e0d8",      # Light beige - Lines: 20, 634, 649
-            "frame_background": "#B3B792",         # Olive green - Lines: 129, 131
-            "default_button": "#979da2",           # Gray - Lines: 141, 399, 433, 591, 596
-            "hover_red": "#CC0000",                # Red - Line: 140
-            "hover_gray": "#6e7174",               # Dark gray - Lines: 141, 399, 433, 596
-            "text_background": "#f9f9fa",          # Off-white - Lines: 143, 161, 229, 396, 430
-            "text_color": "#000000",               # Black - Lines: 143, 396, 430, 631
-            "button_hover_blue": "#3B8ED0",        # Blue - Lines: 589, 590
-            "green_hover": "#0B662B",              # Dark green - Line: 588
-            "transparent": "transparent",          # Transparent - Lines: 221, 250
-        }
+    def __init__(self, app, colors):
+        self.colors = colors
         self.app = app
         self.app.title("Conveyor Controller")
         self.app.LENGTH = 1200
@@ -796,7 +785,19 @@ class ConveyorController:
         self.app.mainloop()
 
 if __name__ == "__main__":
+    colors = {
+            "main_app_background": "#e5e0d8",      # Light beige 
+            "frame_background": "#B3B792",         # Olive green 
+            "default_button": "#979da2",           # Gray 
+            "hover_red": "#CC0000",                # Red 
+            "hover_gray": "#6e7174",               # Dark gray 
+            "text_background": "#f9f9fa",          # Off-white 
+            "text_color": "#000000",               # Black 
+            "button_hover_blue": "#3B8ED0",        # Blue 
+            "green_hover": "#0B662B",              # Dark green 
+            "transparent": "transparent",          # Transparent 
+        }
     ctk.set_appearance_mode("light")
-    app = ctk.CTk(fg_color="#e5e0d8")
-    controller = ConveyorController(app)
+    app = ctk.CTk(fg_color=colors["main_app_background"])
+    controller = ConveyorController(app,colors)
     controller.run()
