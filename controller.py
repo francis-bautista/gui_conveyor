@@ -25,10 +25,9 @@ class ConveyorController:
         self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
                                         size=ctk.ThemeManager.theme["CTkFont"]["size"],
                                         weight="bold")
-        TITLE_FONT_SIZE = 20
-        self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=TITLE_FONT_SIZE,weight="bold")
-        self.BUTTON_WIDTH = 180
-        self.BUTTON_HEIGHT = 40
+        self.TITLE_FONT_SIZE = 20
+        self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
+                                      size=self.TITLE_FONT_SIZE,weight="bold")
         self.CLASS_LABEL_RIPENESS = ['green', 'yellow_green', 'yellow']
         self.CLASS_LABEL_BRUISES = ['bruised', 'unbruised']
         self.CLASS_LABEL_SIZE = ['small', 'medium', 'large']
@@ -61,21 +60,12 @@ class ConveyorController:
         self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
-        self.RELAY1 = 6
-        self.RELAY2 = 13
-        self.RELAY3 = 19
-        self.RELAY4 = 26
-        self.relays = {'relay1':6, 'relay2':13, 'relay3':19, 'relay4':26}
+        self.relays = {'r1':6, 'r2':13, 'r3':19, 'r4':26}
         GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.relays['relay1'], GPIO.OUT)
-        GPIO.setup(self.relays['relay2'], GPIO.OUT)
-        GPIO.setup(self.relays['relay3'], GPIO.OUT)
-        GPIO.setup(self.relays['relay4'], GPIO.OUT)
-        GPIO.output(self.relays['relay1'], GPIO.LOW)
-        GPIO.output(self.relays['relay2'], GPIO.LOW)
-        GPIO.output(self.relays['relay3'], GPIO.LOW)
-        GPIO.output(self.relays['relay4'], GPIO.LOW)
+        for pin_number in self.relays.values():
+            GPIO.setup(pin_number,GPIO.OUT)
+            GPIO.setup(pin_number,GPIO.LOW)
         GPIO.setwarnings(False)
         self.DIR_PIN = 21
         self.STEP_PIN = 20
@@ -98,10 +88,8 @@ class ConveyorController:
         self.init_ui()
     
     def set_to_stop_dc_motors(self):
-        GPIO.output(self.RELAY1, GPIO.LOW)
-        GPIO.output(self.RELAY2, GPIO.LOW)
-        GPIO.output(self.RELAY3, GPIO.LOW)
-        GPIO.output(self.RELAY4, GPIO.LOW)
+        for pin_number in self.relays.values():
+            GPIO.output(pin_number,GPIO.LOW)
         print("Motors stopped!")
 
     def set_to_position_step_motor(self,target):
@@ -167,7 +155,7 @@ class ConveyorController:
         self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt",
                                          width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                          fg_color=self.colors["default_button"]
-                                        ,font=self.DEFAULT_BOLD)
+                                        ,font=self.DEFAULT_BOLD, state="disabled")
         self.button_cwc1.configure(command=self.toggle_button_color(self.button_cwc1))
         self.button_cwc1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
                               pady=BUTTON_PADDING_Y, sticky="nswe")
@@ -175,7 +163,7 @@ class ConveyorController:
         self.button_ccwc1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt",
                                           width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                           fg_color=self.colors["default_button"]
-                                         ,font=self.DEFAULT_BOLD)
+                                         ,font=self.DEFAULT_BOLD, state="disabled")
         self.button_ccwc1.configure(command=self.toggle_button_color(self.button_ccwc1))
         self.button_ccwc1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X, 
                                pady=BUTTON_PADDING_Y, sticky="nswe")
@@ -184,7 +172,7 @@ class ConveyorController:
         self.button_cwc2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt",
                                          width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                          fg_color=self.colors["default_button"]
-                                        ,font=self.DEFAULT_BOLD)
+                                        ,font=self.DEFAULT_BOLD, state="disabled")
         self.button_cwc2.configure(command=self.toggle_button_color(self.button_cwc2))
         col_index = 0
         self.button_cwc2.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
@@ -192,7 +180,7 @@ class ConveyorController:
         self.button_ccwc2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt",
                                           width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, 
                                           fg_color=self.colors["default_button"]
-                                         ,font=self.DEFAULT_BOLD)
+                                         ,font=self.DEFAULT_BOLD, state="disabled")
         col_index += 1
         self.button_ccwc2.configure(command=self.toggle_button_color(self.button_ccwc2))
         self.button_ccwc2.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
@@ -455,21 +443,34 @@ class ConveyorController:
     
     def set_background_image(self):
         if self.priority_enabled == False:
+            self.button_background.configure(text="Getting Background Image")
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             
             background_img = self.get_image(self.picam2)
             background_img.save(f"{self.recorded_time}_background.png")
             
-            self.button_background.configure(state="disabled")
-            self.button_run.configure(state="normal")
-            self.button_side1.configure(state="normal")
-            self.button_enter.configure(state="disabled")
+            # Button configurations: button -> state
+            button_configs = {
+                self.button_background: "disabled",
+                self.button_run: "normal",
+                self.button_side1: "normal", 
+                self.button_enter: "disabled",
+                self.button_cwc1: "normal",
+                self.button_cwc2: "normal",
+                self.button_ccwc1: "normal",
+                self.button_ccwc2: "normal"
+            }
+            
+            for button, state in button_configs.items():
+                button.configure(state=state)
+                
+            self.button_background.configure(text="Captured Background")
         else:
             top_parent = self.button_background.winfo_toplevel()
             self.set_error_pop_up(top_parent, 
-                                  "ERROR: No User Priority",
-                                  "Please enter your selected values for the user priority.")
-    
+                                "ERROR: No User Priority",
+                                "Please enter your selected values for the user priority.")
+
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
@@ -664,21 +665,20 @@ class ConveyorController:
                 self.side2_box.create_image(0, 0, anchor=ctk.NW, image=bottom_photo)
                 self.side2_box.image = bottom_photo  
         self.app.after(0, update)
-        
+
     def set_motors(self, motor_array):
-        GPIO.output(self.RELAY1, motor_array[0])  
-        GPIO.output(self.RELAY2, motor_array[1])   
-        GPIO.output(self.RELAY3, motor_array[2])  
-        GPIO.output(self.RELAY4, motor_array[3])   
+        for i, pin in enumerate(self.relays.values()):
+            GPIO.output(pin, motor_array[i])
         
-        if motor_array[0]:
-            print("Motor 1 is moving in Clockwise")
-        if motor_array[1]:
-            print("Motor 1 is moving in Counter Clockwise")
-        if motor_array[2]:
-            print("Motor 2 is moving in Clockwise")
-        if motor_array[3]:
-            print("Motor 2 is moving in Counter Clockwise")
+        motor_messages = [
+            "Motor 1 is moving in Clockwise",
+            "Motor 1 is moving in Counter Clockwise", 
+            "Motor 2 is moving in Clockwise",
+            "Motor 2 is moving in Counter Clockwise"]
+        
+        for i, message in enumerate(motor_messages):
+            if motor_array[i]:
+                print(message)
 
     def get_number_from_textbox(self, textbox):
         try:
