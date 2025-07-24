@@ -775,18 +775,14 @@ class ConveyorController:
             textbox.configure(state="normal")
 
     def get_video_feed(self):
-        FRAME_LENGTH = 300
-        FRAME_WIDTH = 200
-        BUFFER_TIME = 10
-        X_LOCATION = 0
-        Y_LOCATION = 0
+        vid_params = {'f_length':300, 'f_width':200, 'buffer':10, 'x':0, 'y':0}
         frame = self.picam2.capture_array()
         frame = Image.fromarray(frame).convert("RGB")
-        frame = frame.resize((FRAME_LENGTH, FRAME_WIDTH))
+        frame = frame.resize((vid_params['f_length'], vid_params['f_width']))
         frame = ImageTk.PhotoImage(frame)
-        self.video_canvas.create_image(X_LOCATION, Y_LOCATION, anchor=ctk.NW, image=frame)
+        self.video_canvas.create_image(vid_params['x'], vid_params['y'], anchor=ctk.NW, image=frame)
         self.video_canvas.image = frame
-        app.after(BUFFER_TIME, self.get_video_feed)
+        app.after(vid_params['buffer'], self.get_video_feed)
 
     def run(self):
         self.app.mainloop()
