@@ -19,11 +19,12 @@ class ConveyorController:
         self.colors = colors
         self.app = app
         self.app.title("Conveyor Controller")
-        self.app.LENGTH = 1200
-        self.app.WIDTH = 700
-        self.app.geometry(f"{self.app.LENGTH}x{self.app.WIDTH}")
+        self.WINDOW_SIZE = {'length':1200, 'width':700}
+        self.app.geometry(f"{self.WINDOW_SIZE['length']}x{self.WINDOW_SIZE['width']}")
         self.app.fg_color = self.colors["main_app_background"]
-        self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=ctk.ThemeManager.theme["CTkFont"]["size"],weight="bold")
+        self.DEFAULT_BOLD = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
+                                        size=ctk.ThemeManager.theme["CTkFont"]["size"],
+                                        weight="bold")
         TITLE_FONT_SIZE = 20
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],size=TITLE_FONT_SIZE,weight="bold")
         self.BUTTON_WIDTH = 180
@@ -47,17 +48,14 @@ class ConveyorController:
         self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)
-        RESIZE_PIXELS = 224
-        MEAN_RED_CHANNEL = 0.485
-        MEAN_GREEN_CHANNEL = 0.456
-        MEAN_BLUE_CHANNEL = 0.406
-        SD_RED_CHANNEL = 0.229
-        SD_GREEN_CHANNEL = 0.224
-        SD_BLUE_CHANNEL=0.225
+        self.tf_params = {'px': 224, 'py': 224,
+                          'mean_r':0.485, 'mean_g':0.456, 'mean_b':0.406,
+                          'sd_r':0.229, 'sd_g':0.224, 'sd_b': 0.225}
         self.transform = transforms.Compose([
-            transforms.Resize((RESIZE_PIXELS, RESIZE_PIXELS)),
+            transforms.Resize((self.tf_params['px'], self.tf_params['py'])),
             transforms.ToTensor(),
-            transforms.Normalize([MEAN_RED_CHANNEL, MEAN_GREEN_CHANNEL, MEAN_BLUE_CHANNEL], [SD_RED_CHANNEL, SD_GREEN_CHANNEL, SD_BLUE_CHANNEL])
+            transforms.Normalize([self.tf_params['mean_r'], self.tf_params['mean_g'], self.tf_params['mean_b']],
+                                 [self.tf_params['sd_r'], self.tf_params['sd_g'], self.tf_params['sd_b']])
         ])
         self.FOCAL_LENGTH_PIXELS = 3500
         self.DISTANCE_CAMERA_TO_OBJECT = 40
@@ -67,28 +65,29 @@ class ConveyorController:
         self.RELAY2 = 13
         self.RELAY3 = 19
         self.RELAY4 = 26
+        self.relays = {'relay1':6, 'relay2':13, 'relay3':19, 'relay4':26}
         GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.RELAY1, GPIO.OUT)
-        GPIO.setup(self.RELAY2, GPIO.OUT)
-        GPIO.setup(self.RELAY3, GPIO.OUT)
-        GPIO.setup(self.RELAY4, GPIO.OUT)
-        GPIO.output(self.RELAY1, GPIO.LOW)
-        GPIO.output(self.RELAY2, GPIO.LOW)
-        GPIO.output(self.RELAY3, GPIO.LOW)
-        GPIO.output(self.RELAY4, GPIO.LOW)
+        GPIO.setup(self.relays['relay1'], GPIO.OUT)
+        GPIO.setup(self.relays['relay2'], GPIO.OUT)
+        GPIO.setup(self.relays['relay3'], GPIO.OUT)
+        GPIO.setup(self.relays['relay4'], GPIO.OUT)
+        GPIO.output(self.relays['relay1'], GPIO.LOW)
+        GPIO.output(self.relays['relay2'], GPIO.LOW)
+        GPIO.output(self.relays['relay3'], GPIO.LOW)
+        GPIO.output(self.relays['relay4'], GPIO.LOW)
         GPIO.setwarnings(False)
         self.DIR_PIN = 21
         self.STEP_PIN = 20
         self.steps_per_revolution = 200
-        self.position1 = 50
-        self.position2 = 100
-        self.position3 = 150
         self.current_position = 0
         self.step_delay = 0.001
+        self.stepper_motor = {'pos1':50, 'pos2':100, 'pos3': 150}
         try:
+            self.rpi_cam_resolution = {'length':1920, 'width':1080}
             self.picam2 = Picamera2()
-            self.camera_config = self.picam2.create_video_configuration(main={"size": (1920, 1080)})
+            self.camera_config = self.picam2.create_video_configuration(
+                main={"size": (self.rpi_cam_resolution['length'], self.rpi_cam_resolution['width'])})
             self.picam2.configure(self.camera_config)
             self.picam2.start()
             print("Camera initialized successfully")
