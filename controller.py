@@ -197,12 +197,7 @@ class ConveyorController:
                                   sticky="nswe")
 
         row_index += 1
-        # TODO: replace the textbox with a drop down
-        # self.textbox = ctk.CTkTextbox(left_frame, width=self.BUTTON_WIDTH,
-        #                               height=self.BUTTON_HEIGHT)
-        # self.textbox.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X,
-        #                   pady=BUTTON_PADDING_Y, sticky="nswe")
-        #
+
         self.textbox = ctk.CTkComboBox(left_frame, 
                                        values=["1.0", "2.0", "3.0"],
                                        width=self.BUTTON_WIDTH,
