@@ -449,7 +449,6 @@ class ConveyorController:
             background_img = self.get_image(self.picam2)
             background_img.save(f"{self.recorded_time}_background.png")
             
-            # Button configurations: button -> state
             button_configs = {
                 self.button_background: "disabled",
                 self.button_run: "normal",
@@ -588,9 +587,18 @@ class ConveyorController:
         self.results_data.configure(
             text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
         
-        self.button_side2.configure(state="disabled")
-        self.button_background.configure(state="normal")
-        self.button_enter.configure(state="normal")
+        button_configs = {
+            self.button_background: "normal",
+            self.button_side2: "disabled", 
+            self.button_enter: "normal",
+            self.button_cwc1: "disabled",
+            self.button_cwc2: "disabled",
+            self.button_ccwc1: "disabled",
+            self.button_ccwc2: "disabled"
+        }
+            
+        for button, state in button_configs.items():
+            button.configure(state=state)
      
     def get_grade_letter(self, input_grade):
         priorities = self.get_input_priorities()
