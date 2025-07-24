@@ -197,10 +197,19 @@ class ConveyorController:
                                   sticky="nswe")
 
         row_index += 1
-        self.textbox = ctk.CTkTextbox(left_frame, width=self.BUTTON_WIDTH,
-                                      height=self.BUTTON_HEIGHT)
-        self.textbox.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X,
-                          pady=BUTTON_PADDING_Y, sticky="nswe")
+        # TODO: replace the textbox with a drop down
+        # self.textbox = ctk.CTkTextbox(left_frame, width=self.BUTTON_WIDTH,
+        #                               height=self.BUTTON_HEIGHT)
+        # self.textbox.grid(row=row_index, column=col_index, columnspan=2, padx=BUTTON_PADDING_X,
+        #                   pady=BUTTON_PADDING_Y, sticky="nswe")
+        #
+        self.textbox = ctk.CTkComboBox(left_frame, 
+                                       values=["1.0", "2.0", "3.0"],
+                                       width=self.BUTTON_WIDTH,
+                                       height=self.BUTTON_HEIGHT)
+        self.textbox.set("1.0")
+        self.textbox.grid(row=row_index, column=col_index, columnspan=2, 
+                                 padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
         self.button_background = ctk.CTkButton(left_frame, text="Capture Background",
@@ -721,7 +730,7 @@ class ConveyorController:
         for button in button_list:
             button.configure(fg_color=self.colors["default_button"], 
                              hover_color=self.colors["button_hover_blue"])
-        textbox.delete("0.0", "end")
+        textbox.set("1.0")
         textbox.configure(state="normal")
 
     def toggle_button_color(self, button):
@@ -736,42 +745,54 @@ class ConveyorController:
 
         return toggle_color
 
+    def is_number(self):
+        try:
+            value = self.textbox.get()
+            float(value)  # Try to convert to float
+            return True
+        except ValueError:
+            return False
+
     def init_run_conveyor(self, buttontorun, textbox):
-        run_time = self.get_number_from_textbox(textbox)
-        textbox.configure(state="disabled")
-        button_color = [self.button_cwc1.cget("fg_color"), 
-                        self.button_ccwc1.cget("fg_color"),
-                        self.button_cwc2.cget("fg_color"),
-                        self.button_ccwc2.cget("fg_color")]
-        
-        if run_time is None:
-            top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent, "ERROR: No Time Input",
-                                  "Please enter the time to run conveyor(s).")
-            textbox.configure(state="normal")
-        elif 'green' in button_color:
-            if ((button_color[0] == 'green' and button_color[1] == 'green') or 
-                (button_color[2] == 'green' and button_color[3] == 'green')):
-                top_parent = self.button_background.winfo_toplevel()
-                self.set_error_pop_up(top_parent, "ERROR: Input Error",
-                                      "Please click only one direction for each conveyor.")
+        top_parent = self.button_background.winfo_toplevel()
+        if (self.is_number()):
+            run_time = float(self.textbox.get())
+            textbox.configure(state="disabled")
+            button_color = [self.button_cwc1.cget("fg_color"), 
+                            self.button_ccwc1.cget("fg_color"),
+                            self.button_cwc2.cget("fg_color"),
+                            self.button_ccwc2.cget("fg_color")]
+            
+            if run_time is None:
+                self.set_error_pop_up(top_parent, "ERROR: No Time Input",
+                                    "Please enter the time to run conveyor(s).")
                 textbox.configure(state="normal")
-            else:
-                button_state_array = [1 if 'green' in color else 0 for color in button_color]
-                self.set_motors(button_state_array)
-                buttontorun.configure(text="Running...", state="disabled")
-                set_countdown_thread = threading.Thread(target=self.set_countdown_thread, 
-                                                        args=(int(run_time), 
-                                                        buttontorun, textbox))
-                set_countdown_thread.daemon = True  
-                set_countdown_thread.start()
+            elif 'green' in button_color:
+                if ((button_color[0] == 'green' and button_color[1] == 'green') or 
+                    (button_color[2] == 'green' and button_color[3] == 'green')):
+                    self.set_error_pop_up(top_parent, "ERROR: Input Error",
+                                        "Please click only one direction for each conveyor.")
+                    textbox.configure(state="normal")
+                else:
+                    button_state_array = [1 if 'green' in color else 0 for color in button_color]
+                    self.set_motors(button_state_array)
+                    buttontorun.configure(text="Running...", state="disabled")
+                    set_countdown_thread = threading.Thread(target=self.set_countdown_thread, 
+                                                            args=(int(run_time), 
+                                                            buttontorun, textbox))
+                    set_countdown_thread.daemon = True  
+                    set_countdown_thread.start()
+                    textbox.configure(state="normal")
+            else: 
+                self.textbox.set("1.0")
+                self.set_error_pop_up(top_parent, 
+                                    "ERROR: No Input Error",
+                                    "Please select one of the buttons for the direction of the conveyor(s).")
                 textbox.configure(state="normal")
-                textbox.delete("0.0", "end")  
-        else: 
-            top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent, 
-                                  "ERROR: No Input Error",
-                                  "Please select one of the buttons for the direction of the conveyor(s).")
+
+        else:
+            self.set_error_pop_up(top_parent, "ERROR: Not a number",
+                                            "Please enter a number.")
             textbox.configure(state="normal")
 
     def get_video_feed(self):
