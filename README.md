@@ -54,3 +54,10 @@ Push to the branch
 ```bash
   git push
 ```
+
+### Merge Conflict notes
+```bash
+git merge --abort
+git fetch origin
+git reset --hard origin/master
+```
