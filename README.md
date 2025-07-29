@@ -5,6 +5,10 @@
 - Version 1: run.py
 - Version 2: controller.py
 
+### Version 2.1
+- uses python classes
+- fake_picamera2 and fake_gpio libaries for designing the app without an raspberrypi
+
 ### Version 2
 - user controlled conveyor belt
 - improved user interface

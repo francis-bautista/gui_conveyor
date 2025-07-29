@@ -483,8 +483,6 @@ class ConveyorController:
         top_size_class = determine_size(top_width, top_length) 
         priorities = self.get_priorities()
         predicted = {'r':top_class_ripeness, 'b': top_class_bruises, 's': top_size_class}
-        # top_final_grade = self.get_overall_grade(top_class_ripeness,
-        #                                          top_class_bruises, top_size_class)
         top_final_grade = self.ai.get_overall_grade(predicted, priorities)
         self.top_final_score=top_final_grade
         top_letter_grade = self.get_grade_letter(top_final_grade)
