@@ -450,7 +450,7 @@ class ConveyorController:
         popup.resizable(False, False)
         
         popup.transient(parent)
-        popup.grab_set()
+        # popup.grab_set()
         
         label = ctk.CTkLabel(popup, text=message, wraplength=250, 
                              font=self.DEFAULT_BOLD,
