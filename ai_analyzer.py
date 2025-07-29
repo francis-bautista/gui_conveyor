@@ -3,14 +3,11 @@ import torchvision.transforms as transforms
 from efficientnet_pytorch import EfficientNet
 
 class AIAnalyzer:
-    def __init__(self, device):
+    def __init__(self, device, ripeness_scores, bruises_scores, size_scores):
         self.device = device
-        self.CLASS_LABEL_RIPENESS = ['green', 'yellow_green', 'yellow']
-        self.CLASS_LABEL_BRUISES = ['bruised', 'unbruised']
-        self.CLASS_LABEL_SIZE = ['small', 'medium', 'large']
-        self.RIPENESS_SCORES = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
-        self.BRUISES_SCORES = {'bruised': 1.5, 'unbruised': 3.0}
-        self.SIZE_SCORES = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
+        self.RIPENESS_SCORES = ripeness_scores
+        self.BRUISES_SCORES = bruises_scores
+        self.SIZE_SCORES = size_scores
         self.transform = self.create_transform()
         self.load_models()
     
@@ -28,11 +25,11 @@ class AIAnalyzer:
         return transform
     
     def load_models(self):
-        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_RIPENESS))
+        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.RIPENESS_SCORES))
         self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
         self.model_ripeness.eval()
         self.model_ripeness.to(self.device)
-        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_BRUISES))
+        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.BRUISES_SCORES))
         self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)

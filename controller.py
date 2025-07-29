@@ -34,7 +34,7 @@ class ConveyorController:
         self.bottom_final_score = 0
         self.priority_enabled = True
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.ai = AIAnalyzer(self.device)
+        self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.FOCAL_LENGTH_PIXELS = 3500
         self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
@@ -604,16 +604,6 @@ class ConveyorController:
             return "B"
         else:
             return "C"    
-
-    def get_overall_grade(self,r,b,s):
-        r_priority = float(self.ripeness_combo.get())
-        b_priority = float(self.bruises_combo.get())
-        s_priority = float(self.size_combo.get())
-        resulting_grade = (r_priority*self.RIPENESS_SCORES[r] +
-            b_priority*self.BRUISES_SCORES[b] +
-            s_priority*self.SIZE_SCORES[s])
-        print(f"Resulting Grade: {resulting_grade}")
-        return resulting_grade
     
     def get_image(self, picam2):
         image = picam2.capture_array()
