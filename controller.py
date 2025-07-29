@@ -5,6 +5,7 @@ import customtkinter as ctk
 from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
+from motor_controller import MotorController
 try:
     import RPi.GPIO as GPIO
     from picamera2 import Picamera2
@@ -60,19 +61,20 @@ class ConveyorController:
         self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
-        self.relays = {'r1':6, 'r2':13, 'r3':19, 'r4':26}
-        GPIO.cleanup()
-        GPIO.setmode(GPIO.BCM)
-        for pin_number in self.relays.values():
-            GPIO.setup(pin_number,GPIO.OUT)
-            GPIO.setup(pin_number,GPIO.LOW)
-        GPIO.setwarnings(False)
-        self.DIR_PIN = 21
-        self.STEP_PIN = 20
-        self.steps_per_revolution = 200
-        self.current_position = 0
-        self.step_delay = 0.001
-        self.stepper_motor = {'pos1':50, 'pos2':100, 'pos3': 150}
+        self.mc = MotorController()
+        # self.relays = {'r1':6, 'r2':13, 'r3':19, 'r4':26}
+        # GPIO.cleanup()
+        # GPIO.setmode(GPIO.BCM)
+        # for pin_number in self.relays.values():
+        #     GPIO.setup(pin_number,GPIO.OUT)
+        #     GPIO.setup(pin_number,GPIO.LOW)
+        # GPIO.setwarnings(False)
+        # self.DIR_PIN = 21
+        # self.STEP_PIN = 20
+        # self.steps_per_revolution = 200
+        # self.current_position = 0
+        # self.step_delay = 0.001
+        # self.stepper_motor = {'pos1':50, 'pos2':100, 'pos3': 150}
         try:
             self.rpi_cam_resolution = {'length':1920, 'width':1080}
             self.picam2 = Picamera2()
@@ -87,25 +89,25 @@ class ConveyorController:
 
         self.init_ui()
     
-    def set_to_stop_dc_motors(self):
-        for pin_number in self.relays.values():
-            GPIO.output(pin_number,GPIO.LOW)
-        print("Motors stopped!")
+    # def set_to_stop_dc_motors(self):
+    #     for pin_number in self.relays.values():
+    #         GPIO.output(pin_number,GPIO.LOW)
+    #     print("Motors stopped!")
 
-    def set_to_position_step_motor(self,target):
-        steps_needed = target - self.current_position
-        if steps_needed == 0:
-            return  
-        
-        direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
-        GPIO.output(self.DIR_PIN, direction)
-        for _ in range(abs(steps_needed)):
-            GPIO.output(self.STEP_PIN, GPIO.HIGH)
-            time.sleep(self.step_delay)
-            GPIO.output(self.STEP_PIN, GPIO.LOW)
-            time.sleep(self.step_delay)
-        
-        self.current_position = target
+    # def set_to_position_step_motor(self,target):
+    #     steps_needed = target - self.current_position
+    #     if steps_needed == 0:
+    #         return  
+    #
+    #     direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
+    #     GPIO.output(self.DIR_PIN, direction)
+    #     for _ in range(abs(steps_needed)):
+    #         GPIO.output(self.STEP_PIN, GPIO.HIGH)
+    #         time.sleep(self.step_delay)
+    #         GPIO.output(self.STEP_PIN, GPIO.LOW)
+    #         time.sleep(self.step_delay)
+    #
+    #     self.current_position = target
 
     def init_ui(self):
         INIT_WEIGHT=1
@@ -596,11 +598,11 @@ class ConveyorController:
         button_configs = {
             self.button_background: "normal",
             self.button_side2: "disabled", 
-            self.button_enter: "normal",
-            self.button_cwc1: "disabled",
-            self.button_cwc2: "disabled",
-            self.button_ccwc1: "disabled",
-            self.button_ccwc2: "disabled"
+            self.button_enter: "normal"
+            # self.button_cwc1: "disabled",
+            # self.button_cwc2: "disabled",
+            # self.button_ccwc1: "disabled",
+            # self.button_ccwc2: "disabled"
         }
             
         for button, state in button_configs.items():
@@ -682,19 +684,19 @@ class ConveyorController:
                 self.side2_box.image = bottom_photo  
         self.app.after(0, update)
 
-    def set_motors(self, motor_array):
-        for i, pin in enumerate(self.relays.values()):
-            GPIO.output(pin, motor_array[i])
-        
-        motor_messages = [
-            "Motor 1 is moving in Clockwise",
-            "Motor 1 is moving in Counter Clockwise", 
-            "Motor 2 is moving in Clockwise",
-            "Motor 2 is moving in Counter Clockwise"]
-        
-        for i, message in enumerate(motor_messages):
-            if motor_array[i]:
-                print(message)
+    # def set_motors(self, motor_array):
+    #     for i, pin in enumerate(self.relays.values()):
+    #         GPIO.output(pin, motor_array[i])
+    #
+    #     motor_messages = [
+    #         "Motor 1 is moving in Clockwise",
+    #         "Motor 1 is moving in Counter Clockwise", 
+    #         "Motor 2 is moving in Clockwise",
+    #         "Motor 2 is moving in Counter Clockwise"]
+    #
+    #     for i, message in enumerate(motor_messages):
+    #         if motor_array[i]:
+    #             print(message)
 
     def get_number_from_textbox(self, textbox):
         try:
@@ -725,7 +727,8 @@ class ConveyorController:
     def set_motor_to_finished(self, buttontorun, textbox, button_list):
         buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
         print("Done Running!")
-        self.set_to_stop_dc_motors()
+        # self.set_to_stop_dc_motors()
+        self.mc.stop_motors()
         for button in button_list:
             button.configure(fg_color=self.colors["default_button"], 
                              hover_color=self.colors["button_hover_blue"])
@@ -774,7 +777,8 @@ class ConveyorController:
                     textbox.configure(state="normal")
                 else:
                     button_state_array = [1 if 'green' in color else 0 for color in button_color]
-                    self.set_motors(button_state_array)
+                    # self.set_motors(button_state_array)
+                    self.mc.set_motors(button_state_array)
                     buttontorun.configure(text="Running...", state="disabled")
                     set_countdown_thread = threading.Thread(target=self.set_countdown_thread, 
                                                             args=(int(run_time), 
