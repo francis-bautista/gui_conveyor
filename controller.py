@@ -1,11 +1,10 @@
 import torch, time, sys, os, threading
 from datetime import datetime
-import torchvision.transforms as transforms
 import customtkinter as ctk
-from efficientnet_pytorch import EfficientNet
 from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 from motor_controller import MotorController
+from ai_analyzer import AIAnalyzer
 try:
     from picamera2 import Picamera2
     print("Running on Raspberry Pi - using real GPIO")
@@ -27,9 +26,6 @@ class ConveyorController:
         self.TITLE_FONT_SIZE = 20
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
                                       size=self.TITLE_FONT_SIZE,weight="bold")
-        self.CLASS_LABEL_RIPENESS = ['green', 'yellow_green', 'yellow']
-        self.CLASS_LABEL_BRUISES = ['bruised', 'unbruised']
-        self.CLASS_LABEL_SIZE = ['small', 'medium', 'large']
         self.RIPENESS_SCORES = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
         self.BRUISES_SCORES = {'bruised': 1.5, 'unbruised': 3.0}
         self.SIZE_SCORES = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
@@ -38,23 +34,7 @@ class ConveyorController:
         self.bottom_final_score = 0
         self.priority_enabled = True
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_RIPENESS))
-        self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
-        self.model_ripeness.eval()
-        self.model_ripeness.to(self.device)
-        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.CLASS_LABEL_BRUISES))
-        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
-        self.model_bruises.eval()
-        self.model_bruises.to(self.device)
-        self.tf_params = {'px': 224, 'py': 224,
-                          'mean_r':0.485, 'mean_g':0.456, 'mean_b':0.406,
-                          'sd_r':0.229, 'sd_g':0.224, 'sd_b': 0.225}
-        self.transform = transforms.Compose([
-            transforms.Resize((self.tf_params['px'], self.tf_params['py'])),
-            transforms.ToTensor(),
-            transforms.Normalize([self.tf_params['mean_r'], self.tf_params['mean_g'], self.tf_params['mean_b']],
-                                 [self.tf_params['sd_r'], self.tf_params['sd_g'], self.tf_params['sd_b']])
-        ])
+        self.ai = AIAnalyzer(self.device)
         self.FOCAL_LENGTH_PIXELS = 3500
         self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
@@ -406,10 +386,6 @@ class ConveyorController:
         close_button = ctk.CTkButton(popup, text="Close", command=popup.destroy)
         close_button.pack(pady=10)
         
-    def get_predicted_class(self, image, model, class_labels):
-        image = self.transform(image).unsqueeze(0).to(self.device)
-        output = model(image)
-        _, predicted = torch.max(output, 1)
         return class_labels[predicted.item()]
     
     def set_background_image(self):
@@ -498,24 +474,32 @@ class ConveyorController:
         self.mc.clean_gpio()
         self.picam2.stop()
         sys.exit(0)
+    def get_priorities(self):
+        r = float(self.ripeness_combo.get())
+        b = float(self.bruises_combo.get())
+        s = float(self.size_combo.get())
+        priorities = {'r':r, 'b':b, 's':s}
+        return priorities
 
     def picture_side1(self):
         print("Process and pictured side 1")
         top_image = self.get_image(self.picam2)
         top_image.save(f"{self.recorded_time}_top.png")
         formatted_date_time = self.recorded_time
-        top_class_ripeness = self.get_predicted_class(top_image, self.model_ripeness,
-                                                      self.CLASS_LABEL_RIPENESS)
-        top_class_bruises = self.get_predicted_class(top_image, self.model_bruises,
-                                                     self.CLASS_LABEL_BRUISES)
+        isRipeness=True;
+        top_class_ripeness = self.ai.get_predicted_class(top_image, isRipeness)
+        top_class_bruises = self.ai.get_predicted_class(top_image, not isRipeness)
         top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",
                                                f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
         
         print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
         top_size_class = determine_size(top_width, top_length) 
-        top_final_grade = self.get_overall_grade(top_class_ripeness,
-                                                 top_class_bruises, top_size_class)
+        priorities = self.get_priorities()
+        predicted = {'r':top_class_ripeness, 'b': top_class_bruises, 's': top_size_class}
+        # top_final_grade = self.get_overall_grade(top_class_ripeness,
+        #                                          top_class_bruises, top_size_class)
+        top_final_grade = self.ai.get_overall_grade(predicted, priorities)
         self.top_final_score=top_final_grade
         top_letter_grade = self.get_grade_letter(top_final_grade)
         self.set_textbox_results(top_image, top_class_ripeness,
@@ -529,22 +513,26 @@ class ConveyorController:
         print("Process and pictured side 2")
         bottom_image = self.get_image(self.picam2)
         bottom_image.save(f"{self.recorded_time}_bottom.png")
-        formatted_date_time = self.recorded_time
-        bottom_class_ripeness = self.get_predicted_class(bottom_image,
-                                                         self.model_ripeness,
-                                                         self.CLASS_LABEL_RIPENESS)
-        bottom_class_bruises = self.get_predicted_class(bottom_image, 
-                                                        self.model_bruises, 
-                                                        self.CLASS_LABEL_BRUISES)
+        formatted_date_time = self.recorded_time        
+        isRipeness=True;
+        bottom_class_ripeness = self.ai.get_predicted_class(bottom_image,
+                                                         isRipeness)
+        bottom_class_bruises = self.ai.get_predicted_class(bottom_image, 
+                                                        not isRipeness)
         bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",
                                                      f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
         
         print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
         bottom_size_class = determine_size(bottom_width, bottom_length) 
-        bottom_final_grade = self.get_overall_grade(bottom_class_ripeness,
-                                                    bottom_class_bruises,
-                                                    bottom_size_class)
+        
+        priorities = self.get_priorities()
+        predicted = {'r':bottom_class_ripeness, 'b': bottom_class_bruises, 's': bottom_size_class}
+        bottom_final_grade = self.ai.get_overall_grade(predicted, priorities)
+        #
+        # bottom_final_grade = self.get_overall_grade(bottom_class_ripeness,
+        #                                             bottom_class_bruises,
+        #                                             bottom_size_class)
         self.bottom_final_score=bottom_final_grade
         bottom_letter_grade = self.get_grade_letter(bottom_final_grade)
         self.set_textbox_results(bottom_image, bottom_class_ripeness, bottom_class_bruises,
