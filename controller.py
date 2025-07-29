@@ -7,11 +7,9 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 from motor_controller import MotorController
 try:
-    import RPi.GPIO as GPIO
     from picamera2 import Picamera2
     print("Running on Raspberry Pi - using real GPIO")
 except ImportError:
-    from fake_gpio import GPIO
     from fake_picamera2 import Picamera2
     print("Running on non-RPi system - using mock GPIO")
     
@@ -62,19 +60,6 @@ class ConveyorController:
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.mc = MotorController()
-        # self.relays = {'r1':6, 'r2':13, 'r3':19, 'r4':26}
-        # GPIO.cleanup()
-        # GPIO.setmode(GPIO.BCM)
-        # for pin_number in self.relays.values():
-        #     GPIO.setup(pin_number,GPIO.OUT)
-        #     GPIO.setup(pin_number,GPIO.LOW)
-        # GPIO.setwarnings(False)
-        # self.DIR_PIN = 21
-        # self.STEP_PIN = 20
-        # self.steps_per_revolution = 200
-        # self.current_position = 0
-        # self.step_delay = 0.001
-        # self.stepper_motor = {'pos1':50, 'pos2':100, 'pos3': 150}
         try:
             self.rpi_cam_resolution = {'length':1920, 'width':1080}
             self.picam2 = Picamera2()
@@ -89,26 +74,6 @@ class ConveyorController:
 
         self.init_ui()
     
-    # def set_to_stop_dc_motors(self):
-    #     for pin_number in self.relays.values():
-    #         GPIO.output(pin_number,GPIO.LOW)
-    #     print("Motors stopped!")
-
-    # def set_to_position_step_motor(self,target):
-    #     steps_needed = target - self.current_position
-    #     if steps_needed == 0:
-    #         return  
-    #
-    #     direction = GPIO.HIGH if steps_needed > 0 else GPIO.LOW
-    #     GPIO.output(self.DIR_PIN, direction)
-    #     for _ in range(abs(steps_needed)):
-    #         GPIO.output(self.STEP_PIN, GPIO.HIGH)
-    #         time.sleep(self.step_delay)
-    #         GPIO.output(self.STEP_PIN, GPIO.LOW)
-    #         time.sleep(self.step_delay)
-    #
-    #     self.current_position = target
-
     def init_ui(self):
         INIT_WEIGHT=1
         FRAME_PADDING_X=7
@@ -415,8 +380,8 @@ class ConveyorController:
         col_index=0
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter",
                                           command=self.enter_priority, 
-                                          fg_color=self.colors["default_button"],
-                                          hover_color=self.colors["hover_gray"],
+                                          fg_color=self.colors["green"],
+                                          hover_color=self.colors["green_hover"],
                                           font=self.DEFAULT_BOLD)
         self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y,
                                pady=PADDING_X_Y, sticky="nswe", columnspan=3)
@@ -526,13 +491,13 @@ class ConveyorController:
         
     def reset_program(self):
         print("Resetting")
-        GPIO.cleanup()
+        self.mc.clean_gpio()
         self.picam2.stop()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
-        GPIO.cleanup()
+        self.mc.clean_gpio()
         self.picam2.stop()
         sys.exit(0)
 
@@ -684,20 +649,6 @@ class ConveyorController:
                 self.side2_box.image = bottom_photo  
         self.app.after(0, update)
 
-    # def set_motors(self, motor_array):
-    #     for i, pin in enumerate(self.relays.values()):
-    #         GPIO.output(pin, motor_array[i])
-    #
-    #     motor_messages = [
-    #         "Motor 1 is moving in Clockwise",
-    #         "Motor 1 is moving in Counter Clockwise", 
-    #         "Motor 2 is moving in Clockwise",
-    #         "Motor 2 is moving in Counter Clockwise"]
-    #
-    #     for i, message in enumerate(motor_messages):
-    #         if motor_array[i]:
-    #             print(message)
-
     def get_number_from_textbox(self, textbox):
         try:
             text = textbox.get("1.0", "end-1c").strip()
@@ -727,7 +678,6 @@ class ConveyorController:
     def set_motor_to_finished(self, buttontorun, textbox, button_list):
         buttontorun.configure(text="Run Conveyor(s) (C1/C2)",state="normal")
         print("Done Running!")
-        # self.set_to_stop_dc_motors()
         self.mc.stop_motors()
         for button in button_list:
             button.configure(fg_color=self.colors["default_button"], 
@@ -750,7 +700,7 @@ class ConveyorController:
     def is_number(self):
         try:
             value = self.textbox.get()
-            float(value)  # Try to convert to float
+            float(value)
             return True
         except ValueError:
             return False
@@ -769,15 +719,14 @@ class ConveyorController:
                 self.set_error_pop_up(top_parent, "ERROR: Null Time Input",
                                     "Please enter the time to run conveyor(s).")
                 textbox.configure(state="normal")
-            elif 'green' in button_color:
-                if ((button_color[0] == 'green' and button_color[1] == 'green') or 
-                    (button_color[2] == 'green' and button_color[3] == 'green')):
+            elif self.colors["green"] in button_color:
+                if ((button_color[0] == self.colors["green"] and button_color[1] == self.colors["green"]) or 
+                    (button_color[2] == self.colors["green"] and button_color[3] == self.colors["green"])):
                     self.set_error_pop_up(top_parent, "ERROR: Input Error",
                                         "Please click only one direction for each conveyor.")
                     textbox.configure(state="normal")
                 else:
-                    button_state_array = [1 if 'green' in color else 0 for color in button_color]
-                    # self.set_motors(button_state_array)
+                    button_state_array = [1 if self.colors["green"] in color else 0 for color in button_color]
                     self.mc.set_motors(button_state_array)
                     buttontorun.configure(text="Running...", state="disabled")
                     set_countdown_thread = threading.Thread(target=self.set_countdown_thread, 
@@ -823,6 +772,7 @@ if __name__ == "__main__":
             "button_hover_blue": "#3B8ED0",        # Blue 
             "green_hover": "#0B662B",              # Dark green 
             "transparent": "transparent",          # Transparent 
+            "green": "green",
         }
     ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color=colors["main_app_background"])

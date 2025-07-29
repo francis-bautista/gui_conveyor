@@ -22,6 +22,9 @@ class MotorController:
             GPIO.setup(pin_number,GPIO.OUT)
             GPIO.setup(pin_number,GPIO.LOW)
         GPIO.setwarnings(False)
+
+    def clean_gpio(self):
+        GPIO.cleanup()
     
     def set_motors(self, motor_array):
         for i, pin in enumerate(self.relays.values()):
