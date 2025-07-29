@@ -477,7 +477,8 @@ class ConveyorController:
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
-        popup.geometry("300x150")
+        size = {'l':300, 'w':150}
+        popup.geometry(f"{size['l']}x{size['w']}")
         popup.fg_color = self.colors["main_app_background"]
         popup.resizable(False, False)
         
@@ -589,7 +590,8 @@ class ConveyorController:
         average_letter = self.get_grade_letter(average_score)
         
         self.results_data.configure(
-            text=f"Average Score: {average_score:.2f}\nPredicted Grade: {average_letter}")
+            text=(f"Average Score: {average_score:.2f}\n" + 
+                    f"Predicted Grade: {average_letter}"))
         
         button_configs = {
             self.button_background: "normal",
@@ -654,7 +656,9 @@ class ConveyorController:
         r_priority = float(self.ripeness_combo.get())
         b_priority = float(self.bruises_combo.get())
         s_priority = float(self.size_combo.get())
-        resulting_grade = r_priority*self.RIPENESS_SCORES[r] + b_priority*self.BRUISES_SCORES[b] + s_priority*self.SIZE_SCORES[s]
+        resulting_grade = (r_priority*self.RIPENESS_SCORES[r] +
+            b_priority*self.BRUISES_SCORES[b] +
+            s_priority*self.SIZE_SCORES[s])
         print(f"Resulting Grade: {resulting_grade}")
         return resulting_grade
     
@@ -759,7 +763,7 @@ class ConveyorController:
                             self.button_ccwc2.cget("fg_color")]
             
             if run_time is None:
-                self.set_error_pop_up(top_parent, "ERROR: No Time Input",
+                self.set_error_pop_up(top_parent, "ERROR: Null Time Input",
                                     "Please enter the time to run conveyor(s).")
                 textbox.configure(state="normal")
             elif 'green' in button_color:
@@ -781,7 +785,7 @@ class ConveyorController:
             else: 
                 self.textbox.set("1.0")
                 self.set_error_pop_up(top_parent, 
-                                    "ERROR: No Input Error",
+                                    "ERROR: Null Button Error",
                                     "Please select one of the buttons for the direction of the conveyor(s).")
                 textbox.configure(state="normal")
 
