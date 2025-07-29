@@ -448,9 +448,7 @@ class ConveyorController:
         popup.geometry(f"{size['l']}x{size['w']}")
         popup.fg_color = self.colors["main_app_background"]
         popup.resizable(False, False)
-        
         popup.transient(parent)
-        # popup.grab_set()
         
         label = ctk.CTkLabel(popup, text=message, wraplength=250, 
                              font=self.DEFAULT_BOLD,
