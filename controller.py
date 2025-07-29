@@ -5,12 +5,7 @@ from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size
 from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
-try:
-    from picamera2 import Picamera2
-    print("Running on Raspberry Pi - using real GPIO")
-except ImportError:
-    from fake_picamera2 import Picamera2
-    print("Running on non-RPi system - using mock GPIO")
+from camera_manager import CameraManager
     
 class ConveyorController:
     def __init__(self, app, colors):
@@ -40,17 +35,7 @@ class ConveyorController:
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.mc = MotorController()
-        try:
-            self.rpi_cam_resolution = {'length':1920, 'width':1080}
-            self.picam2 = Picamera2()
-            self.camera_config = self.picam2.create_video_configuration(
-                main={"size": (self.rpi_cam_resolution['length'], self.rpi_cam_resolution['width'])})
-            self.picam2.configure(self.camera_config)
-            self.picam2.start()
-            print("Camera initialized successfully")
-        except Exception as e:
-            print(f"Error initializing camera: {e}")
-            self.picam2 = None
+        self.picam2 = CameraManager()
 
         self.init_ui()
     
@@ -393,7 +378,7 @@ class ConveyorController:
             self.button_background.configure(text="Getting Background Image")
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             
-            background_img = self.get_image(self.picam2)
+            background_img = self.picam2.get_image()
             background_img.save(f"{self.recorded_time}_background.png")
             
             button_configs = {
@@ -466,14 +451,15 @@ class ConveyorController:
     def reset_program(self):
         print("Resetting")
         self.mc.clean_gpio()
-        self.picam2.stop()
+        self.picam2.stop_camera()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
         self.mc.clean_gpio()
-        self.picam2.stop()
+        self.picam2.stop_camera()
         sys.exit(0)
+
     def get_priorities(self):
         r = float(self.ripeness_combo.get())
         b = float(self.bruises_combo.get())
@@ -483,7 +469,7 @@ class ConveyorController:
 
     def picture_side1(self):
         print("Process and pictured side 1")
-        top_image = self.get_image(self.picam2)
+        top_image = self.picam2.get_image()
         top_image.save(f"{self.recorded_time}_top.png")
         formatted_date_time = self.recorded_time
         isRipeness=True;
@@ -511,7 +497,7 @@ class ConveyorController:
 
     def picture_side2(self):
         print("Process and pictured side 2")
-        bottom_image = self.get_image(self.picam2)
+        bottom_image = self.picam2.get_image()
         bottom_image.save(f"{self.recorded_time}_bottom.png")
         formatted_date_time = self.recorded_time        
         isRipeness=True;
@@ -529,10 +515,6 @@ class ConveyorController:
         priorities = self.get_priorities()
         predicted = {'r':bottom_class_ripeness, 'b': bottom_class_bruises, 's': bottom_size_class}
         bottom_final_grade = self.ai.get_overall_grade(predicted, priorities)
-        #
-        # bottom_final_grade = self.get_overall_grade(bottom_class_ripeness,
-        #                                             bottom_class_bruises,
-        #                                             bottom_size_class)
         self.bottom_final_score=bottom_final_grade
         bottom_letter_grade = self.get_grade_letter(bottom_final_grade)
         self.set_textbox_results(bottom_image, bottom_class_ripeness, bottom_class_bruises,
@@ -605,11 +587,6 @@ class ConveyorController:
         else:
             return "C"    
     
-    def get_image(self, picam2):
-        image = picam2.capture_array()
-        image = Image.fromarray(image).convert("RGB")
-        return image
-
     def set_textbox_results(self, image, ripeness, bruises, size, score, letter, is_top):
         def update():
             if is_top:
