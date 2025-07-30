@@ -9,9 +9,9 @@ from camera_manager import CameraManager
 from formula_controller import FormulaController
     
 class ConveyorController:
-    def __init__(self, app, colors, errors):
-        self.colors = colors
-        self.errors = errors
+    def __init__(self, app, data):
+        self.colors = data['colors']
+        self.errors = data['errors']
         self.app = app
         self.app.title("Conveyor Controller")
         self.WINDOW_SIZE = {'length':1200, 'width':700}
@@ -369,10 +369,10 @@ class ConveyorController:
         return frame_choices
         
     def get_help_page_info(self):
-        #TODO: FILL UP THE HELP PAGE
+        #TODO: FILL UP THE HELP PAGE ALSO ITS BROKEN MB 
         popup = ctk.CTkToplevel()
-        length = self.app.LENGTH
-        width = self.app.WIDTH
+        length = self.WINDOW_SIZE['length']
+        width = self.WINDOW_SIZE['width']
         popup.geometry(f"{length}x{width}")
         close_button = ctk.CTkButton(popup, text="Close", command=popup.destroy)
         close_button.pack(pady=10)
@@ -402,6 +402,10 @@ class ConveyorController:
                 button.configure(state=state)
                 
             self.button_background.configure(text="Captured Background")
+            default_null = (f"Ripeness: null\nBruises: null\nSize: null\nScore: null")
+            self.results_data.configure(text=(f"Average Score: null\nPredicted Grade: null"))
+            self.side1_results.configure(text=default_null)
+            self.side2_results.configure(text=default_null)
         else:
             top_parent = self.button_background.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors["null_priority"]["title"],
@@ -659,11 +663,14 @@ class ConveyorController:
         self.app.mainloop()
 
 if __name__ == "__main__":
-    json_files = { 'colors': "colors_str.json", 
-                  'errors':"errors_str.json" }
-    colors = load_json_file(json_files['colors'])
-    errors = load_json_file(json_files['errors'])
+    json_files = {
+        'colors': "colors_str.json",
+        'errors': "errors_str.json"
+    }
+    data = {}
+    for key, filename in json_files.items():
+        data[key] = load_json_file(filename)
     ctk.set_appearance_mode("light")
-    app = ctk.CTk(fg_color=colors["main_app_background"])
-    controller = ConveyorController(app,colors,errors)
+    app = ctk.CTk(fg_color=data["colors"]["main_app_background"])
+    controller = ConveyorController(app, data)
     controller.run()
