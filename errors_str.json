@@ -26,5 +26,17 @@
   "priority_error": {
     "title": "ERROR: At Least One Priority Input Error",
     "message": "Please input a valid number"
+  },
+  "is_null": {
+    "title": "ERROR: Null Input Error",
+    "message": "Please enter values that are not empty for all priorities"
+  },
+  "not_num": {
+    "title": "ERROR: Value Error",
+    "message": "Please enter a valid number for all priorities"
+  },
+  "all_zero": {
+    "title": "ERROR: All Zero Error",
+    "message": "ERROR: Please input at least one priority with a value greater than 0.0"
   }
 }

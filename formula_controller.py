@@ -32,18 +32,28 @@ class FormulaController:
 
     def is_valid_priority(self, combo_boxes):
         all_valid = True
+        all_values = []
+        error_type = "null"
         for key, combo in combo_boxes.items():
             value = combo.get()
             if value == "" or value is None:
-                print(f"Error: '{key}' is empty or not selected.")
+                error_type = "is_null"
                 all_valid = False
-            else:
-                try:
-                    float(value)  # or int(value) if you only allow integers
-                except ValueError:
-                    print(f"Error: '{key}' is not a number.")
-                    all_valid = False
-        return all_valid
+                break
+            try:
+                numeric_value = float(value)
+                all_values.append(numeric_value)
+            except ValueError:
+                error_type = "not_num"
+                all_valid = False
+                break
+        if all_valid:
+            if all(v == 0.0 for v in all_values):
+                error_type = "all_zero"
+                all_valid = False
+
+        return [all_valid, error_type]
+
 
     def set_input_priority(self, arr):
         print(arr)

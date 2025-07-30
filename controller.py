@@ -433,9 +433,8 @@ class ConveyorController:
         popup.geometry(f"+{x}+{y}")
     
     def enter_priority(self, combo_boxes):
-        all_valid = self.formula.is_valid_priority(combo_boxes)
+        [all_valid, error_log] = self.formula.is_valid_priority(combo_boxes)
         if all_valid:
-            print("All combo boxes have valid numbers.")
             if not self.priority_enabled:
                 self.ripeness_combo.configure(state="normal")
                 self.bruises_combo.configure(state="normal")
@@ -454,9 +453,8 @@ class ConveyorController:
                 self.priority_enabled = False
         else:
             top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent, self.errors["priority_error"]["title"],
-                                          self.errors["priority_error"]["message"])
-            print("Some combo boxes are invalid.")
+            self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
+                                          self.errors[error_log]["message"])
         
     def reset_program(self):
         print("Resetting")
