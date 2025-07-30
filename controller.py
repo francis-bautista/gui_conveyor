@@ -12,6 +12,7 @@ class ConveyorController:
     def __init__(self, app, data):
         self.colors = data['colors']
         self.errors = data['errors']
+        self.names = data['names']
         self.app = app
         self.app.title("Conveyor Controller")
         self.WINDOW_SIZE = {'length':1200, 'width':700}
@@ -68,7 +69,8 @@ class ConveyorController:
         left_frame.grid(row=0, column=0, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
         col_index=0
         row_index=0
-        self.button_reset = ctk.CTkButton(left_frame, text="Reset", width=self.BUTTON_WIDTH,
+        txt = self.names["control"]
+        self.button_reset = ctk.CTkButton(left_frame, text=txt["reset"], width=self.BUTTON_WIDTH,
                                           height=self.BUTTON_HEIGHT, 
                                           fg_color=self.colors["default_button"],
                                           hover_color=self.colors["hover_red"]
@@ -77,7 +79,7 @@ class ConveyorController:
         self.button_reset.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
                                pady=BUTTON_PADDING_Y, sticky="nswe")
         col_index += 1
-        self.button_exit = ctk.CTkButton(left_frame, text="Exit", width=self.BUTTON_WIDTH,
+        self.button_exit = ctk.CTkButton(left_frame, text=txt["exit"], width=self.BUTTON_WIDTH,
                                          height=self.BUTTON_HEIGHT,
                                          fg_color=self.colors["bg_red"],
                                          hover_color=self.colors["hover_red"]
@@ -88,7 +90,7 @@ class ConveyorController:
 
         row_index += 1
         col_index = 0
-        self.button_cwc1 = ctk.CTkButton(left_frame, text="rotate forward TOP belt",
+        self.button_cwc1 = ctk.CTkButton(left_frame, text=txt["cwc1"],
                                          width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                          fg_color=self.colors["default_button"]
                                         ,font=self.DEFAULT_BOLD, state="disabled")
@@ -96,7 +98,7 @@ class ConveyorController:
         self.button_cwc1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
                               pady=BUTTON_PADDING_Y, sticky="nswe")
         col_index += 1
-        self.button_ccwc1 = ctk.CTkButton(left_frame, text="rotate backward TOP belt",
+        self.button_ccwc1 = ctk.CTkButton(left_frame, text=txt["ccwc1"],
                                           width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                           fg_color=self.colors["default_button"]
                                          ,font=self.DEFAULT_BOLD, state="disabled")
@@ -105,7 +107,7 @@ class ConveyorController:
                                pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
-        self.button_cwc2 = ctk.CTkButton(left_frame, text="rotate forward BOTTOM belt",
+        self.button_cwc2 = ctk.CTkButton(left_frame, text=txt["cwc2"],
                                          width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT,
                                          fg_color=self.colors["default_button"]
                                         ,font=self.DEFAULT_BOLD, state="disabled")
@@ -113,7 +115,7 @@ class ConveyorController:
         col_index = 0
         self.button_cwc2.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
                               pady=BUTTON_PADDING_Y, sticky="nswe")
-        self.button_ccwc2 = ctk.CTkButton(left_frame, text="rotate backward BOTTOM belt",
+        self.button_ccwc2 = ctk.CTkButton(left_frame, text=txt["ccwc2"],
                                           width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, 
                                           fg_color=self.colors["default_button"]
                                          ,font=self.DEFAULT_BOLD, state="disabled")
@@ -124,7 +126,7 @@ class ConveyorController:
 
         row_index += 1
         col_index = 0
-        self.time_txt_button = ctk.CTkButton(left_frame, text="Time to Move (in seconds)",
+        self.time_txt_button = ctk.CTkButton(left_frame, text=txt["move_time"],
                                              hover="disabled", font=self.DEFAULT_BOLD,
                                              fg_color=self.colors["text_background"],
                                              text_color=self.colors["text_color"]) 
@@ -135,15 +137,15 @@ class ConveyorController:
         row_index += 1
 
         self.textbox = ctk.CTkComboBox(left_frame, 
-                                       values=["1.0", "2.0", "3.0"],
+                                       values=txt["option_val"],
                                        width=self.BUTTON_WIDTH,
                                        height=self.BUTTON_HEIGHT)
-        self.textbox.set("1.0")
+        self.textbox.set(txt["default_val"])
         self.textbox.grid(row=row_index, column=col_index, columnspan=2, 
                                  padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
-        self.button_background = ctk.CTkButton(left_frame, text="Capture Background",
+        self.button_background = ctk.CTkButton(left_frame, text=txt["button_bg"],
                                                width=self.BUTTON_WIDTH * 2 + 40,
                                                height=self.BUTTON_HEIGHT, 
                                               fg_color=self.colors["default_button"],
@@ -155,7 +157,7 @@ class ConveyorController:
                                     sticky="nswe")
         
         row_index += 1
-        self.button_run = ctk.CTkButton(left_frame, text="Run Conveyor(s) (top/bottom)", 
+        self.button_run = ctk.CTkButton(left_frame, text=txt["button_run"], 
                                         width=self.BUTTON_WIDTH * 2 + 40,
                                         height=self.BUTTON_HEIGHT, 
                                         fg_color=self.colors["default_button"], 
@@ -166,7 +168,7 @@ class ConveyorController:
                              pady=BUTTON_PADDING_Y, sticky="nswe")
 
         row_index += 1
-        self.button_side1 = ctk.CTkButton(left_frame, text="Capture Side 1",
+        self.button_side1 = ctk.CTkButton(left_frame, text=txt["button_s1"],
                                           width=self.BUTTON_WIDTH, 
                                           height=self.BUTTON_HEIGHT,
                                           fg_color=self.colors["default_button"], 
@@ -176,7 +178,7 @@ class ConveyorController:
         self.button_side1.grid(row=row_index, column=col_index, padx=BUTTON_PADDING_X,
                                pady=BUTTON_PADDING_Y, sticky="nswe")
 
-        self.button_side2 = ctk.CTkButton(left_frame, text="Capture Side 2",
+        self.button_side2 = ctk.CTkButton(left_frame, text=txt["button_s2"],
                                           width=self.BUTTON_WIDTH, height=self.BUTTON_HEIGHT, 
                                           fg_color=self.colors["default_button"], 
                                           hover_color=self.colors["hover_gray"],
@@ -190,13 +192,14 @@ class ConveyorController:
         row_index=0
         PADDING_X=7
         PADDING_Y=7
+        txt = self.names["video"]
         video_frame = ctk.CTkFrame(frame)
         video_frame.grid(row=row_index, column=0, padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         results_vid_frame = ctk.CTkFrame(video_frame, fg_color=self.colors["transparent"])
         results_vid_frame.grid(row=row_index, column=0, padx=PADDING_X/2, pady=PADDING_Y/2,
                                sticky="nsew")
         
-        video_button = ctk.CTkButton(results_vid_frame, text="Video Feed", width=300,
+        video_button = ctk.CTkButton(results_vid_frame, text=txt["vid_feed"], width=300,
                                      height=self.BUTTON_HEIGHT, hover="disabled",
                                      font=self.TITLE_FONT,
                                      fg_color=self.colors["text_background"], 
@@ -211,7 +214,7 @@ class ConveyorController:
         results_frame = ctk.CTkFrame(video_frame, fg_color=self.colors["transparent"])
         results_frame.grid(row=row_index, columnspan=2, column=1, padx=PADDING_X/2,
                            pady=PADDING_Y/2, sticky="nsew")
-        results_button = ctk.CTkButton(results_frame, text="List of Results", width=300,
+        results_button = ctk.CTkButton(results_frame, text=txt["list_results"], width=300,
                                        height=self.BUTTON_HEIGHT, hover="disabled",
                                        font=self.TITLE_FONT,
                                        fg_color=self.colors["text_background"], 
@@ -224,7 +227,7 @@ class ConveyorController:
         dynamic_results_frame.grid(row=row_index, columnspan=2, column=1,
                                    padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
         self.results_data = ctk.CTkLabel(dynamic_results_frame, 
-                                         text="Average Score: null \nPredicted Grade: null ",
+                                         text=txt["final_results"],
                                          compound="left", justify="left")
         self.results_data.grid(row=row_index, columnspan=2, column=0,
                                padx=PADDING_X, pady=PADDING_Y, sticky="nsew")
@@ -233,14 +236,14 @@ class ConveyorController:
         side_frame = ctk.CTkFrame(frame, width=300, height=200)
         side_frame.grid(row=row_index+1, column=0, padx=PADDING_X,
                         pady=PADDING_Y, sticky="ns")
-        self.side1_button = ctk.CTkButton(side_frame, text="Side 1 Image",
+        self.side1_button = ctk.CTkButton(side_frame, text=txt["side1"],
                                           width=300, height=self.BUTTON_HEIGHT, 
                                           hover="disabled", font=self.TITLE_FONT,
                                           fg_color=self.colors["text_background"], 
                                           text_color=self.colors["text_color"])
         self.side1_button.grid(row=row_index, column=0, padx=PADDING_X,
                                pady=PADDING_Y, sticky="nswe")
-        self.side2_button = ctk.CTkButton(side_frame, text="Side 2 Image",
+        self.side2_button = ctk.CTkButton(side_frame, text=txt["side2"],
                                           width=300, height=self.BUTTON_HEIGHT, 
                                           hover="disabled", font=self.TITLE_FONT,
                                           fg_color=self.colors["text_background"], 
@@ -263,7 +266,7 @@ class ConveyorController:
         results_txt_frame1.grid(row=row_index, column=0, padx=PADDING_X,
                                 pady=PADDING_Y, sticky="nswe")
         self.side1_results = ctk.CTkLabel(results_txt_frame1, 
-                                          text="Ripeness: null\nBruises: null\nSize: null\nScore: null",
+                                          text=txt["side_results"],
                                           compound="left", justify="left")
         self.side1_results.grid(row=0, column=0, padx=PADDING_X,
                                 pady=PADDING_Y, sticky="nswe")
@@ -272,7 +275,7 @@ class ConveyorController:
         results_txt_frame2.grid(row=row_index, column=1, padx=PADDING_X,
                                 pady=PADDING_Y, sticky="nswe")
         self.side2_results = ctk.CTkLabel(results_txt_frame2, 
-                                          text="Ripeness: null\nBruises: null\nSize: null\nScore: null",
+                                          text=txt["side_results"],
                                           compound="left", justify="left")
         self.side2_results.grid(row=0, column=1, padx=PADDING_X,
                                 pady=PADDING_Y, sticky="nswe")
@@ -292,8 +295,8 @@ class ConveyorController:
         frame_choices.columnconfigure(0, weight=1)
         frame_choices.columnconfigure(1, weight=1) 
         frame_choices.columnconfigure(2, weight=1)
-
-        priority_txt = ctk.CTkButton(frame_choices, text="Input User Priority",
+        txt = self.names["priority"]
+        priority_txt = ctk.CTkButton(frame_choices, text=txt["input_user"],
                                      hover="disabled", font=self.DEFAULT_BOLD, 
                                      fg_color=self.colors["text_background"], 
                                      text_color=self.colors["text_color"])
@@ -301,7 +304,7 @@ class ConveyorController:
                           sticky="nswe", columnspan=3)   
         row_index+=1
         
-        ripeness_txt = ctk.CTkButton(frame_choices, text="Ripeness", width=TXT_WIDTH,
+        ripeness_txt = ctk.CTkButton(frame_choices, text=txt["ripeness"], width=TXT_WIDTH,
                                      hover="disabled", font=self.DEFAULT_BOLD,
                                      fg_color=self.colors["text_background"], 
                                      text_color=self.colors["text_color"])
@@ -309,28 +312,28 @@ class ConveyorController:
                           padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="ew")
         
         self.ripeness_combo = ctk.CTkComboBox(frame_choices, 
-                                              values=["0.0", "1.0", "2.0", "3.0"],
+                                              values=txt["option_val"],
                                               width=WIDTH_COMBOBOX)
-        self.ripeness_combo.set("3.0")
+        self.ripeness_combo.set(txt["default_val"])
         self.ripeness_combo.grid(row=row_index+1, column=col_index,
                                  padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
 
         col_index+=1
-        bruises_txt = ctk.CTkButton(frame_choices, text="Bruises", width=TXT_WIDTH,
+        bruises_txt = ctk.CTkButton(frame_choices, text=txt["bruises"], width=TXT_WIDTH,
                                     hover="disabled", font=self.DEFAULT_BOLD, 
                                     fg_color=self.colors["text_background"], 
                                     text_color=self.colors["text_color"])
         bruises_txt.grid(row=row_index, column=col_index, padx=PADDING_X_Y,
                          pady=PADDING_X_Y, sticky="ew")
         self.bruises_combo = ctk.CTkComboBox(frame_choices, 
-                                             values=["0.0", "1.0", "2.0", "3.0"],
+                                             values=txt["option_val"],
                                              width=WIDTH_COMBOBOX)
-        self.bruises_combo.set("3.0")
+        self.bruises_combo.set(txt["default_val"])
         self.bruises_combo.grid(row=row_index+1, column=col_index,
                                 padx=PADDING_X_Y, pady=PADDING_X_Y, sticky="nswe")
         
         col_index+=1
-        size_txt = ctk.CTkButton(frame_choices, text="Size", width=TXT_WIDTH,
+        size_txt = ctk.CTkButton(frame_choices, text=txt["size"], width=TXT_WIDTH,
                                  hover="disabled", font=self.DEFAULT_BOLD,
                                  fg_color=self.colors["text_background"], 
                                  text_color=self.colors["text_color"])
@@ -339,9 +342,9 @@ class ConveyorController:
  
         row_index+=1
         self.size_combo = ctk.CTkComboBox(frame_choices, 
-                                          values=["0.0", "1.0", "2.0", "3.0"],
+                                          values=txt["option_val"],
                                           width=WIDTH_COMBOBOX)
-        self.size_combo.set("3.0")
+        self.size_combo.set(txt["default_val"])
         self.size_combo.grid(row=row_index, column=col_index, padx=PADDING_X_Y,
                              pady=PADDING_X_Y, sticky="nswe")
 
@@ -350,7 +353,7 @@ class ConveyorController:
         combo_boxes = {'ripeness': self.ripeness_combo,
                        'bruises': self.bruises_combo,
                        'size': self.size_combo}
-        self.button_enter = ctk.CTkButton(frame_choices, text="Enter",
+        self.button_enter = ctk.CTkButton(frame_choices, text=txt["enter"],
                                           command=lambda:self.enter_priority(combo_boxes), 
                                           fg_color=self.colors["green"],
                                           hover_color=self.colors["green_hover"],
@@ -358,7 +361,7 @@ class ConveyorController:
         self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y,
                                pady=PADDING_X_Y, sticky="nswe", columnspan=3)
         row_index+=1
-        self.button_help = ctk.CTkButton(frame_choices, text="Help", 
+        self.button_help = ctk.CTkButton(frame_choices, text=txt["help"],
                                          command=self.get_help_page_info,
                                          fg_color=self.colors["default_button"],
                                          hover_color=self.colors["hover_gray"],
@@ -381,7 +384,7 @@ class ConveyorController:
     
     def set_background_image(self):
         if self.priority_enabled == False:
-            self.button_background.configure(text="Getting Background Image")
+            txt = self.names["control"]
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             
             background_img = self.picam2.get_image()
@@ -401,11 +404,11 @@ class ConveyorController:
             for button, state in button_configs.items():
                 button.configure(state=state)
                 
-            self.button_background.configure(text="Captured Background")
-            default_null = (f"Ripeness: null\nBruises: null\nSize: null\nScore: null")
-            self.results_data.configure(text=(f"Average Score: null\nPredicted Grade: null"))
-            self.side1_results.configure(text=default_null)
-            self.side2_results.configure(text=default_null)
+            self.button_background.configure(text=txt["button_dn"])
+            vid_txt = self.names["video"]
+            self.results_data.configure(text=vid_txt["final_results"])
+            self.side1_results.configure(text=vid_txt["side_results"])
+            self.side2_results.configure(text=vid_txt["side_results"])
         else:
             top_parent = self.button_background.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors["null_priority"]["title"],
@@ -540,12 +543,8 @@ class ConveyorController:
             self.button_background: "normal",
             self.button_side2: "disabled", 
             self.button_enter: "normal"
-            # self.button_cwc1: "disabled",
-            # self.button_cwc2: "disabled",
-            # self.button_ccwc1: "disabled",
-            # self.button_ccwc2: "disabled"
         }
-            
+        self.button_background.configure(text="Capture Background")
         for button, state in button_configs.items():
             button.configure(state=state)
      
@@ -665,7 +664,8 @@ class ConveyorController:
 if __name__ == "__main__":
     json_files = {
         'colors': "colors_str.json",
-        'errors': "errors_str.json"
+        'errors': "errors_str.json",
+        'names': "naming.json"
     }
     data = {}
     for key, filename in json_files.items():

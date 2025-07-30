@@ -1,0 +1,45 @@
+{
+  "control": {
+    "reset": "Reset",
+    "exit": "Exit",
+    "cwc1": "rotate forward TOP belt",
+    "ccwc1": "rotate backward TOP belt",
+    "cwc2": "rotate forward BOTTOM belt",
+    "ccwc2": "rotate backward BOTTOM belt",
+    "move_time": "Time to Move (in seconds)",
+    "default_val": "1.0",
+    "option_val": [
+      "1.0",
+      "2.0",
+      "3.0"
+    ],
+    "button_bg": "Capture Background",
+    "button_dn": "Captured Background",
+    "button_run": "Run Conveyor(s) (top/bottom)",
+    "button_s1": "Capture Side 1",
+    "button_s2": "Capture Side 2"
+  },
+  "video": {
+    "vid_feed": "Video Feed",
+    "list_results": "List of Results",
+    "final_results": "Average Score: null \nPredicted Grade: null ",
+    "side1": "Side 1 Image",
+    "side2": "Side 2 Image",
+    "side_results": "Ripeness: null\nBruises: null\nSize: null\nScore: null"
+  },
+  "priority": {
+    "input_user": "Input User Priorities",
+    "ripeness": "Ripeness",
+    "bruises": "Bruises",
+    "size": "Sizes",
+    "default_val": "3.0",
+    "option_val": [
+      "0.0",
+      "1.0",
+      "2.0",
+      "3.0"
+    ],
+    "enter": "Enter",
+    "help": "Help"
+  }
+}
