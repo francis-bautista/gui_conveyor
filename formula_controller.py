@@ -22,9 +22,20 @@ class FormulaController:
             'C': {'min': min_score, 'max': max_score - 2 * segment_size}
         }
 
+    def is_number(self):
+        try:
+            value = self.textbox.get()
+            float(value)
+            return True
+        except ValueError:
+            return False
+
     def set_input_priority(self, arr):
         print(arr)
         self.input_priorities = arr
+
+    def get_priorities(self):
+        return self.input_priorities
 
     def get_grade_letter(self, input_grade):
         boundaries = self.get_grade_formula(self.input_priorities)

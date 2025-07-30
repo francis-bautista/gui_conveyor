@@ -463,12 +463,6 @@ class ConveyorController:
         self.mc.clean_gpio()
         self.picam2.stop_camera()
         sys.exit(0)
-
-    def get_priorities(self):
-        r = float(self.ripeness_combo.get())
-        b = float(self.bruises_combo.get())
-        s = float(self.size_combo.get())
-        priorities = {'r':r, 'b':b, 's':s}
         return priorities
 
     def picture_side1(self):
@@ -485,8 +479,10 @@ class ConveyorController:
         
         print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
         top_size_class = determine_size(top_width, top_length) 
-        priorities = self.get_priorities()
-        predicted = {'r':top_class_ripeness, 'b': top_class_bruises, 's': top_size_class}
+        priorities = self.formula.get_priorities()
+        predicted = {'ripeness':top_class_ripeness,
+                     'bruises': top_class_bruises,
+                     'size': top_size_class}
         top_final_grade = self.ai.get_overall_grade(predicted, priorities)
         self.top_final_score=top_final_grade
         top_letter_grade = self.formula.get_grade_letter(top_final_grade)
@@ -514,8 +510,10 @@ class ConveyorController:
         print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
         bottom_size_class = determine_size(bottom_width, bottom_length) 
         
-        priorities = self.get_priorities()
-        predicted = {'r':bottom_class_ripeness, 'b': bottom_class_bruises, 's': bottom_size_class}
+        priorities = self.formula.get_priorities()
+        predicted = {'ripeness':bottom_class_ripeness,
+                     'bruises': bottom_class_bruises,
+                     'size': bottom_size_class}
         bottom_final_grade = self.ai.get_overall_grade(predicted, priorities)
         self.bottom_final_score=bottom_final_grade
         bottom_letter_grade = self.formula.get_grade_letter(bottom_final_grade)
@@ -613,17 +611,9 @@ class ConveyorController:
 
         return toggle_color
 
-    def is_number(self):
-        try:
-            value = self.textbox.get()
-            float(value)
-            return True
-        except ValueError:
-            return False
-
     def init_run_conveyor(self, buttontorun, textbox):
         top_parent = self.button_background.winfo_toplevel()
-        if (self.is_number()):
+        if (self.formula.is_number()):
             run_time = float(self.textbox.get())
             textbox.configure(state="disabled")
             button_color = [self.button_cwc1.cget("fg_color"), 

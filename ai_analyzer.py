@@ -47,9 +47,9 @@ class AIAnalyzer:
         return class_labels[predicted.item()]
     
     def get_overall_grade(self, scores, predicted):
-        resulting_grade = (predicted['r']*self.RIPENESS_SCORES[scores['r']] +
-            predicted['b']*self.BRUISES_SCORES[scores['b']] +
-            predicted['s']*self.SIZE_SCORES[scores['s']])
+        resulting_grade = (predicted['ripeness']*self.RIPENESS_SCORES[scores['ripeness']] +
+            predicted['bruises']*self.BRUISES_SCORES[scores['bruises']] +
+            predicted['size']*self.SIZE_SCORES[scores['size']])
         print(f"Resulting Grade: {resulting_grade}")
         return resulting_grade
 
