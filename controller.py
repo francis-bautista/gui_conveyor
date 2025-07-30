@@ -476,9 +476,9 @@ class ConveyorController:
         top_image = self.picam2.get_image()
         top_image.save(f"{self.recorded_time}_top.png")
         formatted_date_time = self.recorded_time
-        isRipeness=True;
-        top_class_ripeness = self.ai.get_predicted_class(top_image, isRipeness)
-        top_class_bruises = self.ai.get_predicted_class(top_image, not isRipeness)
+        is_ripeness=True;
+        top_class_ripeness = self.ai.get_predicted_class(top_image, is_ripeness)
+        top_class_bruises = self.ai.get_predicted_class(top_image, not is_ripeness)
         top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",
                                                f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
@@ -504,11 +504,11 @@ class ConveyorController:
         bottom_image = self.picam2.get_image()
         bottom_image.save(f"{self.recorded_time}_bottom.png")
         formatted_date_time = self.recorded_time        
-        isRipeness=True;
+        is_ripeness=True;
         bottom_class_ripeness = self.ai.get_predicted_class(bottom_image,
-                                                         isRipeness)
+                                                         is_ripeness)
         bottom_class_bruises = self.ai.get_predicted_class(bottom_image, 
-                                                        not isRipeness)
+                                                        not is_ripeness)
         bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",
                                                      f"{formatted_date_time}_background.png", 
         formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
