@@ -1,5 +1,6 @@
 import torch
-from PIL import Image
+from PIL import Image, ImageTk
+import customtkinter as ctk
 try:
     from picamera2 import Picamera2
 except ImportError:
@@ -30,6 +31,20 @@ class CameraManager:
         arr = self.picam2.capture_array()
 
         return arr
+    
+    def set_controller_vars(self, app, video_canvas):
+        self.app = app
+        self.video_canvas = video_canvas
+
+    def get_video_feed(self):
+        vid_params = {'f_length':300, 'f_width':200, 'buffer':10, 'x':0, 'y':0}
+        frame = self.get_image()
+        frame = frame.resize((vid_params['f_length'], vid_params['f_width']))
+        frame = ImageTk.PhotoImage(frame)
+        self.video_canvas.create_image(vid_params['x'], vid_params['y'], anchor=ctk.NW, image=frame)
+        self.video_canvas.image = frame
+        self.app.after(vid_params['buffer'], self.get_video_feed)
+
    
     def stop_camera(self):
         self.picam2.stop()
