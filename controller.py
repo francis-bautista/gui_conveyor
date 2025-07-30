@@ -1,7 +1,7 @@
 import torch, time, sys, os, threading
 from datetime import datetime
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import ImageTk
 from get_size import calculate_size, determine_size
 from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
@@ -29,12 +29,12 @@ class ConveyorController:
         self.top_final_score = 0
         self.bottom_final_score = 0
         self.priority_enabled = True
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.FOCAL_LENGTH_PIXELS = 3500
         self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.mc = MotorController()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
