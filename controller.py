@@ -78,7 +78,7 @@ class ConveyorController:
         col_index += 1
         self.button_exit = ctk.CTkButton(left_frame, text="Exit", width=self.BUTTON_WIDTH,
                                          height=self.BUTTON_HEIGHT,
-                                         fg_color=self.colors["default_button"],
+                                         fg_color=self.colors["bg_red"],
                                          hover_color=self.colors["hover_red"]
                                         ,font=self.DEFAULT_BOLD)
         self.button_exit.configure(command=self.exit_program)
@@ -353,7 +353,6 @@ class ConveyorController:
                                           font=self.DEFAULT_BOLD)
         self.button_enter.grid(row=row_index, column=col_index, padx=PADDING_X_Y,
                                pady=PADDING_X_Y, sticky="nswe", columnspan=3)
-        # TODO: put the formula controller
         row_index+=1
         self.button_help = ctk.CTkButton(frame_choices, text="Help", 
                                          command=self.get_help_page_info,
@@ -448,8 +447,9 @@ class ConveyorController:
             self.ripeness_combo.configure(state="disabled")
             self.bruises_combo.configure(state="disabled")
             self.size_combo.configure(state="disabled")
-            self.button_enter.configure(text="Cancel")
+            self.button_enter.configure(text="Cancel", fg_color=self.colors["bg_red"], hover_color=self.colors["hover_red"])
             self.formula.set_input_priority(self.get_input_priorities())
+            # TODO: put the fg to red and hover red
             self.priority_enabled = False
         
     def reset_program(self):
@@ -661,7 +661,7 @@ if __name__ == "__main__":
             "main_app_background": "#e5e0d8",      # Light beige 
             "frame_background": "#B3B792",         # Olive green 
             "default_button": "#979da2",           # Gray 
-            "hover_red": "#CC0000",                # Red 
+            "bg_red": "#CC0000",                # Red 
             "hover_gray": "#6e7174",               # Dark gray 
             "text_background": "#f9f9fa",          # Off-white 
             "text_color": "#000000",               # Black 
@@ -669,6 +669,7 @@ if __name__ == "__main__":
             "green_hover": "#0B662B",              # Dark green 
             "transparent": "transparent",          # Transparent 
             "green": "green",
+            "hover_red": "#990000"
         }
     ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color=colors["main_app_background"])
