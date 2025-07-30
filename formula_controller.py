@@ -22,13 +22,28 @@ class FormulaController:
             'C': {'min': min_score, 'max': max_score - 2 * segment_size}
         }
 
-    def is_number(self):
+    def is_number(self, textbox):
         try:
-            value = self.textbox.get()
+            value = textbox.get()
             float(value)
             return True
         except ValueError:
             return False
+
+    def is_valid_priority(self, combo_boxes):
+        all_valid = True
+        for key, combo in combo_boxes.items():
+            value = combo.get()
+            if value == "" or value is None:
+                print(f"Error: '{key}' is empty or not selected.")
+                all_valid = False
+            else:
+                try:
+                    float(value)  # or int(value) if you only allow integers
+                except ValueError:
+                    print(f"Error: '{key}' is not a number.")
+                    all_valid = False
+        return all_valid
 
     def set_input_priority(self, arr):
         print(arr)

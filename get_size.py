@@ -1,9 +1,17 @@
-import cv2
+import cv2, imutils, json
 import numpy as np
-import imutils
 from imutils import perspective
 from scipy.spatial import distance as dist
 # get_size.py
+def load_json_file(filepath, default_data=None):
+    try:
+        with open(filepath, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Error: '{filepath}' not found.")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding '{filepath}': {e}")
+    return default_data if default_data is not None else {}
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
     # TODO IMPORT NALANG AS A SEPARATE PYTHON FUNCTION
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels

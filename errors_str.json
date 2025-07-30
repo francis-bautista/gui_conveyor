@@ -1,0 +1,30 @@
+{
+  "null_button": {
+    "title": "ERROR: Null Button Error",
+    "message": "Please select one of the buttons for the direction of the conveyor(s)."
+  },
+  "not_number": {
+    "title": "ERROR: Not a number",
+    "message": "Please enter a number."
+  },
+  "null_priority": {
+    "title": "ERROR: No User Priority",
+    "message": "Please enter your selected values for the user priority."
+  },
+  "value_error": {
+    "title": "ERROR: Value Error",
+    "message": "Please enter a valid number."
+  },
+  "null_time": {
+    "title": "ERROR: Null Time Input",
+    "message": "Please enter the time to run conveyor(s)."
+  },
+  "input_error": {
+    "title": "ERROR: Input Error",
+    "message": "Please click only one direction for each conveyor."
+  },
+  "priority_error": {
+    "title": "ERROR: At Least One Priority Input Error",
+    "message": "Please input a valid number"
+  }
+}

@@ -2,15 +2,16 @@ import torch, time, sys, os, threading, json
 from datetime import datetime
 import customtkinter as ctk
 from PIL import ImageTk
-from get_size import calculate_size, determine_size
+from get_size import calculate_size, determine_size, load_json_file
 from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
 from camera_manager import CameraManager
 from formula_controller import FormulaController
     
 class ConveyorController:
-    def __init__(self, app, colors):
+    def __init__(self, app, colors, errors):
         self.colors = colors
+        self.errors = errors
         self.app = app
         self.app.title("Conveyor Controller")
         self.WINDOW_SIZE = {'length':1200, 'width':700}
@@ -346,8 +347,11 @@ class ConveyorController:
 
         row_index+=1
         col_index=0
+        combo_boxes = {'ripeness': self.ripeness_combo,
+                       'bruises': self.bruises_combo,
+                       'size': self.size_combo}
         self.button_enter = ctk.CTkButton(frame_choices, text="Enter",
-                                          command=self.enter_priority, 
+                                          command=lambda:self.enter_priority(combo_boxes), 
                                           fg_color=self.colors["green"],
                                           hover_color=self.colors["green_hover"],
                                           font=self.DEFAULT_BOLD)
@@ -400,9 +404,8 @@ class ConveyorController:
             self.button_background.configure(text="Captured Background")
         else:
             top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent, 
-                                "ERROR: No User Priority",
-                                "Please enter your selected values for the user priority.")
+            self.set_error_pop_up(top_parent, self.errors["null_priority"]["title"],
+                                  self.errors["null_priority"]["message"])
 
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
@@ -429,28 +432,31 @@ class ConveyorController:
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (popup.winfo_height() // 2)
         popup.geometry(f"+{x}+{y}")
     
-    def enter_priority(self):
-        ripeness = self.ripeness_combo.get()
-        bruises = self.bruises_combo.get()
-        size = self.size_combo.get()
-        print(f"Ripeness: {ripeness}, Bruises: {bruises}, Size: {size}")
-        if self.priority_enabled == False:
-            self.ripeness_combo.configure(state="normal")
-            self.bruises_combo.configure(state="normal")
-            self.size_combo.configure(state="normal")
-            self.ripeness_combo.set("3.0")
-            self.bruises_combo.set("3.0")
-            self.size_combo.set("3.0")
-            self.button_enter.configure(text="Enter")
-            self.priority_enabled = True
+    def enter_priority(self, combo_boxes):
+        all_valid = self.formula.is_valid_priority(combo_boxes)
+        if all_valid:
+            print("All combo boxes have valid numbers.")
+            if not self.priority_enabled:
+                self.ripeness_combo.configure(state="normal")
+                self.bruises_combo.configure(state="normal")
+                self.size_combo.configure(state="normal")
+                self.ripeness_combo.set("3.0")
+                self.bruises_combo.set("3.0")
+                self.size_combo.set("3.0")
+                self.button_enter.configure(text="Enter")
+                self.priority_enabled = True
+            else:
+                self.ripeness_combo.configure(state="disabled")
+                self.bruises_combo.configure(state="disabled")
+                self.size_combo.configure(state="disabled")
+                self.button_enter.configure(text="Cancel", fg_color=self.colors["bg_red"], hover_color=self.colors["hover_red"])
+                self.formula.set_input_priority(self.get_input_priorities())
+                self.priority_enabled = False
         else:
-            self.ripeness_combo.configure(state="disabled")
-            self.bruises_combo.configure(state="disabled")
-            self.size_combo.configure(state="disabled")
-            self.button_enter.configure(text="Cancel", fg_color=self.colors["bg_red"], hover_color=self.colors["hover_red"])
-            self.formula.set_input_priority(self.get_input_priorities())
-            # TODO: put the fg to red and hover red
-            self.priority_enabled = False
+            top_parent = self.button_background.winfo_toplevel()
+            self.set_error_pop_up(top_parent, self.errors["priority_error"]["title"],
+                                          self.errors["priority_error"]["message"])
+            print("Some combo boxes are invalid.")
         
     def reset_program(self):
         print("Resetting")
@@ -573,9 +579,8 @@ class ConveyorController:
         except ValueError:
             print("Please enter a valid number")
             top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent,
-                                  "ERROR: Value Error",
-                                  "Please enter a valid number.")
+            self.set_error_pop_up(top_parent, self.errors["value_error"]["title"],
+                                  self.errors["value_error"]["message"])
             return None
         
     def set_countdown_thread(self, start_count, buttontorun, textbox):
@@ -613,7 +618,7 @@ class ConveyorController:
 
     def init_run_conveyor(self, buttontorun, textbox):
         top_parent = self.button_background.winfo_toplevel()
-        if (self.formula.is_number()):
+        if (self.formula.is_number(textbox)):
             run_time = float(self.textbox.get())
             textbox.configure(state="disabled")
             button_color = [self.button_cwc1.cget("fg_color"), 
@@ -622,14 +627,14 @@ class ConveyorController:
                             self.button_ccwc2.cget("fg_color")]
             
             if run_time is None:
-                self.set_error_pop_up(top_parent, "ERROR: Null Time Input",
-                                    "Please enter the time to run conveyor(s).")
+                self.set_error_pop_up(top_parent, self.errors["null_time"]["title"],
+                                      self.errors["null_time"]["message"])
                 textbox.configure(state="normal")
             elif self.colors["green"] in button_color:
                 if ((button_color[0] == self.colors["green"] and button_color[1] == self.colors["green"]) or 
                     (button_color[2] == self.colors["green"] and button_color[3] == self.colors["green"])):
-                    self.set_error_pop_up(top_parent, "ERROR: Input Error",
-                                        "Please click only one direction for each conveyor.")
+                    self.set_error_pop_up(top_parent, self.errors["input_error"]["title"],
+                                          self.errors["input_error"]["message"])
                     textbox.configure(state="normal")
                 else:
                     button_state_array = [1 if self.colors["green"] in color else 0 for color in button_color]
@@ -643,29 +648,24 @@ class ConveyorController:
                     textbox.configure(state="normal")
             else: 
                 self.textbox.set("1.0")
-                self.set_error_pop_up(top_parent, 
-                                    "ERROR: Null Button Error",
-                                    "Please select one of the buttons for the direction of the conveyor(s).")
+                self.set_error_pop_up(top_parent, self.errors["null_button"]["title"],
+                                      self.errors["null_button"]["message"])
                 textbox.configure(state="normal")
 
         else:
-            self.set_error_pop_up(top_parent, "ERROR: Not a number",
-                                            "Please enter a number.")
+            self.set_error_pop_up(top_parent, self.errors["not_number"]["title"],
+                                  self.errors["not_number"]["message"])
             textbox.configure(state="normal")
 
     def run(self):
         self.app.mainloop()
 
 if __name__ == "__main__":
-    file = "colors.json"
-    try:
-        with open(file,"r") as f:
-            colors = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: '{file}' file not found")
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON: {e}")
+    json_files = { 'colors': "colors_str.json", 
+                  'errors':"errors_str.json" }
+    colors = load_json_file(json_files['colors'])
+    errors = load_json_file(json_files['errors'])
     ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color=colors["main_app_background"])
-    controller = ConveyorController(app,colors)
+    controller = ConveyorController(app,colors,errors)
     controller.run()
