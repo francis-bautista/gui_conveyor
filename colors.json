@@ -1,0 +1,14 @@
+{
+  "main_app_background": "#e5e0d8",
+  "frame_background": "#B3B792",
+  "default_button": "#979da2",
+  "bg_red": "#CC0000",
+  "hover_gray": "#6e7174",
+  "text_background": "#f9f9fa",
+  "text_color": "#000000",
+  "button_hover_blue": "#3B8ED0",
+  "green_hover": "#0B662B",
+  "transparent": "transparent",
+  "green": "green",
+  "hover_red": "#990000"
+}

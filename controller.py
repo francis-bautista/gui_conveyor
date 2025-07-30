@@ -1,4 +1,4 @@
-import torch, time, sys, os, threading
+import torch, time, sys, os, threading, json
 from datetime import datetime
 import customtkinter as ctk
 from PIL import ImageTk
@@ -657,20 +657,14 @@ class ConveyorController:
         self.app.mainloop()
 
 if __name__ == "__main__":
-    colors = {
-            "main_app_background": "#e5e0d8",      # Light beige 
-            "frame_background": "#B3B792",         # Olive green 
-            "default_button": "#979da2",           # Gray 
-            "bg_red": "#CC0000",                # Red 
-            "hover_gray": "#6e7174",               # Dark gray 
-            "text_background": "#f9f9fa",          # Off-white 
-            "text_color": "#000000",               # Black 
-            "button_hover_blue": "#3B8ED0",        # Blue 
-            "green_hover": "#0B662B",              # Dark green 
-            "transparent": "transparent",          # Transparent 
-            "green": "green",
-            "hover_red": "#990000"
-        }
+    file = "colors.json"
+    try:
+        with open(file,"r") as f:
+            colors = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: '{file}' file not found")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
     ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color=colors["main_app_background"])
     controller = ConveyorController(app,colors)
