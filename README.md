@@ -65,3 +65,9 @@ git merge --abort
 git fetch origin
 git reset --hard origin/master
 ```
+
+## Python Libraries Required
+- tkinter, customtkinter
+- torch, torchvision, efficientnet_pytorch
+- opencv, scipy, numpy, imutils
+
