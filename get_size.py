@@ -2,7 +2,7 @@ import cv2, imutils, json
 import numpy as np
 from imutils import perspective
 from scipy.spatial import distance as dist
-# get_size.py
+
 def load_json_file(filepath, default_data=None):
     try:
         with open(filepath, "r") as f:
@@ -12,10 +12,11 @@ def load_json_file(filepath, default_data=None):
     except json.JSONDecodeError as e:
         print(f"Error decoding '{filepath}': {e}")
     return default_data if default_data is not None else {}
+
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
+
 def calculate_size(img, top):
-    # fg, bg, formatted_date_time
     fg = img['m']
     bg = img['g']
     formatted_date_time = img['f_dt']
@@ -89,14 +90,13 @@ def calculate_size(img, top):
         return 0, 0
     
 def determine_size(length, width):
-    """Determines the size of the mango based on its length and width.
-    
-    :param length: The length of the mango in cm
-    :param width: The width of the mango in cm
-    :return: A string indicating the size of the mango: 'small', 'medium', or 'large'
-    """
-    minArea = float(11.5 * 8.5)
-    maxArea = float(12.5 * 8.5)
+    area = { 'min_x': 11.5,
+            'min_y': 7.0,
+            'max_x': 12.5,
+            'max_y': 8.5,
+    }
+    minArea = float(area['min_x'] * area['min_y'])
+    maxArea = float(area['max_x'] * area['max_y'])
     area = float(length * width)
     if area < minArea:
         return 'small'
@@ -106,10 +106,4 @@ def determine_size(length, width):
         return 'large'
     
 def midpoint(ptA, ptB):
-    """
-    Calculate the midpoint of two points.
-    :param ptA: First point.
-    :param ptB: Second point.
-    :return: Midpoint of the two points.
-    """
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
