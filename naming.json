@@ -22,7 +22,7 @@
   "video": {
     "vid_feed": "Video Feed",
     "list_results": "List of Results",
-    "final_results": "Average Score: null \nPredicted Grade: null ",
+    "final_results": "Top Scope: null\nBottom Score: null\nGrade A: null\nGrade B: null\nGrade C: null\nAverage Score: null \nPredicted Grade: null ",
     "side1": "Side 1 Image",
     "side2": "Side 2 Image",
     "side_results": "Ripeness: null\nBruises: null\nSize: null\nScore: null"

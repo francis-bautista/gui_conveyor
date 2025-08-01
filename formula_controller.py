@@ -78,5 +78,18 @@ class FormulaController:
             min_val = boundaries[grade]['min']
             max_val = boundaries[grade]['max']
             range_size = max_val - min_val
-            print(f"Grade {grade}: {max_val:.2f} - {min_val:.2f}, Range: {range_size:.2f}")
+            # print(f"Grade {grade}: {max_val:.2f} - {min_val:.2f}, Range: {range_size:.2f}")
 
+    def get_grade_formula_dict(self):
+        boundaries = self.get_grade_formula(self.input_priorities)       
+        print("Calculated Grade Range")
+        grade_dict = {}
+        for grade in ['A', 'B', 'C']:
+            min_val = boundaries[grade]['min']
+            max_val = boundaries[grade]['max']
+            range_size = max_val - min_val
+            grade_string = f"{max_val:.2f} - {min_val:.2f}, Range: {range_size:.2f}"
+            grade_dict[grade] = grade_string
+            # print(f"Grade {grade}: {grade_string}")
+        
+        return grade_dict

@@ -546,9 +546,15 @@ class ConveyorController:
         
         average_score = (self.top_final_score + self.bottom_final_score) / 2
         average_letter = self.formula.get_grade_letter(average_score)
-        
+        # TODO: QWERTY
+        grade_info = self.formula.get_grade_formula_dict()
+        grade_string = "\n".join([f"Grade {grade}: {info}" for grade, info in grade_info.items()])
+        print(grade_string)
         self.results_data.configure(
-            text=(f"Average Score: {average_score:.2f}\n" + 
+            text=(f"Top Score: {self.top_final_score:.2f}\n" +
+                f"Bottom Score: {self.top_final_score:.2f}\n" +
+                grade_string +
+                f"\nAverage Score: {average_score:.2f}\n" + 
                     f"Predicted Grade: {average_letter}"))
         
         button_configs = {
