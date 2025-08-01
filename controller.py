@@ -31,8 +31,8 @@ class ConveyorController:
         self.top_final_score = 0
         self.bottom_final_score = 0
         self.priority_enabled = True
-        self.FOCAL_LENGTH_PIXELS = 3500
-        self.DISTANCE_CAMERA_TO_OBJECT = 40
+        # self.FOCAL_LENGTH_PIXELS = 3500
+        # self.DISTANCE_CAMERA_TO_OBJECT = 40
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -490,72 +490,73 @@ class ConveyorController:
 
     def picture_side1(self):
         print("Process and pictured side 1")
-        top_image = self.picam2.get_image()
-        top_image.save(f"{self.recorded_time}_top.png")
-        formatted_date_time = self.recorded_time
-        is_ripeness=True;
-        top_class_ripeness = self.ai.get_predicted_class(top_image, is_ripeness)
-        top_class_bruises = self.ai.get_predicted_class(top_image, not is_ripeness)
-        top_width, top_length = calculate_size(f"{formatted_date_time}_top.png",
-                                               f"{formatted_date_time}_background.png", 
-        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
+        s1 = self.ai.get_is_s1()
+        t_img = self.picam2.get_image()
+        t_img.save(f"{self.recorded_time}_top.png")
+        f_dt = self.recorded_time
+        t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
+        t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
+        imgs = {'m': f"{f_dt}_top.png",
+                'g': f"{f_dt}_background.png",
+                'f_dt': f_dt}
+        t_x, t_y = calculate_size(imgs, s1)
         
-        print(f"Top Width: {top_width:.2f} cm, Top Length: {top_length:.2f} cm")
-        top_size_class = determine_size(top_width, top_length) 
+        print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
+        t_s = determine_size(t_x, t_y) 
         priorities = self.formula.get_priorities()
-        predicted = {'ripeness':top_class_ripeness,
-                     'bruises': top_class_bruises,
-                     'size': top_size_class}
-        top_final_grade = self.ai.get_overall_grade(predicted, priorities)
-        self.top_final_score=top_final_grade
-        top_letter_grade = self.formula.get_grade_letter(top_final_grade)
-        self.set_textbox_results(top_image, top_class_ripeness,
-                                 top_class_bruises, top_size_class,
-                                 top_final_grade, top_letter_grade, True)
+        ai_pred = {'ripeness': t_r,
+                   'bruises': t_b,
+                   'size': t_s}
+        num_grade = self.ai.get_overall_grade(ai_pred, priorities)
+        self.top_final_score=num_grade
+        letter_grade = self.formula.get_grade_letter(num_grade)
+        results_data = {'img': t_img,
+                        'num_grade': num_grade,
+                        'letter_grade': letter_grade}
+        self.set_textbox_results(results_data, ai_pred, s1)
         
         self.button_side1.configure(state="disabled")
         self.button_side2.configure(state="normal")
 
     def picture_side2(self):
         print("Process and pictured side 2")
-        bottom_image = self.picam2.get_image()
-        bottom_image.save(f"{self.recorded_time}_bottom.png")
-        formatted_date_time = self.recorded_time        
-        is_ripeness=True;
-        bottom_class_ripeness = self.ai.get_predicted_class(bottom_image,
-                                                         is_ripeness)
-        bottom_class_bruises = self.ai.get_predicted_class(bottom_image, 
-                                                        not is_ripeness)
-        bottom_width, bottom_length = calculate_size(f"{formatted_date_time}_bottom.png",
-                                                     f"{formatted_date_time}_background.png", 
-        formatted_date_time, True,self.DISTANCE_CAMERA_TO_OBJECT, self.FOCAL_LENGTH_PIXELS)
+        s2 = self.ai.get_is_s2()
+        b_img = self.picam2.get_image()
+        b_img.save(f"{self.recorded_time}_bottom.png")
+        f_dt = self.recorded_time
+        b_r = self.ai.get_predicted_class(b_img, self.ai.get_is_ripeness())
+        b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())
+        imgs = {'m': f"{f_dt}_bottom.png",
+                'g': f"{f_dt}_background.png",
+                'f_dt': f_dt}
+        b_x, b_y = calculate_size(imgs, s2)
         
-        print(f"Bottom Width: {bottom_width:.2f} cm, Bottom Length: {bottom_length:.2f} cm")
-        bottom_size_class = determine_size(bottom_width, bottom_length) 
+        print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")
+        b_s = determine_size(b_x, b_y) 
         
         priorities = self.formula.get_priorities()
-        predicted = {'ripeness':bottom_class_ripeness,
-                     'bruises': bottom_class_bruises,
-                     'size': bottom_size_class}
-        bottom_final_grade = self.ai.get_overall_grade(predicted, priorities)
-        self.bottom_final_score=bottom_final_grade
-        bottom_letter_grade = self.formula.get_grade_letter(bottom_final_grade)
-        self.set_textbox_results(bottom_image, bottom_class_ripeness, bottom_class_bruises,
-                                 bottom_size_class, bottom_final_grade, bottom_letter_grade,
-                                 False)
+        ai_pred = {'ripeness': b_r,
+                   'bruises': b_b,
+                   'size': b_s}
+        num_grade = self.ai.get_overall_grade(ai_pred, priorities)
+        self.bottom_final_score=num_grade
+        letter_grade = self.formula.get_grade_letter(num_grade)
+        results_data = {'img': b_img,
+                        'num_grade': num_grade,
+                        'letter_grade': letter_grade}
+        self.set_textbox_results(results_data, ai_pred, s2)
         
-        average_score = (self.top_final_score + self.bottom_final_score) / 2
-        average_letter = self.formula.get_grade_letter(average_score)
-        # TODO: QWERTY
+        ave_score = (self.top_final_score + self.bottom_final_score) / 2
+        ave_letter = self.formula.get_grade_letter(ave_score)
         grade_info = self.formula.get_grade_formula_dict()
         grade_string = "\n".join([f"Grade {grade}: {info}" for grade, info in grade_info.items()])
         print(grade_string)
         self.results_data.configure(
             text=(f"Top Score: {self.top_final_score:.2f}\n" +
                 f"Bottom Score: {self.top_final_score:.2f}\n" +
-                grade_string +
-                f"\nAverage Score: {average_score:.2f}\n" + 
-                    f"Predicted Grade: {average_letter}"))
+                grade_string + f"\n" +
+                f"Average Score: {ave_score:.2f}\n" + 
+                f"Predicted Grade: {ave_letter}"))
         
         button_configs = {
             self.button_background: "normal",
@@ -573,7 +574,13 @@ class ConveyorController:
             'size': float(self.size_combo.get())}
         return arr
     
-    def set_textbox_results(self, image, ripeness, bruises, size, score, letter, is_top):
+    def set_textbox_results(self, results_data, ai_pred, is_top):
+        image = results_data['img']
+        ripeness = ai_pred['ripeness']
+        bruises = ai_pred['bruises']
+        size = ai_pred['size']
+        score = results_data['num_grade']
+        letter = results_data['letter_grade']
         def update():
             if is_top:
                 self.side1_results.configure(

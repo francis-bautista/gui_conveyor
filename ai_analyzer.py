@@ -10,7 +10,14 @@ class AIAnalyzer:
         self.SIZE_SCORES = size_scores
         self.transform = self.create_transform()
         self.load_models()
-    
+    def get_is_ripeness(self):
+        return True
+    def get_is_bruises(self):
+        return False
+    def get_is_s1(self):
+        return True
+    def get_is_s2(self):
+        return False
     def create_transform(self):
         self.tf_params = {'px': 224, 'py': 224,
                           'mean_r':0.485, 'mean_g':0.456, 'mean_b':0.406,

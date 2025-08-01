@@ -14,7 +14,13 @@ def load_json_file(filepath, default_data=None):
     return default_data if default_data is not None else {}
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
-def calculate_size(fg, bg, formatted_date_time, top, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS):
+def calculate_size(img, top):
+    # fg, bg, formatted_date_time
+    fg = img['m']
+    bg = img['g']
+    formatted_date_time = img['f_dt']
+    FOCAL_LENGTH_PIXELS = 3500
+    DISTANCE_CAMERA_TO_OBJECT = 40
     try:
         # Determine the suffix based on the `top` parameter
         suffix = "top" if top else "bottom"
