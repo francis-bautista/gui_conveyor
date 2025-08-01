@@ -13,7 +13,6 @@ def load_json_file(filepath, default_data=None):
         print(f"Error decoding '{filepath}': {e}")
     return default_data if default_data is not None else {}
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
-    # TODO IMPORT NALANG AS A SEPARATE PYTHON FUNCTION
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
 def calculate_size(fg, bg, formatted_date_time, top, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS):
     try:
@@ -72,13 +71,11 @@ def calculate_size(fg, bg, formatted_date_time, top, DISTANCE_CAMERA_TO_OBJECT, 
         box = imutils.perspective.order_points(box)
         (tl, tr, br, bl) = box
         
-        # Calculate dimensions
         pixel_width = dist.euclidean(tl, tr)
         pixel_length = dist.euclidean(tr, br)
         real_width = calculate_real_world_dimension(pixel_width, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS)
         real_length = calculate_real_world_dimension(pixel_length, DISTANCE_CAMERA_TO_OBJECT, FOCAL_LENGTH_PIXELS)
         
-        # Apply the scaling factors as in the original code
         return real_width, real_length
         
     except Exception as e:
@@ -92,10 +89,10 @@ def determine_size(length, width):
     :param width: The width of the mango in cm
     :return: A string indicating the size of the mango: 'small', 'medium', or 'large'
     """
-    minArea = float(11.5 * 8.5)  # Minimum area for a mango in cm^2
-    maxArea = float(12.5 * 8.5)  # Maximum area for a mango in cm^2
-    area = float(length * width)  # Calculate area (you can use any metric you prefer)
-    if area < minArea:  # Example thresholds
+    minArea = float(11.5 * 8.5)
+    maxArea = float(12.5 * 8.5)
+    area = float(length * width)
+    if area < minArea:
         return 'small'
     elif minArea <= area < maxArea:
         return 'medium'
