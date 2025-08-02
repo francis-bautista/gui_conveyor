@@ -17,7 +17,9 @@
     "button_dn": "Captured Background",
     "button_run": "Run Conveyor(s) (top/bottom)",
     "button_s1": "Capture Side 1",
-    "button_s2": "Capture Side 2"
+    "button_s2": "Capture Side 2",
+    "padx": 7,
+    "pady": 7
   },
   "video": {
     "vid_feed": "Video Feed",
@@ -25,7 +27,9 @@
     "final_results": "Top Scope: null\nBottom Score: null\nGrade A: null\nGrade B: null\nGrade C: null\nAverage Score: null \nPredicted Grade: null ",
     "side1": "Side 1 Image",
     "side2": "Side 2 Image",
-    "side_results": "Ripeness: null\nBruises: null\nSize: null\nScore: null"
+    "side_results": "Ripeness: null\nBruises: null\nSize: null\nScore: null",
+    "padx": 7,
+    "pady": 7
   },
   "priority": {
     "input_user": "Input User Priorities",
@@ -40,6 +44,8 @@
       "3.0"
     ],
     "enter": "Enter",
-    "help": "Help"
+    "help": "Help",
+    "padx": 7,
+    "pady": 7
   }
 }
