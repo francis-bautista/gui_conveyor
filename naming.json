@@ -7,7 +7,7 @@
     "cwc2": "rotate forward BOTTOM belt",
     "ccwc2": "rotate backward BOTTOM belt",
     "move_time": "Time to Move (in seconds)",
-    "default_val": "1.0",
+    "default_val": "3.0",
     "option_val": [
       "1.0",
       "2.0",
