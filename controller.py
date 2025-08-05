@@ -451,12 +451,13 @@ class ConveyorController:
         [all_valid, error_log] = self.formula.is_valid_priority(combo_boxes)
         if all_valid:
             if not self.priority_enabled:
+                txt = self.names["priority"]["default_val"]
                 self.ripeness_combo.configure(state="normal")
                 self.bruises_combo.configure(state="normal")
                 self.size_combo.configure(state="normal")
-                self.ripeness_combo.set("3.0")
-                self.bruises_combo.set("3.0")
-                self.size_combo.set("3.0")
+                self.ripeness_combo.set(txt)
+                self.bruises_combo.set(txt)
+                self.size_combo.set(txt)
                 self.button_enter.configure(text="Enter")
                 self.priority_enabled = True
             else:
@@ -623,7 +624,8 @@ class ConveyorController:
         for button in button_list:
             button.configure(fg_color=self.colors["default_button"], 
                              hover_color=self.colors["button_hover_blue"])
-        textbox.set("1.0")
+        default=self.names["control"]["default_val"]
+        textbox.set(default)
         textbox.configure(state="normal")
 
     def toggle_button_color(self, button):
