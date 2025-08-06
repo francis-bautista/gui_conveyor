@@ -7,6 +7,7 @@ from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
 from camera_manager import CameraManager
 from formula_controller import FormulaController
+from rcnn_size import MangoMeasurementSystem
     
 class ConveyorController:
     def __init__(self, app, data):
@@ -38,7 +39,9 @@ class ConveyorController:
         self.mc = MotorController()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
-
+        # TODO: check in rpi
+        RCNN_PATH = '../mango_detection_model.pth'
+        self.rcnn_size = MangoMeasurementSystem(RCNN_PATH)
         self.init_ui()
     
     def init_ui(self):
@@ -497,7 +500,10 @@ class ConveyorController:
                 'g': f"{f_dt}_background.png",
                 'f_dt': f_dt}
         t_x, t_y = calculate_size(imgs, s1)
-        
+        # TODO: check this rcnn
+        print("\n\nRCNN")
+        self.rcnn_size.get_size(imgs['m'])
+        print("\n\n")
         print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
         t_s = determine_size(t_x, t_y) 
         priorities = self.formula.get_priorities()
@@ -527,7 +533,10 @@ class ConveyorController:
                 'g': f"{f_dt}_background.png",
                 'f_dt': f_dt}
         b_x, b_y = calculate_size(imgs, s2)
-        
+        # TODO: check this rcnn
+        print("\n\nRCNN")
+        self.rcnn_size.get_size(imgs['m'])
+        print("\n\n")
         print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")
         b_s = determine_size(b_x, b_y) 
         

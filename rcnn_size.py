@@ -1,0 +1,226 @@
+import cv2
+import torch
+import torchvision
+import numpy as np
+import math
+from typing import List, Dict, Tuple
+
+class MangoMeasurementSystem:
+    def __init__(self, model_path, num_classes=7):
+        """
+        Initialize the mango measurement system
+        
+        Args:
+            model_path: Path to trained model
+            num_classes: Number of classes (6 mango classes + background)
+        """
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model = self.load_model(model_path, num_classes)
+        
+        # Class names
+        self.class_names = {
+            1: 'bruised', 2: 'not_bruised', 3: 'yellow',
+            4: 'green_yellow', 5: 'green', 6: 'mango'
+        }
+        
+        # Fixed calibration settings
+        self.reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
+        self.reference_size_cm = 2.4  # Known size of reference object in cm
+        
+    def load_model(self, model_path, num_classes):
+        """Load the trained mango detection model"""
+        try:
+            from torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights
+            
+            model = fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
+            in_features = model.roi_heads.box_predictor.cls_score.in_features
+            model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+                in_features, num_classes
+            )
+            
+            model.load_state_dict(torch.load(model_path, map_location=self.device))
+            model.to(self.device)
+            model.eval()
+            
+            print(f"Model loaded successfully on {self.device}")
+            return model
+            
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            return None
+    
+    def get_size(self, img_path, confidence_threshold=0.5, save_annotated=True):
+        """
+        Get mango sizes from image using fixed calibration and save annotated image
+        
+        Args:
+            img_path: Path to image file
+            confidence_threshold: Minimum confidence for detections
+            save_annotated: Whether to save annotated image (default: True)
+            
+        Returns:
+            List of mango measurements with dimensions in cm
+        """
+        # Load image
+        image = cv2.imread(img_path)
+        if image is None:
+            print(f"Could not load image: {img_path}")
+            return []
+        
+        # Calibrate using fixed reference object
+        x1, y1, x2, y2 = self.reference_box
+        ref_width_pixels = x2 - x1
+        ref_height_pixels = y2 - y1
+        ref_size_pixels = max(ref_width_pixels, ref_height_pixels)
+        pixels_per_cm = ref_size_pixels / self.reference_size_cm
+        
+        print(f"Calibration: {pixels_per_cm:.2f} pixels/cm")
+        
+        # Detect mangoes
+        if self.model is None:
+            print("Model not loaded")
+            return []
+        
+        # Preprocess image
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_tensor = torch.tensor(image_rgb, dtype=torch.float32).permute(2, 0, 1) / 255.0
+        input_tensor = image_tensor.unsqueeze(0).to(self.device)
+        
+        # Predict
+        with torch.no_grad():
+            predictions = self.model(input_tensor)
+        
+        # Extract predictions
+        pred = predictions[0]
+        boxes = pred['boxes'].cpu().numpy()
+        scores = pred['scores'].cpu().numpy()
+        labels = pred['labels'].cpu().numpy()
+        
+        # Filter by confidence
+        keep = scores >= confidence_threshold
+        
+        # Calculate measurements for each detected mango
+        results = []
+        for i, (box, score, label) in enumerate(zip(boxes[keep], scores[keep], labels[keep])):
+            x1, y1, x2, y2 = box
+            
+            # Calculate dimensions in pixels
+            width_pixels = x2 - x1
+            height_pixels = y2 - y1
+            
+            # Convert to real-world measurements
+            width_cm = width_pixels / pixels_per_cm
+            height_cm = height_pixels / pixels_per_cm
+            
+            # Determine length vs width (length is typically the larger dimension)
+            length_cm = max(width_cm, height_cm)
+            width_cm = min(width_cm, height_cm)
+            
+            # Calculate area and volume
+            area_cm2 = length_cm * width_cm
+            
+            # Calculate approximate volume (assuming ellipsoid shape)
+            a = length_cm / 2
+            b = width_cm / 2
+            c = (a + b) / 2
+            volume_cm3 = (4/3) * math.pi * a * b * c
+            
+            result = {
+                'mango_id': i,
+                'class': self.class_names.get(label, f'Class_{label}'),
+                'confidence': round(score, 3),
+                'length_cm': round(length_cm, 2),
+                'width_cm': round(width_cm, 2),
+                'area_cm2': round(area_cm2, 2),
+                'volume_cm3': round(volume_cm3, 2),
+                'bounding_box': box.tolist()
+            }
+            results.append(result)
+        
+        # Print results
+        print(f"\nFound {len(results)} mangoes:")
+        for result in results:
+            print(f"Mango {result['mango_id']} ({result['class']}):")
+            print(f"  Length: {result['length_cm']} cm")
+            print(f"  Width: {result['width_cm']} cm") 
+            print(f"  Area: {result['area_cm2']} cm²")
+            print(f"  Volume: {result['volume_cm3']} cm³")
+            print(f"  Confidence: {result['confidence']}")
+        
+        # Save annotated image
+        if save_annotated and results:
+            self._save_annotated_image(image, results, img_path)
+        
+        return results
+    
+    def _save_annotated_image(self, image, results, original_path):
+        """
+        Save image with bounding boxes and measurement annotations
+        
+        Args:
+            image: Original image (BGR format)
+            results: List of detection results
+            original_path: Original image path
+        """
+        import os
+        
+        # Create a copy for annotation
+        annotated_image = image.copy()
+        
+        # Draw annotations for each mango
+        for result in results:
+            box = result['bounding_box']
+            x1, y1, x2, y2 = [int(coord) for coord in box]
+            
+            # Draw bounding box (green)
+            cv2.rectangle(annotated_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            
+            # Prepare measurement text
+            text_lines = [
+                f"ID: {result['mango_id']} ({result['class']})",
+                f"L: {result['length_cm']} cm",
+                f"W: {result['width_cm']} cm",
+                f"Area: {result['area_cm2']} cm²",
+                f"Vol: {result['volume_cm3']} cm³"
+            ]
+            
+            # Calculate text position (above the bounding box)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.6
+            font_thickness = 2
+            line_height = 25
+            
+            # Start position for text (above the box)
+            text_start_y = max(y1 - 10, line_height * len(text_lines))
+            
+            # Draw each line of text
+            for i, line in enumerate(text_lines):
+                text_y = text_start_y - (len(text_lines) - i - 1) * line_height
+                
+                # Get text size for background rectangle
+                (text_width, text_height), baseline = cv2.getTextSize(line, font, font_scale, font_thickness)
+                
+                # Draw background rectangle (semi-transparent green)
+                overlay = annotated_image.copy()
+                cv2.rectangle(overlay, 
+                             (x1, text_y - text_height - 5), 
+                             (x1 + text_width + 10, text_y + baseline + 5), 
+                             (0, 255, 0), -1)
+                cv2.addWeighted(annotated_image, 0.7, overlay, 0.3, 0, annotated_image)
+                
+                # Draw text (black)
+                cv2.putText(annotated_image, line, (x1 + 5, text_y), 
+                           font, font_scale, (0, 0, 0), font_thickness)
+        
+        # Generate output filename
+        base_name = os.path.splitext(original_path)[0]
+        extension = os.path.splitext(original_path)[1]
+        output_path = f"{base_name}_measured{extension}"
+        
+        # Save annotated image
+        success = cv2.imwrite(output_path, annotated_image)
+        
+        if success:
+            print(f"\nAnnotated image saved as: {output_path}")
+        else:
+            print(f"Error: Could not save annotated image to {output_path}")
