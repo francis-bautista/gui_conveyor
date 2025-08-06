@@ -10,7 +10,7 @@ from formula_controller import FormulaController
 # RCNN is in controller_v2.py
 # from rcnn_size import MangoMeasurementSystem
     
-class ConveyorController:
+class ConveyorControllerV2:
     def __init__(self, app, data):
         self.colors = data['colors']
         self.errors = data['errors']
@@ -705,5 +705,5 @@ if __name__ == "__main__":
         data[key] = load_json_file(filename)
     ctk.set_appearance_mode("light")
     app = ctk.CTk(fg_color=data["colors"]["main_app_background"])
-    controller = ConveyorController(app, data)
+    controller = ConveyorControllerV2(app, data)
     controller.run()
