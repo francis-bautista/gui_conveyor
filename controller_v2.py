@@ -7,8 +7,7 @@ from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
 from camera_manager import CameraManager
 from formula_controller import FormulaController
-# RCNN is in controller_v2.py
-# from rcnn_size import MangoMeasurementSystem
+from rcnn_size import MangoMeasurementSystem
     
 class ConveyorControllerV2:
     def __init__(self, app, data):
