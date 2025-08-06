@@ -34,13 +34,13 @@ class MangoMeasurementSystem:
             from torchvision.models.detection import fasterrcnn_mobilenet_v3_large_fpn
             import torch
             
-            print("📱 Creating Faster R-CNN with MobileNetV3-Large backbone...")
+            print("Creating Faster R-CNN with MobileNetV3-Large backbone...")
             
             # Create MobileNetV3-Large Faster R-CNN model
             model = fasterrcnn_mobilenet_v3_large_fpn(weights=None, num_classes=num_classes)
             
             # Load the checkpoint
-            print("🔄 Loading model weights...")
+            print("Loading model weights...")
             checkpoint = torch.load(model_path, map_location=self.device)
             
             # Extract model state dict
@@ -65,14 +65,14 @@ class MangoMeasurementSystem:
             model.to(self.device)
             model.eval()
             
-            print(f"✅ Model loaded successfully on {self.device}")
-            print(f"📊 Classes: {num_classes}")
+            print(f"Model loaded successfully on {self.device}")
+            print(f"Classes: {num_classes}")
             self.model = model
             
             return model
             
         except Exception as e:
-            print(f"❌ Error loading model: {e}")
+            print(f"Error loading model: {e}")
             return None    
     #
     # def load_model(self, model_path, num_classes):

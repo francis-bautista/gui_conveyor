@@ -500,9 +500,9 @@ class ConveyorController:
                 'g': f"{f_dt}_background.png",
                 'f_dt': f_dt}
         t_x, t_y = calculate_size(imgs, s1)
-        # TODO: check this rcnn
+        # TODO: check this rcnn and then display on ctk
         print("\n\nRCNN")
-        self.rcnn_size.get_size(imgs['m'])
+        rcnn_size = self.rcnn_size.get_size(imgs['m'])
         print("\n\n")
         print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
         t_s = determine_size(t_x, t_y) 
@@ -533,7 +533,7 @@ class ConveyorController:
                 'g': f"{f_dt}_background.png",
                 'f_dt': f_dt}
         b_x, b_y = calculate_size(imgs, s2)
-        # TODO: check this rcnn
+        # TODO: check this rcnn and then display it on ctk
         print("\n\nRCNN")
         self.rcnn_size.get_size(imgs['m'])
         print("\n\n")
