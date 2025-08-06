@@ -40,7 +40,7 @@ class ConveyorController:
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         # TODO: check in rpi
-        RCNN_PATH = '../mango_detection_model.pth'
+        RCNN_PATH = "mango_detection_model.pth"
         self.rcnn_size = MangoMeasurementSystem(RCNN_PATH)
         self.init_ui()
     
