@@ -67,6 +67,7 @@ class MangoMeasurementSystem:
             
             print(f"✅ Model loaded successfully on {self.device}")
             print(f"📊 Classes: {num_classes}")
+            self.model = model
             
             return model
             
