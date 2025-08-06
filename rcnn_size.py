@@ -20,35 +20,82 @@ class MangoMeasurementSystem:
         # Class names
         self.class_names = {
             1: 'bruised', 2: 'not_bruised', 3: 'yellow',
-            4: 'green_yellow', 5: 'green', 6: 'mango'
+            4: 'green_yellow', 5: 'green', 6: 'mango', 7: 'background'
         }
         
         # Fixed calibration settings
         self.reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
         self.reference_size_cm = 2.4  # Known size of reference object in cm
-        
-    def load_model(self, model_path, num_classes):
-        """Load the trained mango detection model"""
+
+    def load_model(self, model_path, num_classes=7):
+        """Load the trained mango detection model (MobileNetV3-Large backbone)"""
         try:
-            from torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights
+            import torchvision
+            from torchvision.models.detection import fasterrcnn_mobilenet_v3_large_fpn
+            import torch
             
-            model = fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
-            in_features = model.roi_heads.box_predictor.cls_score.in_features
-            model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-                in_features, num_classes
-            )
+            print("📱 Creating Faster R-CNN with MobileNetV3-Large backbone...")
             
-            model.load_state_dict(torch.load(model_path, map_location=self.device))
+            # Create MobileNetV3-Large Faster R-CNN model
+            model = fasterrcnn_mobilenet_v3_large_fpn(weights=None, num_classes=num_classes)
+            
+            # Load the checkpoint
+            print("🔄 Loading model weights...")
+            checkpoint = torch.load(model_path, map_location=self.device)
+            
+            # Extract model state dict
+            if isinstance(checkpoint, dict):
+                if 'model_state_dict' in checkpoint:
+                    model_state = checkpoint['model_state_dict']
+                elif 'state_dict' in checkpoint:
+                    model_state = checkpoint['state_dict']
+                else:
+                    model_state = checkpoint
+            else:
+                model_state = checkpoint
+            
+            # Load weights
+            missing_keys, unexpected_keys = model.load_state_dict(model_state, strict=False)
+            
+            if missing_keys:
+                print(f"⚠️ Missing keys: {len(missing_keys)}")
+            if unexpected_keys:
+                print(f"⚠️ Unexpected keys: {len(unexpected_keys)}")
+            
             model.to(self.device)
             model.eval()
             
-            print(f"Model loaded successfully on {self.device}")
+            print(f"✅ Model loaded successfully on {self.device}")
+            print(f"📊 Classes: {num_classes}")
+            
             return model
             
         except Exception as e:
-            print(f"Error loading model: {e}")
-            return None
-    
+            print(f"❌ Error loading model: {e}")
+            return None    
+    #
+    # def load_model(self, model_path, num_classes):
+    #     """Load the trained mango detection model"""
+    #     try:
+    #         from torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights
+    #
+    #         model = fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
+    #         in_features = model.roi_heads.box_predictor.cls_score.in_features
+    #         model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+    #             in_features, num_classes
+    #         )
+    #
+    #         model.load_state_dict(torch.load(model_path, map_location=self.device))
+    #         model.to(self.device)
+    #         model.eval()
+    #
+    #         print(f"Model loaded successfully on {self.device}")
+    #         return model
+    #
+    #     except Exception as e:
+    #         print(f"Error loading model: {e}")
+    #         return None
+    #
     def get_size(self, img_path, confidence_threshold=0.5, save_annotated=True):
         """
         Get mango sizes from image using fixed calibration and save annotated image
