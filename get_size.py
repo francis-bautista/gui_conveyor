@@ -2,6 +2,93 @@ import cv2, imutils, json
 import numpy as np
 from imutils import perspective
 from scipy.spatial import distance as dist
+import os
+import pandas as pd
+# C:\Users\Kenan\thesis-size
+# TODO: ANALYZE TWO IMAGES
+def batch_analyze(self, image_folder, output_csv=None):
+    """
+    Analyze multiple images and optionally save results to CSV
+    
+    Args:
+        image_folder: Folder containing images
+        output_csv: Path to save CSV results (optional)
+    """
+    
+    all_results = []
+    image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+    
+    for image_file in image_files:
+        image_path = os.path.join(image_folder, image_file)
+        print(f"Processing: {image_file}")
+        
+        results = self.analyze_image(image_path)
+        
+        for result in results:
+            row = {
+                'image_file': image_file,
+                'mango_id': result['mango_id'],
+                'class': result['class'],
+                'confidence': result['confidence'],
+                'length_cm': result['measurements']['length_cm'],
+                'width_cm': result['measurements']['width_cm'],
+                'area_cm2': result['measurements']['area_cm2'],
+                'volume_cm3': result['measurements']['volume_cm3']
+            }
+            all_results.append(row)
+    
+    # Create DataFrame
+    df = pd.DataFrame(all_results)
+    
+    if output_csv:
+        df.to_csv(output_csv, index=False)
+        print(f"Results saved to: {output_csv}")
+    
+    # Print summary statistics
+    if not df.empty:
+        print("\n=== MEASUREMENT SUMMARY ===")
+        print(f"Total mangoes measured: {len(df)}")
+        print(f"Average length: {df['length_cm'].mean():.2f} cm")
+        print(f"Average width: {df['width_cm'].mean():.2f} cm")
+        print(f"Average area: {df['area_cm2'].mean():.2f} cm²")
+        print(f"Length range: {df['length_cm'].min():.2f} - {df['length_cm'].max():.2f} cm")
+        print(f"Width range: {df['width_cm'].min():.2f} - {df['width_cm'].max():.2f} cm")
+    
+    return df
+
+# TODO: GET SIZE USING ONE IMAGE
+def calibrate_and_measure_single_image(img_path):
+    """Example: Calibrate with reference object and measure mangoes"""
+
+# Initialize system
+    measurement_system = MangoMeasurementSystem('mango_detection_model.pth')
+
+# Load image with reference object (e.g., ruler, coin, known object)
+    image_path = img_path
+    image = cv2.imread(image_path)
+
+# Manual calibration with reference object
+# You need to manually identify the reference object bounding box
+# (980, 435, 1164, 612)
+    reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
+    reference_size_cm = 2.4  # Known size of reference object in cm
+
+# Calibrate
+    measurement_system.calibrate_with_reference_object(image, reference_box, reference_size_cm)
+
+# Measure mangoes
+    results = measurement_system.analyze_image(image_path)
+
+# Print results
+    for result in results:
+        print(f"\nMango {result['mango_id']} ({result['class']}):")
+        print(f"  Length: {result['measurements']['length_cm']} cm")
+        print(f"  Width: {result['measurements']['width_cm']} cm")
+        print(f"  Area: {result['measurements']['area_cm2']} cm²")
+        print(f"  Confidence: {result['confidence']}")
+
+# Visualize results
+    measurement_system.visualize_measurements(image_path)
 
 def load_json_file(filepath, default_data=None):
     try:
