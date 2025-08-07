@@ -507,6 +507,8 @@ class ConveyorControllerV2:
         print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
         # TODO: put the RCNN thing here 
         t_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
+        print("RCNN")
+        print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
         priorities = self.formula.get_priorities()
         ai_pred = {'ripeness': t_r,
                    'bruises': t_b,
@@ -541,7 +543,8 @@ class ConveyorControllerV2:
         print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")        
         # TODO: put the RCNN thing here 
         b_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
-        
+        print("RCNN")
+        print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
         priorities = self.formula.get_priorities()
         ai_pred = {'ripeness': b_r,
                    'bruises': b_b,
