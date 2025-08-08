@@ -177,8 +177,8 @@ class MangoMeasurementSystem:
                 'mango_id': i,
                 'class': self.class_names.get(label, f'Class_{label}'),
                 'confidence': round(score, 3),
-                'length_cm': round(length_cm, 2),
-                'width_cm': round(width_cm, 2),
+                'length_cm': round(length_cm, 2), #3
+                'width_cm': round(width_cm, 2), #4
                 'area_cm2': round(area_cm2, 2),
                 'volume_cm3': round(volume_cm3, 2),
                 'bounding_box': box.tolist()

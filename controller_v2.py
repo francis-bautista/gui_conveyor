@@ -503,6 +503,8 @@ class ConveyorControllerV2:
         # # TODO: check this rcnn and then display on ctk
         print("\n\nRCNN")
         rcnn_size = self.rcnn_size.get_size(imgs['m'])
+        print(rcnn_size)
+        rcnn_size = {'length_cm': rcnn_size[0]['length_cm'], 'width_cm': rcnn_size[1]['width_cm']}
         print("\n\n")
         print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
         # TODO: put the RCNN thing here 
@@ -539,6 +541,7 @@ class ConveyorControllerV2:
         # # TODO: check this rcnn and then display it on ctk
         print("\n\nRCNN")
         rcnn_size = self.rcnn_size.get_size(imgs['m'])
+        rcnn_size = {'length_cm': rcnn_size[0]['length_cm'], 'width_cm': rcnn_size[1]['width_cm']}
         print("\n\n")
         print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")        
         # TODO: put the RCNN thing here 
