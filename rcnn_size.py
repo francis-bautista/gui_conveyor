@@ -200,7 +200,8 @@ class MangoMeasurementSystem:
             self._save_annotated_image(image, results, img_path)
         
         return results
-    
+
+
     def _save_annotated_image(self, image, results, original_path):
         """
         Save image with bounding boxes and measurement annotations

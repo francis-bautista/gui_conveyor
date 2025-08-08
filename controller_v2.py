@@ -488,6 +488,24 @@ class ConveyorControllerV2:
         sys.exit(0)
         return priorities
 
+    def process_mango_image(self, img_path):
+        results = self.rcnn_size.get_size(img_path)
+        
+        if not results:
+            print("No mangoes detected")
+            length = 0
+            width = 0
+            print(f"Processing Mango: No detection")
+            print(f"  Dimensions: {length} x {width} cm")
+            return length, width
+        else:
+            most_confident = max(results, key=lambda x: x['confidence'])
+            length = most_confident['length_cm']
+            width = most_confident['width_cm']
+            # print(f"Processing Mango {mango['mango_id']}:")
+            print(f"  Dimensions: {length} x {width} cm")
+            return length, width
+        
     def picture_side1(self):
         print("Process and pictured side 1")
         s1 = self.ai.get_is_s1()
@@ -502,9 +520,9 @@ class ConveyorControllerV2:
         t_x, t_y = calculate_size(imgs, s1)
         # # TODO: check this rcnn and then display on ctk
         print("\n\nRCNN")
-        rcnn_size = self.rcnn_size.get_size(imgs['m'])
-        print(rcnn_size)
-        rcnn_size = {'length_cm': rcnn_size[0]['length_cm'], 'width_cm': rcnn_size[1]['width_cm']}
+        # rcnn_size = self.rcnn_size.get_size(imgs['m'])
+        x, y = self.process_mango_image(imgs['m'])
+        rcnn_size = {'length_cm': x, 'width_cm': y}
         print("\n\n")
         print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
         # TODO: put the RCNN thing here 
@@ -540,8 +558,9 @@ class ConveyorControllerV2:
         b_x, b_y = calculate_size(imgs, s2)
         # # TODO: check this rcnn and then display it on ctk
         print("\n\nRCNN")
-        rcnn_size = self.rcnn_size.get_size(imgs['m'])
-        rcnn_size = {'length_cm': rcnn_size[0]['length_cm'], 'width_cm': rcnn_size[1]['width_cm']}
+        # rcnn_size = self.rcnn_size.get_size(imgs['m'])
+        x, y = self.process_mango_image(imgs['m'])
+        rcnn_size = {'length_cm': x, 'width_cm': y}
         print("\n\n")
         print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")        
         # TODO: put the RCNN thing here 
