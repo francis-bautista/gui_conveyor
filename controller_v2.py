@@ -32,6 +32,7 @@ class ConveyorControllerV2:
         self.top_final_score = 0
         self.bottom_final_score = 0
         self.priority_enabled = True
+        self.check_priority = False
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -415,7 +416,10 @@ class ConveyorControllerV2:
                     combo.configure(state="normal")
                     combo.set(txt)
                 self.button_enter.configure(text="Enter")
-                for button in [self.button_side1, self.button_side2]:
+                for button in [self.button_side1, self.button_side2,
+                               self.button_cwc1, self.button_ccwc1,
+                               self.button_cwc2, self.button_ccwc2,
+                               self.button_run]:
                     button.configure(state="disabled")
                 self.priority_enabled = True
             else:
@@ -428,7 +432,8 @@ class ConveyorControllerV2:
                 )
                 self.formula.set_input_priority(self.get_input_priorities())
                 self.priority_enabled = False
-                bool = self.check_priority_input()
+                is_bool = self.check_priority_input()
+                self.check_priority = is_bool
         else:
             top_parent = self.button_run.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
@@ -495,7 +500,7 @@ class ConveyorControllerV2:
 
 
     def picture_side1(self):
-        isTrue = self.check_priority_input()
+        isTrue = self.check_priority
         if (isTrue):
             self.button_enter.configure(state="disabled")
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
