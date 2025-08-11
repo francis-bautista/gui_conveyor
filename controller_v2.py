@@ -140,20 +140,9 @@ class ConveyorControllerV2:
         self.textbox.set(txt["default_val"])
         self.textbox.grid(row=row_index, column=col_index, columnspan=2, 
                                  padx=txt["padx"], pady=txt["pady"], sticky="nswe")
-
-        row_index += 1
-        self.button_background = ctk.CTkButton(left_frame, text=txt["button_bg"],
-                                               width=self.BUTTON_WIDTH * 2 + 40,
-                                               height=self.BUTTON_HEIGHT, 
-                                              fg_color=self.colors["default_button"],
-                                               hover_color=self.colors["hover_gray"], 
-                                               font=self.DEFAULT_BOLD)
-        self.button_background.configure(command=self.set_background_image)
-        self.button_background.grid(row=row_index, column=col_index, columnspan=2,
-                                    padx=txt["padx"], pady=txt["pady"],
-                                    sticky="nswe")
         
         row_index += 1
+
         self.button_run = ctk.CTkButton(left_frame, text=txt["button_run"], 
                                         width=self.BUTTON_WIDTH * 2 + 40,
                                         height=self.BUTTON_HEIGHT, 
@@ -389,38 +378,6 @@ class ConveyorControllerV2:
         close_button.pack(pady=10)
         
         return class_labels[predicted.item()]
-    
-    def set_background_image(self):
-        if self.priority_enabled == False:
-            txt = self.names["control"]
-            self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            
-            background_img = self.picam2.get_image()
-            background_img.save(f"{self.recorded_time}_background.png")
-            
-            button_configs = {
-                self.button_background: "disabled",
-                self.button_run: "normal",
-                self.button_side1: "normal", 
-                self.button_enter: "disabled",
-                self.button_cwc1: "normal",
-                self.button_cwc2: "normal",
-                self.button_ccwc1: "normal",
-                self.button_ccwc2: "normal"
-            }
-            
-            for button, state in button_configs.items():
-                button.configure(state=state)
-                
-            self.button_background.configure(text=txt["button_dn"])
-            vid_txt = self.names["video"]
-            self.results_data.configure(text=vid_txt["final_results"])
-            self.side1_results.configure(text=vid_txt["side_results"])
-            self.side2_results.configure(text=vid_txt["side_results"])
-        else:
-            top_parent = self.button_background.winfo_toplevel()
-            self.set_error_pop_up(top_parent, self.errors["null_priority"]["title"],
-                                  self.errors["null_priority"]["message"])
 
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
@@ -454,23 +411,26 @@ class ConveyorControllerV2:
         if all_valid:
             if not self.priority_enabled:
                 txt = self.names["priority"]["default_val"]
-                self.ripeness_combo.configure(state="normal")
-                self.bruises_combo.configure(state="normal")
-                self.size_combo.configure(state="normal")
-                self.ripeness_combo.set(txt)
-                self.bruises_combo.set(txt)
-                self.size_combo.set(txt)
+                for combo in [self.ripeness_combo, self.bruises_combo, self.size_combo]:
+                    combo.configure(state="normal")
+                    combo.set(txt)
                 self.button_enter.configure(text="Enter")
+                for button in [self.button_side1, self.button_side2]:
+                    button.configure(state="disabled")
                 self.priority_enabled = True
             else:
-                self.ripeness_combo.configure(state="disabled")
-                self.bruises_combo.configure(state="disabled")
-                self.size_combo.configure(state="disabled")
-                self.button_enter.configure(text="Cancel", fg_color=self.colors["bg_red"], hover_color=self.colors["hover_red"])
+                for combo in [self.ripeness_combo, self.bruises_combo, self.size_combo]:
+                    combo.configure(state="disabled")
+                self.button_enter.configure(
+                    text="Cancel",
+                    fg_color=self.colors["bg_red"],
+                    hover_color=self.colors["hover_red"]
+                )
                 self.formula.set_input_priority(self.get_input_priorities())
                 self.priority_enabled = False
+                bool = self.check_priority_input()
         else:
-            top_parent = self.button_background.winfo_toplevel()
+            top_parent = self.button_run.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
                                           self.errors[error_log]["message"])
         
@@ -505,40 +465,72 @@ class ConveyorControllerV2:
             print(f"  Dimensions: {length} x {width} cm")
             return length, width
         
+    def check_priority_input(self):
+        if (self.priority_enabled == False):
+            txt = self.names["control"]
+
+            button_configs = {
+                self.button_run: "normal",
+                self.button_side1: "normal", 
+                self.button_cwc1: "normal",
+                self.button_cwc2: "normal",
+                self.button_ccwc1: "normal",
+                self.button_ccwc2: "normal"
+            }
+
+            for button, state in button_configs.items():
+                button.configure(state=state)
+
+            vid_txt = self.names["video"]
+            self.results_data.configure(text=vid_txt["final_results"])
+            self.side1_results.configure(text=vid_txt["side_results"])
+            self.side2_results.configure(text=vid_txt["side_results"])
+            return True
+        else:
+            # Return error message
+            top_parent = self.button_enter.winfo_toplevel()
+            self.set_error_pop_up(top_parent, self.errors["null_priority"]["title"],
+                                    self.errors["null_priority"]["message"])
+            return False
+
+
     def picture_side1(self):
-        print("Process and pictured side 1")
-        s1 = self.ai.get_is_s1()
-        t_img = self.picam2.get_image()
-        t_img.save(f"{self.recorded_time}_top.png")
-        f_dt = self.recorded_time
-        t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
-        t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
-        imgs = {'m': f"{f_dt}_top.png",
-                'g': f"{f_dt}_background.png",
-                'f_dt': f_dt}
-        t_x, t_y = calculate_size(imgs, s1)
-        print("\n\nRCNN")
-        x, y = self.process_mango_image(imgs['m'])
-        rcnn_size = {'length_cm': x, 'width_cm': y}
-        print("\n\n")
-        print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
-        t_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
-        print("RCNN")
-        print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
-        priorities = self.formula.get_priorities()
-        ai_pred = {'ripeness': t_r,
-                   'bruises': t_b,
-                   'size': t_s}
-        num_grade = self.ai.get_overall_grade(ai_pred, priorities)
-        self.top_final_score=num_grade
-        letter_grade = self.formula.get_grade_letter(num_grade)
-        results_data = {'img': t_img,
-                        'num_grade': num_grade,
-                        'letter_grade': letter_grade}
-        self.set_textbox_results(results_data, ai_pred, s1)
-        
-        self.button_side1.configure(state="disabled")
-        self.button_side2.configure(state="normal")
+        isTrue = self.check_priority_input()
+        if (isTrue):
+            self.button_enter.configure(state="disabled")
+            self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            print("Process and pictured side 1")
+            s1 = self.ai.get_is_s1()
+            t_img = self.picam2.get_image()
+            t_img.save(f"{self.recorded_time}_top.png")
+            f_dt = self.recorded_time
+            t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
+            t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
+            imgs = {'m': f"{f_dt}_top.png",
+                    'g': f"{f_dt}_background.png",
+                    'f_dt': f_dt}
+            t_x, t_y = calculate_size(imgs, s1)
+            print("\n\nRCNN")
+            x, y = self.process_mango_image(imgs['m'])
+            rcnn_size = {'length_cm': x, 'width_cm': y}
+            print("\n\n")
+            print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
+            t_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
+            print("RCNN")
+            print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
+            priorities = self.formula.get_priorities()
+            ai_pred = {'ripeness': t_r,
+                    'bruises': t_b,
+                    'size': t_s}
+            num_grade = self.ai.get_overall_grade(ai_pred, priorities)
+            self.top_final_score=num_grade
+            letter_grade = self.formula.get_grade_letter(num_grade)
+            results_data = {'img': t_img,
+                            'num_grade': num_grade,
+                            'letter_grade': letter_grade}
+            self.set_textbox_results(results_data, ai_pred, s1)
+            self.button_side1.configure(state="disabled")
+            self.button_side2.configure(state="normal")
 
     def picture_side2(self):
         print("Process and pictured side 2")
@@ -585,11 +577,10 @@ class ConveyorControllerV2:
                 f"Predicted Grade: {ave_letter}"))
         
         button_configs = {
-            self.button_background: "normal",
+            self.button_side1: "normal",
             self.button_side2: "disabled", 
             self.button_enter: "normal"
         }
-        self.button_background.configure(text="Capture Background")
         for button, state in button_configs.items():
             button.configure(state=state)
      
@@ -630,7 +621,7 @@ class ConveyorControllerV2:
                 return None
         except ValueError:
             print("Please enter a valid number")
-            top_parent = self.button_background.winfo_toplevel()
+            top_parent = self.button_enter.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors["value_error"]["title"],
                                   self.errors["value_error"]["message"])
             return None
@@ -670,7 +661,7 @@ class ConveyorControllerV2:
         return toggle_color
 
     def init_run_conveyor(self, buttontorun, textbox):
-        top_parent = self.button_background.winfo_toplevel()
+        top_parent = self.button_enter.winfo_toplevel()
         if (self.formula.is_number(textbox)):
             run_time = float(self.textbox.get())
             textbox.configure(state="disabled")
@@ -700,7 +691,6 @@ class ConveyorControllerV2:
                     set_countdown_thread.start()
                     textbox.configure(state="normal")
             else: 
-                self.textbox.set("1.0")
                 self.set_error_pop_up(top_parent, self.errors["null_button"]["title"],
                                       self.errors["null_button"]["message"])
                 textbox.configure(state="normal")
