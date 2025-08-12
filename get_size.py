@@ -56,6 +56,35 @@ def batch_analyze(self, image_folder, output_csv=None):
     
     return df
 
+def calibrate_with_reference_object(self, image, reference_box, reference_size_cm):
+    """
+    Calibrate the measurement system using a reference object
+    
+    Args:
+        image: Input image
+        reference_box: Bounding box of reference object [x1, y1, x2, y2]
+        reference_size_cm: Known size of reference object in cm
+    """
+    x1, y1, x2, y2 = reference_box
+    
+    # Calculate reference object dimensions in pixels
+    ref_width_pixels = x2 - x1
+    ref_height_pixels = y2 - y1
+    
+    # Use the larger dimension for calibration (more accurate)
+    ref_size_pixels = max(ref_width_pixels, ref_height_pixels)
+    
+    # Calculate pixels per cm
+    self.pixels_per_cm = ref_size_pixels / reference_size_cm
+    self.reference_object_size_cm = reference_size_cm
+    
+    print(f"Calibration complete:")
+    print(f"  Reference object: {reference_size_cm} cm")
+    print(f"  Reference pixels: {ref_size_pixels:.1f} pixels")
+    print(f"  Scale: {self.pixels_per_cm:.2f} pixels/cm")
+    
+    return self.pixels_per_cm
+
 # TODO: GET SIZE USING ONE IMAGE
 def calibrate_and_measure_single_image(img_path):
     """Example: Calibrate with reference object and measure mangoes"""
@@ -179,7 +208,7 @@ def calculate_size(img, top):
 def determine_size(length, width):
     area = { 'min_x': 11.5,
             'min_y': 7.0,
-            'max_x': 12.5,
+            'max_x': 15.5,
             'max_y': 8.5,
     }
     minArea = float(area['min_x'] * area['min_y'])

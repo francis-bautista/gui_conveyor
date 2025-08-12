@@ -512,12 +512,12 @@ class ConveyorControllerV2:
             t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
             t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
             imgs = {'f_dt': f_dt}
-            t_x, t_y = calculate_size(imgs, s1)
+            # t_x, t_y = calculate_size(imgs, s1)
             print("\n\nRCNN")
             x, y = self.process_mango_image(imgs['m'])
             rcnn_size = {'length_cm': x, 'width_cm': y}
             print("\n\n")
-            print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
+            # print(f"Top Width: {t_x:.2f} cm, Top Length: {t_y:.2f} cm")
             t_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
             print("RCNN")
             print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
@@ -544,12 +544,12 @@ class ConveyorControllerV2:
         b_r = self.ai.get_predicted_class(b_img, self.ai.get_is_ripeness())
         b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())
         imgs = {'f_dt': f_dt}
-        b_x, b_y = calculate_size(imgs, s2)
+        # b_x, b_y = calculate_size(imgs, s2)
         print("\n\nRCNN")
         x, y = self.process_mango_image(imgs['m'])
         rcnn_size = {'length_cm': x, 'width_cm': y}
         print("\n\n")
-        print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")        
+        # print(f"Bottom Width: {b_x:.2f} cm, Bottom Length: {b_y:.2f} cm")        
         b_s = determine_size(rcnn_size['length_cm'], rcnn_size['width_cm']) 
         print("RCNN")
         print(f"Length: {rcnn_size['length_cm']:.2f} cm, Width: {rcnn_size['width_cm']:.2f} cm")
