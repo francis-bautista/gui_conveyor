@@ -24,7 +24,8 @@ class MangoMeasurementSystem:
         }
         
         # Fixed calibration settings
-        self.reference_box = [364, 179, 453, 267]  # [x1, y1, x2, y2] of reference object
+        # self.reference_box = [364, 179, 453, 267]
+        self.reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
         self.reference_size_cm = 2.4  # Known size of reference object in cm
 
     def load_model(self, model_path, num_classes=7):
