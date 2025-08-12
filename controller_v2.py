@@ -26,7 +26,7 @@ class ConveyorControllerV2:
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
                                       size=self.TITLE_FONT_SIZE,weight="bold")
         self.RIPENESS_SCORES = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
-        self.BRUISES_SCORES = {'bruised': 1.5, 'unbruised': 3.0}
+        self.BRUISES_SCORES = {'bruised': 1.0, 'unbruised': 2.0}
         self.SIZE_SCORES = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.top_final_score = 0
