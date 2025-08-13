@@ -5,16 +5,8 @@ from scipy.spatial import distance as dist
 import os
 import pandas as pd
 # C:\Users\Kenan\thesis-size
-# TODO: ANALYZE TWO IMAGES
+
 def batch_analyze(self, image_folder, output_csv=None):
-    """
-    Analyze multiple images and optionally save results to CSV
-    
-    Args:
-        image_folder: Folder containing images
-        output_csv: Path to save CSV results (optional)
-    """
-    
     all_results = []
     image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
     
@@ -37,14 +29,12 @@ def batch_analyze(self, image_folder, output_csv=None):
             }
             all_results.append(row)
     
-    # Create DataFrame
     df = pd.DataFrame(all_results)
     
     if output_csv:
         df.to_csv(output_csv, index=False)
         print(f"Results saved to: {output_csv}")
     
-    # Print summary statistics
     if not df.empty:
         print("\n=== MEASUREMENT SUMMARY ===")
         print(f"Total mangoes measured: {len(df)}")
@@ -67,14 +57,11 @@ def calibrate_with_reference_object(self, image, reference_box, reference_size_c
     """
     x1, y1, x2, y2 = reference_box
     
-    # Calculate reference object dimensions in pixels
     ref_width_pixels = x2 - x1
     ref_height_pixels = y2 - y1
     
-    # Use the larger dimension for calibration (more accurate)
     ref_size_pixels = max(ref_width_pixels, ref_height_pixels)
     
-    # Calculate pixels per cm
     self.pixels_per_cm = ref_size_pixels / reference_size_cm
     self.reference_object_size_cm = reference_size_cm
     
@@ -85,30 +72,21 @@ def calibrate_with_reference_object(self, image, reference_box, reference_size_c
     
     return self.pixels_per_cm
 
-# TODO: GET SIZE USING ONE IMAGE
 def calibrate_and_measure_single_image(img_path):
     """Example: Calibrate with reference object and measure mangoes"""
 
-# Initialize system
     measurement_system = MangoMeasurementSystem('mango_detection_model.pth')
 
-# Load image with reference object (e.g., ruler, coin, known object)
     image_path = img_path
     image = cv2.imread(image_path)
 
-# Manual calibration with reference object
-# You need to manually identify the reference object bounding box
-# (980, 435, 1164, 612)
     reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
     reference_size_cm = 2.4  # Known size of reference object in cm
 
-# Calibrate
     measurement_system.calibrate_with_reference_object(image, reference_box, reference_size_cm)
 
-# Measure mangoes
     results = measurement_system.analyze_image(image_path)
 
-# Print results
     for result in results:
         print(f"\nMango {result['mango_id']} ({result['class']}):")
         print(f"  Length: {result['measurements']['length_cm']} cm")
@@ -116,7 +94,6 @@ def calibrate_and_measure_single_image(img_path):
         print(f"  Area: {result['measurements']['area_cm2']} cm²")
         print(f"  Confidence: {result['confidence']}")
 
-# Visualize results
     measurement_system.visualize_measurements(image_path)
 
 def load_json_file(filepath, default_data=None):
@@ -139,7 +116,6 @@ def calculate_size(img, top):
     FOCAL_LENGTH_PIXELS = 3500
     DISTANCE_CAMERA_TO_OBJECT = 40
     try:
-        # Determine the suffix based on the `top` parameter
         suffix = "top" if top else "bottom"
         foreground = cv2.imread(fg)
         background = cv2.imread(bg)
@@ -147,32 +123,27 @@ def calculate_size(img, top):
             print(f"Error: Unable to read image files. Foreground: {fg}, Background: {bg}")
             return 0, 0
             
-        # Generate foreground mask using absolute difference
         fgMask = cv2.absdiff(foreground, background)
         fgMask_filename = f"{formatted_date_time}_fgMask_{suffix}.png"
         cv2.imwrite(fgMask_filename, fgMask)
         # print(f"Foreground mask saved as {fgMask_filename}")
         
-        # Fix the syntax errors in the thresholding line
         _, thresh = cv2.threshold(cv2.cvtColor(fgMask, cv2.COLOR_BGR2GRAY), 50, 255, cv2.THRESH_BINARY)
         thresh_filename = f"{formatted_date_time}_thresh_{suffix}.png"
         cv2.imwrite(thresh_filename, thresh)
         # print(f"Threshold saved as {thresh_filename}")
         
-        # Process the threshold image
         image = cv2.imread(thresh_filename)
         if image is None:
             print(f"Error: Unable to read threshold image {thresh_filename}")
             return 0, 0
             
-        # Image processing steps
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
         edged = cv2.Canny(gray, 50, 100)
         edged = cv2.dilate(edged, None, iterations=1)
         edged = cv2.erode(edged, None, iterations=1)
         
-        # Find all contours
         cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
         
