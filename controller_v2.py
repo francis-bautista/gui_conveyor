@@ -466,8 +466,6 @@ class ConveyorControllerV2:
             most_confident = max(results, key=lambda x: x['confidence'])
             length = most_confident['length_cm']
             width = most_confident['width_cm']
-            # print(f"Processing Mango {mango['mango_id']}:")
-            print(f"  Dimensions: {length} x {width} cm")
             return length, width
         
     def check_priority_input(self):
