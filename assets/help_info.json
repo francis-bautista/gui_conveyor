@@ -1,0 +1,32 @@
+[
+  {
+    "name": "exit_button",
+    "img_path": "assets/exit_button.png",
+    "text": "Description for Item 1."
+  },
+  {
+    "name": "reset_button",
+    "img_path": "assets/reset_button.png",
+    "text": "Description for Item 2."
+  },
+  {
+    "name": "rotate_top_forward_button",
+    "img_path": "assets/rotate_forward_top_belt_button.png",
+    "text": "descp"
+  },
+  {
+    "name": "rotate_top_backward_button",
+    "img_path": "rotate_backward_top_belt_button.png",
+    "text": ""
+  },
+  {
+    "name": "rotate_bottom_forward_button",
+    "img_path": "assets/rotate_forward_bottom_belt_button.png",
+    "text": "descp"
+  },
+  {
+    "name": "rotate_bottom_backward_button",
+    "img_path": "rotate_backward_bottom_belt_button.png",
+    "text": ""
+  }
+]
