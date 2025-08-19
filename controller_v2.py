@@ -370,15 +370,64 @@ class ConveyorControllerV2:
         return frame_choices
         
     def get_help_page_info(self):
-        #TODO: FILL UP THE HELP PAGE ALSO ITS BROKEN MB 
-        popup = ctk.CTkToplevel()
-        length = self.WINDOW_SIZE['length']
-        width = self.WINDOW_SIZE['width']
-        popup.geometry(f"{length}x{width}")
-        close_button = ctk.CTkButton(popup, text="Close", command=popup.destroy)
-        close_button.pack(pady=10)
-        
-        return class_labels[predicted.item()]
+       popup = ctk.CTkToplevel(self.app)
+       popup.title("Button Help Guide")
+       popup.geometry(f"{self.WINDOW_SIZE['length']}x{self.WINDOW_SIZE['width']}")
+       
+       popup.update_idletasks()
+       popup.grab_set()
+       
+       try:
+           with open("assets/help_info.json", "r") as file:
+               help_info = json.load(file)
+       except Exception as e:
+           popup.title("Error")
+           popup.geometry("400x200")
+           
+           ctk.CTkLabel(popup, text=f"Error loading help data: {str(e)}").pack(pady=20)
+           ctk.CTkButton(popup, text="Close", command=popup.destroy).pack(pady=10)
+           return
+
+       popup.title("Button Help Guide")  
+
+       scroll_frame = ctk.CTkScrollableFrame(
+           popup, 
+           width=self.WINDOW_SIZE['length'] - 20,
+           height=self.WINDOW_SIZE['width'] - 60
+       )
+       scroll_frame.pack(pady=10, padx=10, fill="both", expand=True)
+
+       buttons_data = help_info.get('buttons', []) if isinstance(help_info, dict) else help_info
+
+       for button in buttons_data:
+           button_frame = ctk.CTkFrame(scroll_frame)
+           button_frame.pack(pady=5, fill="x", padx=5)
+
+           try:
+               from PIL import Image  
+               img = ctk.CTkImage(
+                   Image.open(button.get("img_path", "")), 
+                   size=(50, 50)  
+               )
+               img_label = ctk.CTkLabel(button_frame, image=img, text="")
+               img_label.pack(side="left", padx=10)
+           except Exception as img_error:
+               print(f"Could not load image: {img_error}")
+               img_label = ctk.CTkLabel(button_frame, text="[Image Not Found]")
+               img_label.pack(side="left", padx=10)
+
+           button_name = button.get('name', 'Unknown Button')
+           button_text = button.get('text', 'No description available')
+           desc_text = f"{button_name.replace('_', ' ').title()}\n{button_text}"
+           
+           ctk.CTkLabel(
+               button_frame,
+               text=desc_text,
+               justify="left",
+               wraplength=self.WINDOW_SIZE['length'] - 100  
+           ).pack(side="left", fill="x", expand=True, padx=10)
+
+       ctk.CTkButton(popup, text="Close", command=popup.destroy).pack(pady=10)       
 
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
