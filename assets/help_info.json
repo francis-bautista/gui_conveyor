@@ -12,21 +12,21 @@
   {
     "name": "rotate_top_forward_button",
     "img_path": "assets/rotate_forward_top_belt_button.png",
-    "text": "descp"
+    "text": "rotates the top conveyor belt forward"
   },
   {
     "name": "rotate_top_backward_button",
-    "img_path": "rotate_backward_top_belt_button.png",
-    "text": ""
+    "img_path": "assets/rotate_backward_top_belt_button.png",
+    "text": "rotates the top conveyor belt backward"
   },
   {
     "name": "rotate_bottom_forward_button",
     "img_path": "assets/rotate_forward_bottom_belt_button.png",
-    "text": "descp"
+    "text": "rotates the bottom conveyor belt forward"
   },
   {
     "name": "rotate_bottom_backward_button",
-    "img_path": "rotate_backward_bottom_belt_button.png",
-    "text": ""
+    "img_path": "assets/rotate_backward_bottom_belt_button.png",
+    "text": "rotates the the bottom conveyor belt backward"
   }
 ]
