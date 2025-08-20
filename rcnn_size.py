@@ -106,7 +106,6 @@ class MangoMeasurementSystem:
             a = length_cm / 2
             b = width_cm / 2
             c = (a + b) / 2
-            volume_cm3 = (4/3) * math.pi * a * b * c
             
             result = {
                 'mango_id': i,
@@ -115,7 +114,6 @@ class MangoMeasurementSystem:
                 'length_cm': round(length_cm, 2), #3
                 'width_cm': round(width_cm, 2), #4
                 'area_cm2': round(area_cm2, 2),
-                'volume_cm3': round(volume_cm3, 2),
                 'bounding_box': box.tolist()
             }
             results.append(result)
@@ -126,7 +124,6 @@ class MangoMeasurementSystem:
             print(f"  Length: {result['length_cm']} cm")
             print(f"  Width: {result['width_cm']} cm") 
             print(f"  Area: {result['area_cm2']} cm²")
-            print(f"  Volume: {result['volume_cm3']} cm³")
             print(f"  Confidence: {result['confidence']}")
         
         if save_annotated and results:
@@ -150,7 +147,6 @@ class MangoMeasurementSystem:
                 f"L: {result['length_cm']} cm",
                 f"W: {result['width_cm']} cm",
                 f"Area: {result['area_cm2']} cm²",
-                f"Vol: {result['volume_cm3']} cm³"
             ]
             
             font = cv2.FONT_HERSHEY_SIMPLEX
