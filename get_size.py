@@ -177,19 +177,19 @@ def calculate_size(img, top):
         return 0, 0
     
 def determine_size(length, width):
-    area = { 'min_x': 11.5,
-            'min_y': 7.0,
-            'max_x': 15.5,
-            'max_y': 8.5,
+    area = { 'min_x': 12.5,
+            'min_y': 8.5,
+            'max_x': 14.5,
+            'max_y': 9,
     }
     minArea = float(area['min_x'] * area['min_y'])
     maxArea = float(area['max_x'] * area['max_y'])
     area = float(length * width)
-    if area < minArea:
+    if area < minArea: # less than 106.25 cm area
         return 'small'
-    elif minArea <= area < maxArea:
+    elif minArea <= area < maxArea: # between  106.25 and 130.5 cm area
         return 'medium'
-    else:
+    else: # greater than 130.5 cm
         return 'large'
     
 def midpoint(ptA, ptB):
