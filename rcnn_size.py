@@ -12,7 +12,7 @@ class MangoMeasurementSystem:
             1: 'bruised', 2: 'not_bruised', 3: 'yellow',
             4: 'green_yellow', 5: 'green', 6: 'mango', 7: 'background'
         }
-        
+        # coin object reference
         self.reference_box = [815, 383, 999, 556]
         # self.reference_box = [980, 435, 1164, 612]  # [x1, y1, x2, y2] of reference object
         self.reference_size_cm = 2.4  # Known size of reference object in cm
