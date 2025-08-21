@@ -156,11 +156,7 @@ def main():
     success = check_model_loading(model_path)
     
     if not success:
-        print("\n💡 Troubleshooting tips:")
-        print("1. Make sure the model file path is correct")
-        print("2. Check if you have the right PyTorch/torchvision versions")
-        print("3. Verify the model was trained with the same architecture")
-        print("4. Try loading with map_location='cpu' if CUDA issues")
+        print("ERROR: Unable to load the model")
 
 if __name__ == "__main__":
     main()

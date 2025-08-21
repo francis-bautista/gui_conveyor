@@ -32,6 +32,7 @@ class AIAnalyzer:
         return transform
     
     def load_models(self):
+        # TODO: change this one to the specific version of the efficientnet
         self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.RIPENESS_SCORES))
         self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
         self.model_ripeness.eval()
