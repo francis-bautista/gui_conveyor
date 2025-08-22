@@ -2,12 +2,12 @@
   {
     "name": "exit_button",
     "img_path": "assets/exit_button.png",
-    "text": "Description for Item 1."
+    "text": "exits the program"
   },
   {
     "name": "reset_button",
     "img_path": "assets/reset_button.png",
-    "text": "Description for Item 2."
+    "text": "resets the conveyor belt options to default"
   },
   {
     "name": "rotate_top_forward_button",

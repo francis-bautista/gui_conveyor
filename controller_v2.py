@@ -1,6 +1,8 @@
 import torch, time, sys, os, threading, json
+import help_module
 from datetime import datetime
 import customtkinter as ctk
+from PIL import Image  
 from PIL import ImageTk
 from get_size import calculate_size, determine_size, load_json_file
 from motor_controller import MotorController
@@ -360,7 +362,7 @@ class ConveyorControllerV2:
                                pady=txt["pady"], sticky="nswe", columnspan=3)
         row_index+=1
         self.button_help = ctk.CTkButton(frame_choices, text=txt["help"],
-                                         command=self.get_help_page_info,
+                                         command=self.help_popup,
                                          fg_color=self.colors["default_button"],
                                          hover_color=self.colors["hover_gray"],
                                          font=self.DEFAULT_BOLD)
@@ -369,66 +371,6 @@ class ConveyorControllerV2:
         
         return frame_choices
         
-    def get_help_page_info(self):
-       popup = ctk.CTkToplevel(self.app)
-       popup.title("Button Help Guide")
-       popup.geometry(f"{self.WINDOW_SIZE['length']}x{self.WINDOW_SIZE['width']}")
-       
-       popup.update_idletasks()
-       popup.grab_set()
-       
-       try:
-           with open("assets/help_info.json", "r") as file:
-               help_info = json.load(file)
-       except Exception as e:
-           popup.title("Error")
-           popup.geometry("400x200")
-           
-           ctk.CTkLabel(popup, text=f"Error loading help data: {str(e)}").pack(pady=20)
-           ctk.CTkButton(popup, text="Close", command=popup.destroy).pack(pady=10)
-           return
-
-       popup.title("Button Help Guide")  
-
-       scroll_frame = ctk.CTkScrollableFrame(
-           popup, 
-           width=self.WINDOW_SIZE['length'] - 20,
-           height=self.WINDOW_SIZE['width'] - 60
-       )
-       scroll_frame.pack(pady=10, padx=10, fill="both", expand=True)
-
-       buttons_data = help_info.get('buttons', []) if isinstance(help_info, dict) else help_info
-
-       for button in buttons_data:
-           button_frame = ctk.CTkFrame(scroll_frame)
-           button_frame.pack(pady=5, fill="x", padx=5)
-
-           try:
-               from PIL import Image  
-               img = ctk.CTkImage(
-                   Image.open(button.get("img_path", "")), 
-                   size=(50, 50)  
-               )
-               img_label = ctk.CTkLabel(button_frame, image=img, text="")
-               img_label.pack(side="left", padx=10)
-           except Exception as img_error:
-               print(f"Could not load image: {img_error}")
-               img_label = ctk.CTkLabel(button_frame, text="[Image Not Found]")
-               img_label.pack(side="left", padx=10)
-
-           button_name = button.get('name', 'Unknown Button')
-           button_text = button.get('text', 'No description available')
-           desc_text = f"{button_name.replace('_', ' ').title()}\n{button_text}"
-           
-           ctk.CTkLabel(
-               button_frame,
-               text=desc_text,
-               justify="left",
-               wraplength=self.WINDOW_SIZE['length'] - 100  
-           ).pack(side="left", fill="x", expand=True, padx=10)
-
-       ctk.CTkButton(popup, text="Close", command=popup.destroy).pack(pady=10)       
-
     def set_error_pop_up(self, parent, title="Error", message="An error occurred"):
         popup = ctk.CTkToplevel(parent)
         popup.title(title)
@@ -488,6 +430,10 @@ class ConveyorControllerV2:
             self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
                                           self.errors[error_log]["message"])
         
+    def help_popup(self):
+        help_page = help_module.Help(self.app)
+        help_page.grab_set()
+
     def reset_program(self):
         print("Resetting")
         self.mc.clean_gpio()
