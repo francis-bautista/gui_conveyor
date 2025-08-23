@@ -2,8 +2,7 @@ import torch, time, sys, os, threading, json
 import help_module
 from datetime import datetime
 import customtkinter as ctk
-from PIL import Image  
-from PIL import ImageTk
+from PIL import Image, ImageTk
 from get_size import calculate_size, determine_size, load_json_file
 from motor_controller import MotorController
 from ai_analyzer import AIAnalyzer
