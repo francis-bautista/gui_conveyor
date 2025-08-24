@@ -33,12 +33,14 @@ class AIAnalyzer:
     
     def load_models(self):
         # TODO: change this one to the specific version of the efficientnet
-        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b4', num_classes=len(self.RIPENESS_SCORES))
-        self.model_ripeness.load_state_dict(torch.load("ripeness_b4.pth", map_location=self.device))
+        # b0 -> b4
+        # bruises -> bruises_b4
+        self.model_ripeness = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.RIPENESS_SCORES))
+        self.model_ripeness.load_state_dict(torch.load("ripeness.pth", map_location=self.device))
         self.model_ripeness.eval()
         self.model_ripeness.to(self.device)
-        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b4', num_classes=len(self.BRUISES_SCORES))
-        self.model_bruises.load_state_dict(torch.load("bruises_b4.pth", map_location=self.device))
+        self.model_bruises = EfficientNet.from_pretrained('efficientnet-b0', num_classes=len(self.BRUISES_SCORES))
+        self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)
     
