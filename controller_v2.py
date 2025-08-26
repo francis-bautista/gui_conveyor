@@ -1,4 +1,4 @@
-import torch, time, sys, os, threading, json
+import torch, time, sys, os, threading, json, shutil
 import help_module
 from datetime import datetime
 import customtkinter as ctk
@@ -36,6 +36,7 @@ class ConveyorControllerV2:
         self.check_priority = False
         self.BUTTON_WIDTH = 180
         self.BUTTON_HEIGHT = 40
+        self.img_dir = ""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.mc = MotorController()
@@ -396,7 +397,11 @@ class ConveyorControllerV2:
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (popup.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (popup.winfo_height() // 2)
         popup.geometry(f"+{x}+{y}")
-    
+    # TODO: make 1->3 dir based on the priority
+    # _date and time
+    # __Grade-A
+    # __Grade-B
+    # __Grade-C
     def enter_priority(self, combo_boxes):
         [all_valid, error_log] = self.formula.is_valid_priority(combo_boxes)
         if all_valid:
@@ -412,7 +417,7 @@ class ConveyorControllerV2:
                                self.button_run]:
                     button.configure(state="disabled")
                 self.priority_enabled = True
-            else:
+            else: # All sucessful input is true
                 for combo in [self.ripeness_combo, self.bruises_combo, self.size_combo]:
                     combo.configure(state="disabled")
                 self.button_enter.configure(
@@ -424,6 +429,16 @@ class ConveyorControllerV2:
                 self.priority_enabled = False
                 is_bool = self.check_priority_input()
                 self.check_priority = is_bool
+                # TODO: check if this works
+                # Create a base directory with current date and time
+                self.img_dir = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                os.makedirs(self.img_dir, exist_ok=True)
+
+                # Create subdirectories for Grade-A, Grade-B, and Grade-C inside it
+                for grade in ["Grade-A", "Grade-B", "Grade-C"]:
+                    os.makedirs(os.path.join(self.img_dir, grade), exist_ok=True)
+
+                print(f"Created directories under {self.img_dir}")
         else:
             top_parent = self.button_run.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
@@ -499,7 +514,10 @@ class ConveyorControllerV2:
             print("Process and pictured side 1")
             s1 = self.ai.get_is_s1()
             t_img = self.picam2.get_image()
-            t_img.save(f"{self.recorded_time}_top.png")
+            # TODO: check if correct
+            # t_img.save(f"{self.recorded_time}_top.png")
+            filename = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
+            t_img.save(filename)
             f_dt = self.recorded_time
             t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
             t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
@@ -532,7 +550,10 @@ class ConveyorControllerV2:
         print("Process and pictured side 2")
         s2 = self.ai.get_is_s2()
         b_img = self.picam2.get_image()
-        b_img.save(f"{self.recorded_time}_bottom.png")
+        filename = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
+        b_img.save(filename)
+        # TODO: check if top correct
+        # b_img.save(f"{self.recorded_time}_bottom.png")
         f_dt = self.recorded_time
         b_r = self.ai.get_predicted_class(b_img, self.ai.get_is_ripeness())
         b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())
@@ -578,6 +599,23 @@ class ConveyorControllerV2:
         }
         for button, state in button_configs.items():
             button.configure(state=state)
+
+        # === Move BOTH images into Grade-{ave_letter} folder ===
+        grade_folder = os.path.join(self.img_dir, f"Grade-{ave_letter.upper()}")
+        os.makedirs(grade_folder, exist_ok=True)
+
+        top_src = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
+        bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
+        top_dst = os.path.join(grade_folder, f"{self.recorded_time}_top.png")
+        bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_bottom.png")
+
+        if os.path.exists(top_src):
+            shutil.move(top_src, top_dst)
+            print(f"Moved TOP image to: {top_dst}")
+
+        if os.path.exists(bottom_src):
+            shutil.move(bottom_src, bottom_dst)
+            print(f"Moved BOTTOM image to: {bottom_dst}")
      
     def get_input_priorities(self):
         arr = {
