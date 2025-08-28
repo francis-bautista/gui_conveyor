@@ -9,7 +9,7 @@ steps_per_revolution = 200
 # Define absolute positions (steps from home)
 position1 = 50
 position2 = 100
-position3 = 150
+position3 = -50
 # position4 = 200
 
 current_position = 0  # Track current position
@@ -47,12 +47,15 @@ def main():
     try:
         setupPy()
         while True:
+            print("Position 1")
             move_to_position(position1)
-            time.sleep(1)
+            time.sleep(3)
+            print("Position 2")
             move_to_position(position2)
-            time.sleep(1)
+            time.sleep(3)
+            print("Position 3")
             move_to_position(position3)
-            time.sleep(1)
+            time.sleep(3)
             # move_to_position(position4)
             # time.sleep(1)
             
