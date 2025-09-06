@@ -56,7 +56,7 @@ class MangoMeasurementSystem:
             print(f"Error loading model: {e}")
             return None    
     
-    def get_size(self, img_path, confidence_threshold=0.3, save_annotated=True):
+    def get_size(self, img_path, confidence_threshold=0.2, save_annotated=True):
         image = cv2.imread(img_path)
         if image is None:
             print(f"Could not load image: {img_path}")
