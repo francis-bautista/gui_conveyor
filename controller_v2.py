@@ -598,8 +598,8 @@ class ConveyorControllerV2:
         grade_string = "\n".join([f"Grade {grade}: {info}" for grade, info in grade_info.items()])
         print(grade_string)
         self.results_data.configure(
-            text=(f"Top Score: {self.top_final_score:.2f}\n" +
-                f"Bottom Score: {self.bottom_final_score:.2f}\n" +
+            text=(f"Side 1 Score: {self.top_final_score:.2f}\n" +
+                f"Side 2 Score: {self.bottom_final_score:.2f}\n" +
                 grade_string + f"\n" +
                 f"Average Score: {ave_score:.2f}\n" + 
                 f"Predicted Grade: {ave_letter}"))
