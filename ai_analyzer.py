@@ -43,19 +43,53 @@ class AIAnalyzer:
         self.model_bruises.load_state_dict(torch.load("bruises.pth", map_location=self.device))
         self.model_bruises.eval()
         self.model_bruises.to(self.device)
+        print("loaded the ripeness and bruises model")
     
-    def get_predicted_class(self, image, isRipeness):
-        image = self.transform(image).unsqueeze(0).to(self.device)
-        if (isRipeness):
-            output = self.model_ripeness(image)
-            class_labels = list(self.RIPENESS_SCORES.keys())
-        else:
-            output = self.model_bruises(image)            
-            class_labels = list(self.BRUISES_SCORES.keys())
-        _, predicted = torch.max(output, 1)
+    # def get_predicted_class(self, image, isRipeness):
+    #     image = self.transform(image).unsqueeze(0).to(self.device)
+    #     if (isRipeness):
+    #         output = self.model_ripeness(image)
+    #         class_labels = list(self.RIPENESS_SCORES.keys())
+    #     else:
+    #         output = self.model_bruises(image)            
+    #         class_labels = list(self.BRUISES_SCORES.keys())
+    #     _, predicted = torch.max(output, 1)
+    #
+    #     return class_labels[predicted.item()]
 
-        return class_labels[predicted.item()]
+    def get_predicted_class(self, image, isRipeness):
+        try:
+            # Validate inputs
+            if image is None:
+                raise ValueError("Image cannot be None")
+            
+            image = self.transform(image).unsqueeze(0).to(self.device)
+            
+            if isRipeness:
+                if not hasattr(self, 'model_ripeness') or self.model_ripeness is None:
+                    raise RuntimeError("Ripeness model not loaded")
+                output = self.model_ripeness(image)
+                class_labels = list(self.RIPENESS_SCORES.keys())
+            else:
+                if not hasattr(self, 'model_bruises') or self.model_bruises is None:
+                    raise RuntimeError("Bruises model not loaded")
+                output = self.model_bruises(image)            
+                class_labels = list(self.BRUISES_SCORES.keys())
+            
+            with torch.no_grad():
+                _, predicted = torch.max(output, 1)
+                predicted_idx = predicted.item()
+                
+                # Validate prediction index
+                if predicted_idx >= len(class_labels):
+                    raise IndexError(f"Predicted index {predicted_idx} out of range for {len(class_labels)} classes")
+            
+            return class_labels[predicted_idx]
     
+    except Exception as e:
+        # Log error or handle gracefully
+        print(f"Error in prediction: {e}")
+        return class_labels[0] if 'class_labels' in locals() else "unknown"   
     def get_overall_grade(self, scores, predicted):
         resulting_grade = (predicted['ripeness']*self.RIPENESS_SCORES[scores['ripeness']] +
             predicted['bruises']*self.BRUISES_SCORES[scores['bruises']] +
