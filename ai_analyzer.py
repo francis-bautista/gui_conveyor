@@ -86,10 +86,11 @@ class AIAnalyzer:
             
             return class_labels[predicted_idx]
     
-    except Exception as e:
-        # Log error or handle gracefully
-        print(f"Error in prediction: {e}")
-        return class_labels[0] if 'class_labels' in locals() else "unknown"   
+        except Exception as e:
+            # Log error or handle gracefully
+            print(f"Error in prediction: {e}")
+            return class_labels[0] if 'class_labels' in locals() else "unknown"
+
     def get_overall_grade(self, scores, predicted):
         resulting_grade = (predicted['ripeness']*self.RIPENESS_SCORES[scores['ripeness']] +
             predicted['bruises']*self.BRUISES_SCORES[scores['bruises']] +
