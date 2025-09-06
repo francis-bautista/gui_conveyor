@@ -599,7 +599,7 @@ class ConveyorControllerV2:
         print(grade_string)
         self.results_data.configure(
             text=(f"Top Score: {self.top_final_score:.2f}\n" +
-                f"Bottom Score: {self.top_final_score:.2f}\n" +
+                f"Bottom Score: {self.bottom_final_score:.2f}\n" +
                 grade_string + f"\n" +
                 f"Average Score: {ave_score:.2f}\n" + 
                 f"Predicted Grade: {ave_letter}"))
