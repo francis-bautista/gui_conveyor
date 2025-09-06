@@ -526,8 +526,10 @@ class ConveyorControllerV2:
             f_dt = self.recorded_time
             t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
             t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
-            imgs = {'m': f"{f_dt}_top.png", 
-                    'f_dt': f_dt}
+            path_img = os.path.join(self.img_dir, f"{f_dt}_top.png")
+            # imgs = {'m': f"{f_dt}_top.png", 
+            #         'f_dt': f_dt}
+            imgs = {'m': path_img, 'f_dt': f_dt}
             # t_x, t_y = calculate_size(imgs, s1)
             print("\n\nRCNN")
             x, y = self.process_mango_image(imgs['m'])
@@ -562,8 +564,12 @@ class ConveyorControllerV2:
         f_dt = self.recorded_time
         b_r = self.ai.get_predicted_class(b_img, self.ai.get_is_ripeness())
         b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())
-        imgs = {'m': f"{f_dt}_bottom.png", 
-                'f_dt': f_dt}
+        path_img = os.path.join(self.img_dir, f"{f_dt}_bottom.png")
+        # imgs = {'m': f"{f_dt}_top.png", 
+        #         'f_dt': f_dt}
+        imgs = {'m': path_img, 'f_dt': f_dt}
+        # imgs = {'m': f"{f_dt}_bottom.png", 
+        #         'f_dt': f_dt}
         # b_x, b_y = calculate_size(imgs, s2)
         print("\n\nRCNN")
         x, y = self.process_mango_image(imgs['m'])
