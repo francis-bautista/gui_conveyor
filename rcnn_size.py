@@ -61,7 +61,7 @@ class MangoMeasurementSystem:
         if image is None:
             print(f"Could not load image: {img_path}")
             return []
-        
+        print("loaded img")
         x1, y1, x2, y2 = self.reference_box
         ref_width_pixels = x2 - x1
         ref_height_pixels = y2 - y1
@@ -73,7 +73,7 @@ class MangoMeasurementSystem:
         if self.model is None:
             print("Model not loaded")
             return []
-        
+        print("loaded rcnn model")
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_tensor = torch.tensor(image_rgb, dtype=torch.float32).permute(2, 0, 1) / 255.0
         input_tensor = image_tensor.unsqueeze(0).to(self.device)
