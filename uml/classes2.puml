@@ -1,0 +1,1194 @@
+@startuml classes
+set namespaceSeparator none
+class "AIAnalyzer" as ai_analyzer.AIAnalyzer {
+  BRUISES_SCORES
+  RIPENESS_SCORES
+  SIZE_SCORES
+  device
+  model_bruises
+  model_ripeness
+  tf_params : dict
+  transform
+  create_transform()
+  get_is_bruises()
+  get_is_ripeness()
+  get_is_s1()
+  get_is_s2()
+  get_overall_grade(scores, predicted)
+  get_predicted_class(image, isRipeness)
+  load_models()
+}
+class "AdaptiveAvgPool2d" as torch.nn.modules.pooling.AdaptiveAvgPool2d {
+  output_size
+  forward(input: Tensor) -> Tensor
+}
+class "BatchNorm2d" as torch.nn.modules.batchnorm.BatchNorm2d {
+}
+class "CTkAppearanceModeBaseClass" as customtkinter.windows.widgets.appearance_mode.appearance_mode_base_class.CTkAppearanceModeBaseClass {
+  destroy()
+}
+class "CTkBaseClass" as customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass {
+  {abstract}bind(sequence, command, add)
+  bind_all(sequence, func, add)
+  cget(attribute_name: str)
+  config()
+  configure(require_redraw)
+  destroy()
+  grid()
+  grid_forget()
+  pack()
+  pack_forget()
+  place()
+  place_forget()
+  {abstract}unbind(sequence, funcid)
+  unbind_all(sequence)
+}
+class "CTkButton" as customtkinter.windows.widgets.ctk_button.CTkButton {
+  bind(sequence: str, command: Callable, add: Union[str, bool])
+  cget(attribute_name: str) -> any
+  configure(require_redraw)
+  destroy()
+  focus()
+  focus_force()
+  focus_set()
+  invoke()
+  unbind(sequence: str, funcid: str)
+}
+class "CTkCanvas" as customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas {
+  image
+  radius_to_char_fine : Optional[dict]
+  coords(tag_or_id)
+  create_aa_circle(x_pos: int, y_pos: int, radius: int, angle: int, fill: str, tags: Union[str, Tuple[str, ...]], anchor: str) -> int
+  init_font_character_mapping()
+  itemconfig(tag_or_id)
+}
+class "CTkComboBox" as customtkinter.windows.widgets.ctk_combobox.CTkComboBox {
+  draw_engine
+  bind(sequence, command, add)
+  cget(attribute_name: str) -> any
+  configure(require_redraw)
+  destroy()
+  focus()
+  focus_force()
+  focus_set()
+  get() -> str
+  set(value: str)
+  unbind(sequence, funcid)
+}
+class "CTkFont" as customtkinter.windows.widgets.font.ctk_font.CTkFont {
+  add_size_configure_callback(callback: Callable)
+  cget(attribute_name: str) -> any
+  config()
+  configure()
+  copy() -> 'CTkFont'
+  create_scaled_tuple(font_scaling: float) -> Tuple[str, int, str]
+  remove_size_configure_callback(callback: Callable)
+}
+class "CTkFrame" as customtkinter.windows.widgets.ctk_frame.CTkFrame {
+  bind(sequence, command, add)
+  cget(attribute_name: str) -> any
+  configure(require_redraw)
+  unbind(sequence, funcid)
+  winfo_children() -> List[any]
+}
+class "CTkLabel" as customtkinter.windows.widgets.ctk_label.CTkLabel {
+  bind(sequence: str, command: Callable, add: str)
+  cget(attribute_name: str) -> any
+  configure(require_redraw)
+  destroy()
+  focus()
+  focus_force()
+  focus_set()
+  unbind(sequence: str, funcid: Optional[str])
+}
+class "CTkScalingBaseClass" as customtkinter.windows.widgets.scaling.scaling_base_class.CTkScalingBaseClass {
+  destroy()
+}
+class "CameraManager" as camera_manager.CameraManager {
+  app
+  camera_config : dict
+  picam2 : NoneType
+  resolution : dict
+  video_canvas
+  capture_array()
+  get_image()
+  get_video_feed()
+  set_controller_vars(app, video_canvas)
+  stop_camera()
+}
+class "Compose" as torchvision.transforms.transforms.Compose {
+  transforms
+}
+class "Conv2d" as torch.nn.modules.conv.Conv2d {
+  forward(input: Tensor) -> Tensor
+}
+class "Conv2dDynamicSamePadding" as efficientnet_pytorch.utils.Conv2dDynamicSamePadding {
+  stride : list
+  forward(x)
+}
+class "ConveyorControllerV2" as controller_v2.ConveyorControllerV2 {
+  BRUISES_SCORES : dict
+  BUTTON_HEIGHT : int
+  BUTTON_WIDTH : int
+  DEFAULT_BOLD
+  RIPENESS_SCORES : dict
+  SIZE_SCORES : dict
+  TITLE_FONT
+  TITLE_FONT_SIZE : int
+  WINDOW_SIZE : dict
+  ai
+  app
+  bottom_final_score : int
+  bruises_combo
+  button_ccwc1
+  button_ccwc2
+  button_cwc1
+  button_cwc2
+  button_enter
+  button_exit
+  button_help
+  button_reset
+  button_run
+  button_side1
+  button_side2
+  check_priority : bool
+  colors
+  device
+  errors
+  formula
+  img_dir : str
+  main_frame
+  mc
+  names
+  picam2
+  priority_enabled : bool
+  rcnn_size
+  recorded_time
+  results_data
+  ripeness_combo
+  side1_box
+  side1_button
+  side1_results
+  side2_box
+  side2_button
+  side2_results
+  size_combo
+  textbox
+  time_txt_button
+  top_final_score : int
+  video_canvas
+  view_frame
+  check_priority_input()
+  enter_priority(combo_boxes)
+  exit_program()
+  get_input_priorities()
+  get_number_from_textbox(textbox)
+  help_popup()
+  init_control_frame(main_frame)
+  init_run_conveyor(buttontorun, textbox)
+  init_ui()
+  init_user_priority_frame(main_frame)
+  init_video_frame(frame)
+  picture_side1()
+  picture_side2()
+  process_mango_image(img_path)
+  reset_program()
+  run()
+  set_countdown_thread(start_count, buttontorun, textbox)
+  set_error_pop_up(parent, title, message)
+  set_motor_to_finished(buttontorun, textbox, button_list)
+  set_textbox_results(results_data, ai_pred, is_top)
+  toggle_button_color(button)
+}
+class "DrawEngine" as customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine {
+  preferred_drawing_method : Optional[str]
+  draw_background_corners(width: Union[float, int], height: Union[float, int])
+  draw_checkmark(width: Union[float, int], height: Union[float, int], size: Union[int, float]) -> bool
+  draw_dropdown_arrow(x_position: Union[int, float], y_position: Union[int, float], size: Union[int, float]) -> bool
+  draw_rounded_progress_bar_with_border(width: Union[float, int], height: Union[float, int], corner_radius: Union[float, int], border_width: Union[float, int], progress_value_1: float, progress_value_2: float, orientation: str) -> bool
+  draw_rounded_rect_with_border(width: Union[float, int], height: Union[float, int], corner_radius: Union[float, int], border_width: Union[float, int], overwrite_preferred_drawing_method: str) -> bool
+  draw_rounded_rect_with_border_vertical_split(width: Union[float, int], height: Union[float, int], corner_radius: Union[float, int], border_width: Union[float, int], left_section_width: Union[float, int]) -> bool
+  draw_rounded_scrollbar(width: Union[float, int], height: Union[float, int], corner_radius: Union[float, int], border_spacing: Union[float, int], start_value: float, end_value: float, orientation: str) -> bool
+  draw_rounded_slider_with_border_and_button(width: Union[float, int], height: Union[float, int], corner_radius: Union[float, int], border_width: Union[float, int], button_length: Union[float, int], button_corner_radius: Union[float, int], slider_value: float, orientation: str) -> bool
+  set_round_to_even_numbers(round_width_to_even_numbers: bool, round_height_to_even_numbers: bool)
+}
+class "DropdownMenu" as customtkinter.windows.widgets.core_widget_classes.dropdown_menu.DropdownMenu {
+  cget(attribute_name: str) -> any
+  configure()
+  destroy()
+  open(x: Union[int, float], y: Union[int, float])
+}
+class "Dropout" as torch.nn.modules.dropout.Dropout {
+  forward(input: Tensor) -> Tensor
+}
+class "EfficientNet" as efficientnet_pytorch.model.EfficientNet {
+  extract_endpoints(inputs)
+  extract_features(inputs)
+  forward(inputs)
+  from_name(model_name, in_channels)
+  from_pretrained(model_name, weights_path, advprop, in_channels, num_classes)
+  get_image_size(model_name)
+  set_swish(memory_efficient)
+}
+class "FakePicamera2" as fake_picamera2.FakePicamera2 {
+  camera_config : NoneType
+  camera_properties
+  is_recording : bool
+  is_started : bool
+  preview_running : bool
+  recording_thread : NoneType, Thread
+  capture_array(name)
+  capture_file(name, format, wait)
+  capture_metadata()
+  close()
+  configure(config)
+  create_preview_configuration(main, lores, raw, transform, colour_space, buffer_count, controls)
+  create_still_configuration(main, lores, raw, transform, colour_space, buffer_count, controls)
+  create_video_configuration(main, lores, raw, transform, colour_space, buffer_count, controls)
+  set_controls(controls)
+  start(config, show_preview)
+  start_preview(preview)
+  start_recording(output, format, pts, audio)
+  stop()
+  stop_preview()
+  stop_recording()
+}
+class "FasterRCNN" as torchvision.models.detection.faster_rcnn.FasterRCNN {
+}
+class "FormulaController" as formula_controller.FormulaController {
+  BRUISES_SCORES
+  RIPENESS_SCORES
+  SIZE_SCORES
+  input_priorities
+  get_grade_formula(priorities)
+  get_grade_formula_dict()
+  get_grade_letter(input_grade)
+  get_priorities()
+  is_number(textbox)
+  is_valid_priority(combo_boxes)
+  print_grade_formula(boundaries)
+  set_input_priority(arr)
+}
+class "GeneralizedRCNN" as torchvision.models.detection.generalized_rcnn.GeneralizedRCNN {
+  backbone
+  roi_heads
+  rpn
+  transform
+  eager_outputs(losses, detections)
+  forward(images, targets)
+}
+class "Linear" as torch.nn.modules.linear.Linear {
+  bias
+  in_features : int
+  out_features : int
+  weight
+  extra_repr() -> str
+  forward(input: Tensor) -> Tensor
+  reset_parameters() -> None
+}
+class "MangoMeasurementSystem" as rcnn_size.MangoMeasurementSystem {
+  class_names : dict
+  device
+  model : NoneType
+  reference_box : list
+  reference_size_cm : float
+  get_size(img_path, confidence_threshold, save_annotated)
+  load_model(model_path, num_classes)
+}
+class "MemoryEfficientSwish" as efficientnet_pytorch.utils.MemoryEfficientSwish {
+  forward(x)
+}
+class "Module" as torch.nn.modules.module.Module {
+  T_destination
+  call_super_init : bool
+  dump_patches : bool
+  forward : Callable[..., Any]
+  training : bool
+  add_module(name: str, module: Optional['Module']) -> None
+  apply(fn: Callable[['Module'], None]) -> T
+  bfloat16() -> T
+  buffers(recurse: bool) -> Iterator[Tensor]
+  children() -> Iterator['Module']
+  compile()
+  cpu() -> T
+  cuda(device: Optional[Union[int, device]]) -> T
+  double() -> T
+  eval() -> T
+  extra_repr() -> str
+  float() -> T
+  get_buffer(target: str) -> 'Tensor'
+  get_extra_state() -> Any
+  get_parameter(target: str) -> 'Parameter'
+  get_submodule(target: str) -> 'Module'
+  half() -> T
+  ipu(device: Optional[Union[int, device]]) -> T
+  load_state_dict(state_dict: Mapping[str, Any], strict: bool, assign: bool)
+  modules() -> Iterator['Module']
+  mtia(device: Optional[Union[int, device]]) -> T
+  named_buffers(prefix: str, recurse: bool, remove_duplicate: bool) -> Iterator[Tuple[str, Tensor]]
+  named_children() -> Iterator[Tuple[str, 'Module']]
+  named_modules(memo: Optional[Set['Module']], prefix: str, remove_duplicate: bool)
+  named_parameters(prefix: str, recurse: bool, remove_duplicate: bool) -> Iterator[Tuple[str, Parameter]]
+  parameters(recurse: bool) -> Iterator[Parameter]
+  register_backward_hook(hook: Callable[['Module', _grad_t, _grad_t], Union[None, _grad_t]]) -> RemovableHandle
+  register_buffer(name: str, tensor: Optional[Tensor], persistent: bool) -> None
+  register_forward_hook(hook: Union[Callable[[T, Tuple[Any, ...], Any], Optional[Any]], Callable[[T, Tuple[Any, ...], Dict[str, Any], Any], Optional[Any]]]) -> RemovableHandle
+  register_forward_pre_hook(hook: Union[Callable[[T, Tuple[Any, ...]], Optional[Any]], Callable[[T, Tuple[Any, ...], Dict[str, Any]], Optional[Tuple[Any, Dict[str, Any]]]]]) -> RemovableHandle
+  register_full_backward_hook(hook: Callable[['Module', _grad_t, _grad_t], Union[None, _grad_t]], prepend: bool) -> RemovableHandle
+  register_full_backward_pre_hook(hook: Callable[['Module', _grad_t], Union[None, _grad_t]], prepend: bool) -> RemovableHandle
+  register_load_state_dict_post_hook(hook)
+  register_load_state_dict_pre_hook(hook)
+  register_module(name: str, module: Optional['Module']) -> None
+  register_parameter(name: str, param: Optional[Parameter]) -> None
+  register_state_dict_post_hook(hook)
+  register_state_dict_pre_hook(hook)
+  requires_grad_(requires_grad: bool) -> T
+  set_extra_state(state: Any) -> None
+  set_submodule(target: str, module: 'Module') -> None
+  share_memory() -> T
+  state_dict() -> T_destination
+  to(device: Optional[DeviceLikeType], dtype: Optional[dtype], non_blocking: bool) -> Self
+  to_empty() -> T
+  train(mode: bool) -> T
+  type(dst_type: Union[dtype, str]) -> T
+  xpu(device: Optional[Union[int, device]]) -> T
+  zero_grad(set_to_none: bool) -> None
+}
+class "ModuleList" as torch.nn.modules.container.ModuleList {
+  append(module: Module) -> 'ModuleList'
+  extend(modules: Iterable[Module]) -> Self
+  insert(index: int, module: Module) -> None
+  pop(key: Union[int, slice]) -> Module
+}
+class "MotorController" as motor_controller.MotorController {
+  DIR_PIN : int
+  STEP_PIN : int
+  current_position : int
+  relays : dict
+  step_delay : float
+  stepper_motor : dict
+  steps_per_revolution : int
+  clean_gpio()
+  set_motors(motor_array)
+  set_stepper_position(target)
+  setup_gpio()
+  stop_motors()
+}
+class "OptimizedModule" as torch._dynamo.eval_frame.OptimizedModule {
+  dynamo_ctx
+  forward
+  get_compiler_config : Callable[[], Any]
+  training
+}
+class "Parameter" as torch.nn.parameter.Parameter {
+  grad
+}
+class "PhotoImage" as PIL.ImageTk.PhotoImage {
+  tk : NoneType
+  height() -> int
+  paste(im: Image.Image) -> None
+  width() -> int
+}
+class "Size" as torch._C.Size {
+  numel() -> _int
+}
+class "T_destination" as .T_destination {
+}
+class "Tensor" as torch._tensor.Tensor {
+  data
+  detach : NoneType
+  detach_ : NoneType
+  requires_grad
+  align_to()
+  backward(gradient, retain_graph, create_graph, inputs)
+  dim_order()
+  eig(eigenvectors)
+  is_shared()
+  istft(n_fft: int, hop_length: Optional[int], win_length: Optional[int], window: 'Optional[Tensor]', center: bool, normalized: bool, onesided: Optional[bool], length: Optional[int], return_complex: bool)
+  lstsq(other)
+  lu(pivot, get_infos)
+  module_load(other, assign)
+  norm(p: Optional[Union[float, str]], dim, keepdim, dtype)
+  refine_names()
+  register_hook(hook)
+  register_post_accumulate_grad_hook(hook)
+  reinforce(reward)
+  rename()
+  rename_()
+  resize()
+  resize_as(tensor)
+  share_memory_()
+  solve(other)
+  split(split_size, dim)
+  stft(n_fft: int, hop_length: Optional[int], win_length: Optional[int], window: 'Optional[Tensor]', center: bool, pad_mode: str, normalized: bool, onesided: Optional[bool], return_complex: Optional[bool])
+  storage()
+  storage_type()
+  symeig(eigenvectors)
+  to_sparse_coo()
+  unflatten(dim, sizes)
+  unique(sorted, return_inverse, return_counts, dim)
+  unique_consecutive(return_inverse, return_counts, dim)
+}
+class "TensorBase" as torch._C.TensorBase {
+  H
+  T
+  data
+  device
+  dtype
+  grad : Optional[Tensor]
+  grad_fn : Optional[_Node]
+  imag
+  is_cpu : bool
+  is_cuda : bool
+  is_ipu : bool
+  is_leaf : bool
+  is_maia : bool
+  is_meta : bool
+  is_mkldnn : bool
+  is_mps : bool
+  is_mtia : bool
+  is_nested : bool
+  is_quantized : bool
+  is_sparse : bool
+  is_sparse_csr : bool
+  is_vulkan : bool
+  is_xpu : bool
+  itemsize : int
+  layout
+  mH
+  mT
+  names : List[str]
+  nbytes : int
+  ndim : int
+  output_nr : int
+  real
+  requires_grad : bool
+  retains_grad : bool
+  shape
+  abs() -> Tensor
+  abs_() -> Tensor
+  absolute() -> Tensor
+  absolute_() -> Tensor
+  acos() -> Tensor
+  acos_() -> Tensor
+  acosh() -> Tensor
+  acosh_() -> Tensor
+  add(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  add_(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  addbmm(batch1: Tensor, batch2: Tensor) -> Tensor
+  addbmm_(batch1: Tensor, batch2: Tensor) -> Tensor
+  addcdiv(tensor1: Tensor, tensor2: Tensor) -> Tensor
+  addcdiv_(tensor1: Tensor, tensor2: Tensor) -> Tensor
+  addcmul(tensor1: Tensor, tensor2: Tensor) -> Tensor
+  addcmul_(tensor1: Tensor, tensor2: Tensor) -> Tensor
+  addmm(mat1: Tensor, mat2: Tensor) -> Tensor
+  addmm_(mat1: Tensor, mat2: Tensor) -> Tensor
+  addmv(mat: Tensor, vec: Tensor) -> Tensor
+  addmv_(mat: Tensor, vec: Tensor) -> Tensor
+  addr(vec1: Tensor, vec2: Tensor) -> Tensor
+  addr_(vec1: Tensor, vec2: Tensor) -> Tensor
+  adjoint() -> Tensor
+  align_as(other: Tensor) -> Tensor
+  align_to(order: Sequence[Union[str, ellipsis, None]], ellipsis_idx: _int) -> Tensor
+  all() -> Tensor
+  allclose(other: Tensor, rtol: _float, atol: _float, equal_nan: _bool) -> _bool
+  amax(dim: Union[_int, _size], keepdim: _bool) -> Tensor
+  amin(dim: Union[_int, _size], keepdim: _bool) -> Tensor
+  aminmax() -> torch.return_types.aminmax
+  angle() -> Tensor
+  any() -> Tensor
+  apply_(callable: Callable) -> Tensor
+  arccos() -> Tensor
+  arccos_() -> Tensor
+  arccosh() -> Tensor
+  arccosh_() -> Tensor
+  arcsin() -> Tensor
+  arcsin_() -> Tensor
+  arcsinh() -> Tensor
+  arcsinh_() -> Tensor
+  arctan() -> Tensor
+  arctan2(other: Tensor) -> Tensor
+  arctan2_(other: Tensor) -> Tensor
+  arctan_() -> Tensor
+  arctanh() -> Tensor
+  arctanh_() -> Tensor
+  argmax(dim: Optional[_int], keepdim: _bool) -> Tensor
+  argmin(dim: Optional[_int], keepdim: _bool) -> Tensor
+  argsort() -> Tensor
+  argwhere() -> Tensor
+  as_strided(size: Sequence[Union[_int, SymInt]], stride: Sequence[Union[_int, SymInt]], storage_offset: Optional[Union[_int, SymInt]]) -> Tensor
+  as_strided_(size: Sequence[Union[_int, SymInt]], stride: Sequence[Union[_int, SymInt]], storage_offset: Optional[Union[_int, SymInt]]) -> Tensor
+  as_strided_scatter(src: Tensor, size: Sequence[Union[_int, SymInt]], stride: Sequence[Union[_int, SymInt]], storage_offset: Optional[Union[_int, SymInt]]) -> Tensor
+  as_subclass(cls: _Type[S]) -> S
+  asin() -> Tensor
+  asin_() -> Tensor
+  asinh() -> Tensor
+  asinh_() -> Tensor
+  atan() -> Tensor
+  atan2(other: Tensor) -> Tensor
+  atan2_(other: Tensor) -> Tensor
+  atan_() -> Tensor
+  atanh() -> Tensor
+  atanh_() -> Tensor
+  baddbmm(batch1: Tensor, batch2: Tensor) -> Tensor
+  baddbmm_(batch1: Tensor, batch2: Tensor) -> Tensor
+  bernoulli() -> Tensor
+  bernoulli_(p: Tensor) -> Tensor
+  bfloat16() -> Tensor
+  bincount(weights: Optional[Tensor], minlength: _int) -> Tensor
+  bitwise_and(other: Tensor) -> Tensor
+  bitwise_and_(other: Tensor) -> Tensor
+  bitwise_left_shift(other: Tensor) -> Tensor
+  bitwise_left_shift_(other: Tensor) -> Tensor
+  bitwise_not() -> Tensor
+  bitwise_not_() -> Tensor
+  bitwise_or(other: Tensor) -> Tensor
+  bitwise_or_(other: Tensor) -> Tensor
+  bitwise_right_shift(other: Tensor) -> Tensor
+  bitwise_right_shift_(other: Tensor) -> Tensor
+  bitwise_xor(other: Tensor) -> Tensor
+  bitwise_xor_(other: Tensor) -> Tensor
+  bmm(mat2: Tensor) -> Tensor
+  bool() -> Tensor
+  broadcast_to(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  byte() -> Tensor
+  cauchy_(median: _float, sigma: _float) -> Tensor
+  ccol_indices() -> Tensor
+  ceil() -> Tensor
+  ceil_() -> Tensor
+  chalf() -> Tensor
+  char() -> Tensor
+  cholesky(upper: _bool) -> Tensor
+  cholesky_inverse(upper: _bool) -> Tensor
+  cholesky_solve(input2: Tensor, upper: _bool) -> Tensor
+  chunk(chunks: _int, dim: _int) -> tuple[Tensor, ...]
+  clamp(min: Optional[Tensor], max: Optional[Tensor]) -> Tensor
+  clamp_(min: Optional[Tensor], max: Optional[Tensor]) -> Tensor
+  clamp_max(max: Tensor) -> Tensor
+  clamp_max_(max: Tensor) -> Tensor
+  clamp_min(min: Tensor) -> Tensor
+  clamp_min_(min: Tensor) -> Tensor
+  clip(min: Optional[Tensor], max: Optional[Tensor]) -> Tensor
+  clip_(min: Optional[Tensor], max: Optional[Tensor]) -> Tensor
+  clone() -> Tensor
+  coalesce() -> Tensor
+  col_indices() -> Tensor
+  conj() -> Tensor
+  conj_physical() -> Tensor
+  conj_physical_() -> Tensor
+  contiguous(memory_format) -> Tensor
+  copy_(src: Tensor, non_blocking: _bool) -> Tensor
+  copysign(other: Tensor) -> Tensor
+  copysign_(other: Tensor) -> Tensor
+  corrcoef() -> Tensor
+  cos() -> Tensor
+  cos_() -> Tensor
+  cosh() -> Tensor
+  cosh_() -> Tensor
+  count_nonzero(dim: Optional[_int]) -> Tensor
+  cov() -> Tensor
+  cpu(memory_format: torch.memory_format) -> Tensor
+  cross(other: Tensor, dim: Optional[_int]) -> Tensor
+  crow_indices() -> Tensor
+  cuda(device: Optional[Union[_device, _int, str]], non_blocking: _bool, memory_format: torch.memory_format) -> Tensor
+  cummax(dim: _int) -> torch.return_types.cummax
+  cummin(dim: _int) -> torch.return_types.cummin
+  cumprod(dim: _int) -> Tensor
+  cumprod_(dim: _int) -> Tensor
+  cumsum(dim: _int) -> Tensor
+  cumsum_(dim: _int) -> Tensor
+  data_ptr() -> _int
+  deg2rad() -> Tensor
+  deg2rad_() -> Tensor
+  dense_dim() -> _int
+  dequantize() -> Tensor
+  det() -> Tensor
+  detach() -> Tensor
+  detach_() -> Tensor
+  diag(diagonal: _int) -> Tensor
+  diag_embed(offset: _int, dim1: _int, dim2: _int) -> Tensor
+  diagflat(offset: _int) -> Tensor
+  diagonal() -> Tensor
+  diagonal_scatter(src: Tensor, offset: _int, dim1: _int, dim2: _int) -> Tensor
+  diff(n: _int, dim: _int, prepend: Optional[Tensor], append: Optional[Tensor]) -> Tensor
+  digamma() -> Tensor
+  digamma_() -> Tensor
+  dim() -> _int
+  dist(other: Tensor, p: Union[Number, _complex]) -> Tensor
+  div(other: Union[Tensor, Number]) -> Tensor
+  div_(other: Union[Tensor, Number]) -> Tensor
+  divide(other: Tensor) -> Tensor
+  divide_(other: Tensor) -> Tensor
+  dot(tensor: Tensor) -> Tensor
+  double() -> Tensor
+  dsplit(sections: _int) -> tuple[Tensor, ...]
+  element_size() -> _int
+  eq(other: Tensor) -> Tensor
+  eq_(other: Tensor) -> Tensor
+  equal(other: Tensor) -> _bool
+  erf() -> Tensor
+  erf_() -> Tensor
+  erfc() -> Tensor
+  erfc_() -> Tensor
+  erfinv() -> Tensor
+  erfinv_() -> Tensor
+  exp() -> Tensor
+  exp2() -> Tensor
+  exp2_() -> Tensor
+  exp_() -> Tensor
+  expand(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  expand_as(other: Tensor) -> Tensor
+  expm1() -> Tensor
+  expm1_() -> Tensor
+  exponential_(lambd: _float) -> Tensor
+  fill_(value: Tensor) -> Tensor
+  fill_diagonal_(fill_value: Union[Number, _complex], wrap: _bool) -> Tensor
+  fix() -> Tensor
+  fix_() -> Tensor
+  flatten(start_dim: _int, end_dim: _int) -> Tensor
+  flip(dims: _size) -> Tensor
+  fliplr() -> Tensor
+  flipud() -> Tensor
+  float() -> Tensor
+  float_power(exponent: Tensor) -> Tensor
+  float_power_(exponent: Tensor) -> Tensor
+  floor() -> Tensor
+  floor_() -> Tensor
+  floor_divide(other: Union[Tensor, Number, torch.SymInt, torch.SymFloat]) -> Tensor
+  floor_divide_(other: Union[Tensor, Number, torch.SymInt, torch.SymFloat]) -> Tensor
+  fmax(other: Tensor) -> Tensor
+  fmin(other: Tensor) -> Tensor
+  fmod(other: Tensor) -> Tensor
+  fmod_(other: Tensor) -> Tensor
+  frac() -> Tensor
+  frac_() -> Tensor
+  frexp() -> torch.return_types.frexp
+  gather(dim: _int, index: Tensor) -> Tensor
+  gcd(other: Tensor) -> Tensor
+  gcd_(other: Tensor) -> Tensor
+  ge(other: Tensor) -> Tensor
+  ge_(other: Tensor) -> Tensor
+  geometric_(p: _float) -> Tensor
+  geqrf() -> torch.return_types.geqrf
+  ger(vec2: Tensor) -> Tensor
+  get_device() -> _int
+  greater(other: Tensor) -> Tensor
+  greater_(other: Tensor) -> Tensor
+  greater_equal(other: Tensor) -> Tensor
+  greater_equal_(other: Tensor) -> Tensor
+  gt(other: Tensor) -> Tensor
+  gt_(other: Tensor) -> Tensor
+  half() -> Tensor
+  hardshrink(lambd: Union[Number, _complex]) -> Tensor
+  has_names() -> _bool
+  heaviside(values: Tensor) -> Tensor
+  heaviside_(values: Tensor) -> Tensor
+  histc(bins: _int, min: Union[Number, _complex], max: Union[Number, _complex]) -> Tensor
+  histogram(bins: Tensor) -> torch.return_types.histogram
+  hsplit(sections: _int) -> tuple[Tensor, ...]
+  hypot(other: Tensor) -> Tensor
+  hypot_(other: Tensor) -> Tensor
+  i0() -> Tensor
+  i0_() -> Tensor
+  igamma(other: Tensor) -> Tensor
+  igamma_(other: Tensor) -> Tensor
+  igammac(other: Tensor) -> Tensor
+  igammac_(other: Tensor) -> Tensor
+  index_add(dim: _int, index: Tensor, source: Tensor) -> Tensor
+  index_add_(dim: _int, index: Tensor, source: Tensor) -> Tensor
+  index_copy(dim: _int, index: Tensor, source: Tensor) -> Tensor
+  index_copy_(dim: _int, index: Tensor, source: Tensor) -> Tensor
+  index_fill(dim: _int, index: Tensor, value: Tensor) -> Tensor
+  index_fill_(dim: _int, index: Tensor, value: Tensor) -> Tensor
+  index_put(indices: Optional[Union[tuple[Tensor, ...], list[Tensor]]], values: Tensor, accumulate: _bool) -> Tensor
+  index_put_(indices: Optional[Union[tuple[Tensor, ...], list[Tensor]]], values: Tensor, accumulate: _bool) -> Tensor
+  index_reduce(dim: _int, index: Tensor, source: Tensor, reduce: str) -> Tensor
+  index_reduce_(dim: _int, index: Tensor, source: Tensor, reduce: str) -> Tensor
+  index_select(dim: _int, index: Tensor) -> Tensor
+  indices() -> Tensor
+  inner(other: Tensor) -> Tensor
+  int() -> Tensor
+  int_repr() -> Tensor
+  inverse() -> Tensor
+  is_coalesced() -> _bool
+  is_complex() -> _bool
+  is_conj() -> _bool
+  is_contiguous(memory_format) -> _bool
+  is_distributed() -> _bool
+  is_floating_point() -> _bool
+  is_inference() -> _bool
+  is_neg() -> _bool
+  is_nonzero() -> _bool
+  is_pinned(device: Optional[Optional[DeviceLikeType]]) -> _bool
+  is_same_size(other: Tensor) -> _bool
+  is_set_to(tensor: Tensor) -> _bool
+  is_signed() -> _bool
+  isclose(other: Tensor, rtol: _float, atol: _float, equal_nan: _bool) -> Tensor
+  isfinite() -> Tensor
+  isinf() -> Tensor
+  isnan() -> Tensor
+  isneginf() -> Tensor
+  isposinf() -> Tensor
+  isreal() -> Tensor
+  istft(n_fft: _int, hop_length: Optional[_int], win_length: Optional[_int], window: Optional[Tensor], center: _bool, normalized: _bool, onesided: Optional[_bool], length: Optional[_int], return_complex: _bool) -> Tensor
+  item() -> Number
+  kron(other: Tensor) -> Tensor
+  kthvalue(k: _int, dim: _int, keepdim: _bool) -> torch.return_types.kthvalue
+  lcm(other: Tensor) -> Tensor
+  lcm_(other: Tensor) -> Tensor
+  ldexp(other: Tensor) -> Tensor
+  ldexp_(other: Tensor) -> Tensor
+  le(other: Tensor) -> Tensor
+  le_(other: Tensor) -> Tensor
+  lerp(end: Tensor, weight: Tensor) -> Tensor
+  lerp_(end: Tensor, weight: Tensor) -> Tensor
+  less(other: Tensor) -> Tensor
+  less_(other: Tensor) -> Tensor
+  less_equal(other: Tensor) -> Tensor
+  less_equal_(other: Tensor) -> Tensor
+  lgamma() -> Tensor
+  lgamma_() -> Tensor
+  log() -> Tensor
+  log10() -> Tensor
+  log10_() -> Tensor
+  log1p() -> Tensor
+  log1p_() -> Tensor
+  log2() -> Tensor
+  log2_() -> Tensor
+  log_() -> Tensor
+  log_normal_(mean: _float, std: _float) -> Tensor
+  log_softmax(dim: _int, dtype: Optional[_dtype]) -> Tensor
+  logaddexp(other: Tensor) -> Tensor
+  logaddexp2(other: Tensor) -> Tensor
+  logcumsumexp(dim: _int) -> Tensor
+  logdet() -> Tensor
+  logical_and(other: Tensor) -> Tensor
+  logical_and_(other: Tensor) -> Tensor
+  logical_not() -> Tensor
+  logical_not_() -> Tensor
+  logical_or(other: Tensor) -> Tensor
+  logical_or_(other: Tensor) -> Tensor
+  logical_xor(other: Tensor) -> Tensor
+  logical_xor_(other: Tensor) -> Tensor
+  logit(eps: Optional[_float]) -> Tensor
+  logit_(eps: Optional[_float]) -> Tensor
+  logsumexp(dim: Union[_int, _size], keepdim: _bool) -> Tensor
+  long() -> Tensor
+  lt(other: Tensor) -> Tensor
+  lt_(other: Tensor) -> Tensor
+  lu_solve(LU_data: Tensor, LU_pivots: Tensor) -> Tensor
+  map2_(x: Tensor, y: Tensor, callable: Callable) -> Tensor
+  map_(tensor: Tensor, callable: Callable) -> Tensor
+  masked_fill(mask: Tensor, value: Tensor) -> Tensor
+  masked_fill_(mask: Tensor, value: Tensor) -> Tensor
+  masked_scatter(mask: Tensor, source: Tensor) -> Tensor
+  masked_scatter_(mask: Tensor, source: Tensor) -> Tensor
+  masked_select(mask: Tensor) -> Tensor
+  matmul(other: Tensor) -> Tensor
+  matrix_exp() -> Tensor
+  matrix_power(n: _int) -> Tensor
+  max() -> Tensor
+  maximum(other: Tensor) -> Tensor
+  mean() -> Tensor
+  median() -> Tensor
+  min() -> Tensor
+  minimum(other: Tensor) -> Tensor
+  mm(mat2: Tensor) -> Tensor
+  mode(dim: _int, keepdim: _bool) -> torch.return_types.mode
+  moveaxis(source: _int, destination: _int) -> Tensor
+  movedim(source: _int, destination: _int) -> Tensor
+  msort() -> Tensor
+  mul(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  mul_(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  multinomial(num_samples: _int, replacement: _bool) -> Tensor
+  multiply(other: Tensor) -> Tensor
+  multiply_(other: Tensor) -> Tensor
+  mv(vec: Tensor) -> Tensor
+  mvlgamma(p: _int) -> Tensor
+  mvlgamma_(p: _int) -> Tensor
+  nan_to_num(nan: Optional[_float], posinf: Optional[_float], neginf: Optional[_float]) -> Tensor
+  nan_to_num_(nan: Optional[_float], posinf: Optional[_float], neginf: Optional[_float]) -> Tensor
+  nanmean(dim: Optional[Union[_int, _size]], keepdim: _bool) -> Tensor
+  nanmedian() -> Tensor
+  nanquantile(q: Tensor, dim: Optional[_int], keepdim: _bool) -> Tensor
+  nansum(dim: Optional[Union[_int, _size]], keepdim: _bool) -> Tensor
+  narrow(dim: _int, start: Tensor, length: Union[_int, SymInt]) -> Tensor
+  narrow_copy(dim: _int, start: Union[_int, SymInt], length: Union[_int, SymInt]) -> Tensor
+  ndimension() -> _int
+  ne(other: Tensor) -> Tensor
+  ne_(other: Tensor) -> Tensor
+  neg() -> Tensor
+  neg_() -> Tensor
+  negative() -> Tensor
+  negative_() -> Tensor
+  nelement() -> _int
+  new() -> Self
+  new_empty(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  new_empty_strided(size: Sequence[Union[_int, SymInt]], stride: Sequence[Union[_int, SymInt]]) -> Tensor
+  new_full(size: Sequence[Union[_int, SymInt]], fill_value: Union[Number, _complex]) -> Tensor
+  new_ones(size: _size, dtype: Optional[_dtype], device: Optional[DeviceLikeType], requires_grad: _bool, pin_memory: _bool) -> Tensor
+  new_tensor(data: Any, dtype: Optional[_dtype], device: Optional[DeviceLikeType], requires_grad: _bool, pin_memory: _bool) -> Tensor
+  new_zeros(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  nextafter(other: Tensor) -> Tensor
+  nextafter_(other: Tensor) -> Tensor
+  nonzero() -> Tensor
+  nonzero_static() -> Tensor
+  normal_(mean: _float, std: _float) -> Tensor
+  not_equal(other: Tensor) -> Tensor
+  not_equal_(other: Tensor) -> Tensor
+  numel() -> _int
+  numpy() -> numpy.ndarray
+  orgqr(input2: Tensor) -> Tensor
+  ormqr(input2: Tensor, input3: Tensor, left: _bool, transpose: _bool) -> Tensor
+  outer(vec2: Tensor) -> Tensor
+  permute(dims: _size) -> Tensor
+  pin_memory(device: Optional[Optional[DeviceLikeType]]) -> Tensor
+  pinverse(rcond: _float) -> Tensor
+  polygamma(n: _int) -> Tensor
+  polygamma_(n: _int) -> Tensor
+  positive() -> Tensor
+  pow(exponent: Tensor) -> Tensor
+  pow_(exponent: Tensor) -> Tensor
+  prelu(weight: Tensor) -> Tensor
+  prod() -> Tensor
+  put(index: Tensor, source: Tensor, accumulate: _bool) -> Tensor
+  put_(index: Tensor, source: Tensor, accumulate: _bool) -> Tensor
+  q_per_channel_axis() -> _int
+  q_per_channel_scales() -> Tensor
+  q_per_channel_zero_points() -> Tensor
+  q_scale() -> _float
+  q_zero_point() -> _int
+  qr(some: _bool) -> torch.return_types.qr
+  qscheme() -> _qscheme
+  quantile(q: Tensor, dim: Optional[_int], keepdim: _bool) -> Tensor
+  rad2deg() -> Tensor
+  rad2deg_() -> Tensor
+  random_() -> Tensor
+  ravel() -> Tensor
+  reciprocal() -> Tensor
+  reciprocal_() -> Tensor
+  record_stream(s: Stream) -> None
+  refine_names(names: Sequence[Union[str, ellipsis, None]]) -> Tensor
+  relu() -> Tensor
+  relu_() -> Tensor
+  remainder(other: Tensor) -> Tensor
+  remainder_(other: Tensor) -> Tensor
+  rename(names: Optional[Sequence[Union[str, ellipsis, None]]]) -> Tensor
+  rename_(names: Optional[Sequence[Union[str, ellipsis, None]]]) -> Tensor
+  renorm(p: Union[Number, _complex], dim: _int, maxnorm: Union[Number, _complex]) -> Tensor
+  renorm_(p: Union[Number, _complex], dim: _int, maxnorm: Union[Number, _complex]) -> Tensor
+  repeat(repeats: Sequence[Union[_int, SymInt]]) -> Tensor
+  repeat_interleave(repeats: Tensor, dim: Optional[_int]) -> Tensor
+  requires_grad_(mode: _bool) -> Tensor
+  reshape(shape: Sequence[Union[_int, SymInt]]) -> Tensor
+  reshape_as(other: Tensor) -> Tensor
+  resize_(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  resize_as_(the_template: Tensor) -> Tensor
+  resize_as_sparse_(the_template: Tensor) -> Tensor
+  resolve_conj() -> Tensor
+  resolve_neg() -> Tensor
+  retain_grad() -> None
+  roll(shifts: Union[Union[_int, SymInt], Sequence[Union[_int, SymInt]]], dims: Union[_int, _size]) -> Tensor
+  rot90(k: _int, dims: _size) -> Tensor
+  round() -> Tensor
+  round_() -> Tensor
+  row_indices() -> Tensor
+  rsqrt() -> Tensor
+  rsqrt_() -> Tensor
+  scatter(dim: _int, index: Tensor, src: Tensor) -> Tensor
+  scatter_(dim: _int, index: Tensor, src: Tensor) -> Tensor
+  scatter_add(dim: _int, index: Tensor, src: Tensor) -> Tensor
+  scatter_add_(dim: _int, index: Tensor, src: Tensor) -> Tensor
+  scatter_reduce(dim: _int, index: Tensor, src: Tensor, reduce: str) -> Tensor
+  scatter_reduce_(dim: _int, index: Tensor, src: Tensor, reduce: str) -> Tensor
+  select(dim: _int, index: Union[_int, SymInt]) -> Tensor
+  select_scatter(src: Tensor, dim: _int, index: Union[_int, SymInt]) -> Tensor
+  set_(storage: Union[Storage, TypedStorage, UntypedStorage], offset: IntLikeType, size: _symsize, stride: _symsize) -> Tensor
+  sgn() -> Tensor
+  sgn_() -> Tensor
+  short() -> Tensor
+  sigmoid() -> Tensor
+  sigmoid_() -> Tensor
+  sign() -> Tensor
+  sign_() -> Tensor
+  signbit() -> Tensor
+  sin() -> Tensor
+  sin_() -> Tensor
+  sinc() -> Tensor
+  sinc_() -> Tensor
+  sinh() -> Tensor
+  sinh_() -> Tensor
+  size(dim: None) -> Size
+  slice_inverse(src: Tensor, dim: _int, start: Optional[Union[_int, SymInt]], end: Optional[Union[_int, SymInt]], step: Union[_int, SymInt]) -> Tensor
+  slice_scatter(src: Tensor, dim: _int, start: Optional[Union[_int, SymInt]], end: Optional[Union[_int, SymInt]], step: Union[_int, SymInt]) -> Tensor
+  slogdet() -> torch.return_types.slogdet
+  smm(mat2: Tensor) -> Tensor
+  softmax(dim: _int, dtype: Optional[_dtype]) -> Tensor
+  sort() -> torch.return_types.sort
+  sparse_dim() -> _int
+  sparse_mask(mask: Tensor) -> Tensor
+  sparse_resize_(size: _size, sparse_dim: _int, dense_dim: _int) -> Tensor
+  sparse_resize_and_clear_(size: _size, sparse_dim: _int, dense_dim: _int) -> Tensor
+  split(split_size: _int, dim: _int) -> Sequence[Tensor]
+  split_with_sizes(split_sizes: Sequence[Union[_int, SymInt]], dim: _int) -> tuple[Tensor, ...]
+  sqrt() -> Tensor
+  sqrt_() -> Tensor
+  square() -> Tensor
+  square_() -> Tensor
+  squeeze() -> Tensor
+  squeeze_() -> Tensor
+  sspaddmm(mat1: Tensor, mat2: Tensor) -> Tensor
+  std(dim: Optional[Union[_int, _size]], unbiased: _bool, keepdim: _bool) -> Tensor
+  storage_offset() -> Union[_int, SymInt]
+  storage_type() -> Storage
+  stride(dim: None) -> Tuple[_int, ...]
+  sub(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  sub_(other: Union[Tensor, Number, _complex, torch.SymInt, torch.SymFloat]) -> Tensor
+  subtract(other: Tensor) -> Tensor
+  subtract_(other: Tensor) -> Tensor
+  sum() -> Tensor
+  sum_to_size(size: Sequence[Union[_int, SymInt]]) -> Tensor
+  svd(some: _bool, compute_uv: _bool) -> torch.return_types.svd
+  swapaxes(axis0: _int, axis1: _int) -> Tensor
+  swapaxes_(axis0: _int, axis1: _int) -> Tensor
+  swapdims(dim0: _int, dim1: _int) -> Tensor
+  swapdims_(dim0: _int, dim1: _int) -> Tensor
+  t() -> Tensor
+  t_() -> Tensor
+  take(index: Tensor) -> Tensor
+  take_along_dim(indices: Tensor, dim: Optional[_int]) -> Tensor
+  tan() -> Tensor
+  tan_() -> Tensor
+  tanh() -> Tensor
+  tanh_() -> Tensor
+  tensor_split(indices: Sequence[Union[_int, SymInt]], dim: _int) -> tuple[Tensor, ...]
+  tile(dims: Sequence[Union[_int, SymInt]]) -> Tensor
+  to(dtype: _dtype, non_blocking: _bool, copy: _bool) -> Tensor
+  to_dense(dtype: Optional[_dtype]) -> Tensor
+  to_mkldnn(dtype: Optional[_dtype]) -> Tensor
+  to_padded_tensor(padding: _float, output_size: Optional[Sequence[Union[_int, SymInt]]]) -> Tensor
+  to_sparse() -> Tensor
+  to_sparse_bsc(blocksize: Union[_int, _size], dense_dim: Optional[_int]) -> Tensor
+  to_sparse_bsr(blocksize: Union[_int, _size], dense_dim: Optional[_int]) -> Tensor
+  to_sparse_csc(dense_dim: Optional[_int]) -> Tensor
+  to_sparse_csr(dense_dim: Optional[_int]) -> Tensor
+  tolist() -> List
+  topk(k: Union[_int, SymInt], dim: _int, largest: _bool, sorted: _bool) -> torch.return_types.topk
+  trace() -> Tensor
+  transpose(dim0: _int, dim1: _int) -> Tensor
+  transpose_(dim0: _int, dim1: _int) -> Tensor
+  triangular_solve(A: Tensor, upper: _bool, transpose: _bool, unitriangular: _bool) -> torch.return_types.triangular_solve
+  tril(diagonal: _int) -> Tensor
+  tril_(diagonal: _int) -> Tensor
+  triu(diagonal: _int) -> Tensor
+  triu_(diagonal: _int) -> Tensor
+  true_divide(other: Union[Tensor, Number, torch.SymInt, torch.SymFloat]) -> Tensor
+  true_divide_(other: Union[Tensor, Number, torch.SymInt, torch.SymFloat]) -> Tensor
+  trunc() -> Tensor
+  trunc_() -> Tensor
+  type(dtype: None, non_blocking: _bool) -> str
+  type_as(other: Tensor) -> Tensor
+  unbind(dim: _int) -> tuple[Tensor, ...]
+  unflatten(dim: Union[str, ellipsis, None], sizes: Sequence[Union[_int, SymInt]], names: Sequence[Union[str, ellipsis, None]]) -> Tensor
+  unfold(dimension: _int, size: _int, step: _int) -> Tensor
+  uniform_(from_: _float, to: _float) -> Tensor
+  unsafe_chunk(chunks: _int, dim: _int) -> tuple[Tensor, ...]
+  unsafe_split(split_size: Union[_int, SymInt], dim: _int) -> tuple[Tensor, ...]
+  unsafe_split_with_sizes(split_sizes: Sequence[Union[_int, SymInt]], dim: _int) -> tuple[Tensor, ...]
+  unsqueeze(dim: _int) -> Tensor
+  unsqueeze_(dim: _int) -> Tensor
+  untyped_storage() -> UntypedStorage
+  values() -> Tensor
+  var(dim: Optional[Union[_int, _size]], unbiased: _bool, keepdim: _bool) -> Tensor
+  vdot(other: Tensor) -> Tensor
+  view(dtype: _dtype) -> Tensor
+  view_as(other: Tensor) -> Tensor
+  vsplit(sections: _int) -> tuple[Tensor, ...]
+  where(condition: Tensor, other: Tensor) -> Tensor
+  xlogy(other: Tensor) -> Tensor
+  xlogy_(other: Tensor) -> Tensor
+  xpu(device: Optional[Union[_device, _int, str]], non_blocking: _bool, memory_format: torch.memory_format) -> Tensor
+  zero_() -> Tensor
+}
+class "Union" as .Union {
+}
+class "Union" as .Union {
+}
+class "_AdaptiveAvgPoolNd" as torch.nn.modules.pooling._AdaptiveAvgPoolNd {
+  output_size
+  extra_repr() -> str
+}
+class "_BatchNorm" as torch.nn.modules.batchnorm._BatchNorm {
+  forward(input: Tensor) -> Tensor
+}
+class "_ConvNd" as torch.nn.modules.conv._ConvNd {
+  bias : Optional[Tensor]
+  dilation : Tuple[int, ...]
+  groups : int
+  in_channels : int
+  kernel_size : Tuple[int, ...]
+  out_channels : int
+  output_padding : Tuple[int, ...]
+  padding : Union[str, Tuple[int, ...]]
+  padding_mode : str
+  stride : Tuple[int, ...]
+  transposed : bool
+  weight
+  extra_repr()
+  reset_parameters() -> None
+}
+class "_DropoutNd" as torch.nn.modules.dropout._DropoutNd {
+  inplace : bool
+  p : float
+  extra_repr() -> str
+}
+class "_NormBase" as torch.nn.modules.batchnorm._NormBase {
+  affine : bool
+  bias
+  eps : float
+  momentum : Optional[float]
+  num_batches_tracked : Optional[Tensor]
+  num_features : int
+  running_mean : Optional[Tensor]
+  running_var : Optional[Tensor]
+  track_running_stats : bool
+  weight
+  extra_repr()
+  reset_parameters() -> None
+  reset_running_stats() -> None
+}
+class "device" as torch._C.device {
+  index : int
+  type : str
+}
+class "dtype" as torch._C.dtype {
+  is_complex : bool
+  is_floating_point : bool
+  is_signed : bool
+  itemsize : int
+  to_complex() -> dtype
+  to_real() -> dtype
+}
+class "layout" as torch._C.layout {
+}
+customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass --|> customtkinter.windows.widgets.appearance_mode.appearance_mode_base_class.CTkAppearanceModeBaseClass
+customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass --|> customtkinter.windows.widgets.scaling.scaling_base_class.CTkScalingBaseClass
+customtkinter.windows.widgets.core_widget_classes.dropdown_menu.DropdownMenu --|> customtkinter.windows.widgets.appearance_mode.appearance_mode_base_class.CTkAppearanceModeBaseClass
+customtkinter.windows.widgets.core_widget_classes.dropdown_menu.DropdownMenu --|> customtkinter.windows.widgets.scaling.scaling_base_class.CTkScalingBaseClass
+customtkinter.windows.widgets.ctk_button.CTkButton --|> customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass
+customtkinter.windows.widgets.ctk_combobox.CTkComboBox --|> customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass
+customtkinter.windows.widgets.ctk_frame.CTkFrame --|> customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass
+customtkinter.windows.widgets.ctk_label.CTkLabel --|> customtkinter.windows.widgets.core_widget_classes.ctk_base_class.CTkBaseClass
+efficientnet_pytorch.model.EfficientNet --|> torch.nn.modules.module.Module
+efficientnet_pytorch.utils.Conv2dDynamicSamePadding --|> torch.nn.modules.conv.Conv2d
+efficientnet_pytorch.utils.MemoryEfficientSwish --|> torch.nn.modules.module.Module
+torch._dynamo.eval_frame.OptimizedModule --|> torch.nn.modules.module.Module
+torch._tensor.Tensor --|> torch._C.TensorBase
+torch.nn.modules.batchnorm.BatchNorm2d --|> torch.nn.modules.batchnorm._BatchNorm
+torch.nn.modules.batchnorm._BatchNorm --|> torch.nn.modules.batchnorm._NormBase
+torch.nn.modules.batchnorm._NormBase --|> torch.nn.modules.module.Module
+torch.nn.modules.container.ModuleList --|> torch.nn.modules.module.Module
+torch.nn.modules.conv.Conv2d --|> torch.nn.modules.conv._ConvNd
+torch.nn.modules.conv._ConvNd --|> torch.nn.modules.module.Module
+torch.nn.modules.dropout.Dropout --|> torch.nn.modules.dropout._DropoutNd
+torch.nn.modules.dropout._DropoutNd --|> torch.nn.modules.module.Module
+torch.nn.modules.linear.Linear --|> torch.nn.modules.module.Module
+torch.nn.modules.pooling.AdaptiveAvgPool2d --|> torch.nn.modules.pooling._AdaptiveAvgPoolNd
+torch.nn.modules.pooling._AdaptiveAvgPoolNd --|> torch.nn.modules.module.Module
+torch.nn.parameter.Parameter --|> torch._tensor.Tensor
+torchvision.models.detection.faster_rcnn.FasterRCNN --|> torchvision.models.detection.generalized_rcnn.GeneralizedRCNN
+torchvision.models.detection.generalized_rcnn.GeneralizedRCNN --|> torch.nn.modules.module.Module
+.T_destination --* torch.nn.modules.module.Module : T_destination
+.Union --* torch.nn.modules.pooling.AdaptiveAvgPool2d : output_size
+ai_analyzer.AIAnalyzer --* controller_v2.ConveyorControllerV2 : ai
+camera_manager.CameraManager --* controller_v2.ConveyorControllerV2 : picam2
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* controller_v2.ConveyorControllerV2 : video_canvas
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* controller_v2.ConveyorControllerV2 : side1_box
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* controller_v2.ConveyorControllerV2 : side2_box
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* customtkinter.windows.widgets.ctk_button.CTkButton : _canvas
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* customtkinter.windows.widgets.ctk_combobox.CTkComboBox : _canvas
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* customtkinter.windows.widgets.ctk_frame.CTkFrame : _canvas
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --* customtkinter.windows.widgets.ctk_label.CTkLabel : _canvas
+customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine --* customtkinter.windows.widgets.ctk_button.CTkButton : _draw_engine
+customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine --* customtkinter.windows.widgets.ctk_combobox.CTkComboBox : draw_engine
+customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine --* customtkinter.windows.widgets.ctk_frame.CTkFrame : _draw_engine
+customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine --* customtkinter.windows.widgets.ctk_label.CTkLabel : _draw_engine
+customtkinter.windows.widgets.core_widget_classes.dropdown_menu.DropdownMenu --* customtkinter.windows.widgets.ctk_combobox.CTkComboBox : _dropdown_menu
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_reset
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_exit
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_cwc1
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_ccwc1
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_cwc2
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_ccwc2
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : time_txt_button
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_run
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_side1
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_side2
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : side1_button
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : side2_button
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_enter
+customtkinter.windows.widgets.ctk_button.CTkButton --* controller_v2.ConveyorControllerV2 : button_help
+customtkinter.windows.widgets.ctk_combobox.CTkComboBox --* controller_v2.ConveyorControllerV2 : textbox
+customtkinter.windows.widgets.ctk_combobox.CTkComboBox --* controller_v2.ConveyorControllerV2 : ripeness_combo
+customtkinter.windows.widgets.ctk_combobox.CTkComboBox --* controller_v2.ConveyorControllerV2 : bruises_combo
+customtkinter.windows.widgets.ctk_combobox.CTkComboBox --* controller_v2.ConveyorControllerV2 : size_combo
+customtkinter.windows.widgets.ctk_frame.CTkFrame --* controller_v2.ConveyorControllerV2 : main_frame
+customtkinter.windows.widgets.ctk_frame.CTkFrame --* controller_v2.ConveyorControllerV2 : view_frame
+customtkinter.windows.widgets.ctk_label.CTkLabel --* controller_v2.ConveyorControllerV2 : results_data
+customtkinter.windows.widgets.ctk_label.CTkLabel --* controller_v2.ConveyorControllerV2 : side1_results
+customtkinter.windows.widgets.ctk_label.CTkLabel --* controller_v2.ConveyorControllerV2 : side2_results
+customtkinter.windows.widgets.font.ctk_font.CTkFont --* controller_v2.ConveyorControllerV2 : DEFAULT_BOLD
+customtkinter.windows.widgets.font.ctk_font.CTkFont --* controller_v2.ConveyorControllerV2 : TITLE_FONT
+customtkinter.windows.widgets.font.ctk_font.CTkFont --* customtkinter.windows.widgets.core_widget_classes.dropdown_menu.DropdownMenu : _font
+customtkinter.windows.widgets.font.ctk_font.CTkFont --* customtkinter.windows.widgets.ctk_combobox.CTkComboBox : _font
+customtkinter.windows.widgets.font.ctk_font.CTkFont --* customtkinter.windows.widgets.ctk_label.CTkLabel : _font
+efficientnet_pytorch.model.EfficientNet --* ai_analyzer.AIAnalyzer : model_ripeness
+efficientnet_pytorch.model.EfficientNet --* ai_analyzer.AIAnalyzer : model_bruises
+efficientnet_pytorch.utils.Conv2dDynamicSamePadding --* efficientnet_pytorch.model.EfficientNet : _conv_stem
+efficientnet_pytorch.utils.Conv2dDynamicSamePadding --* efficientnet_pytorch.model.EfficientNet : _conv_stem
+efficientnet_pytorch.utils.Conv2dDynamicSamePadding --* efficientnet_pytorch.model.EfficientNet : _conv_head
+efficientnet_pytorch.utils.MemoryEfficientSwish --* efficientnet_pytorch.model.EfficientNet : _swish
+efficientnet_pytorch.utils.MemoryEfficientSwish --* efficientnet_pytorch.model.EfficientNet : _swish
+fake_picamera2.FakePicamera2 --* camera_manager.CameraManager : picam2
+formula_controller.FormulaController --* controller_v2.ConveyorControllerV2 : formula
+motor_controller.MotorController --* controller_v2.ConveyorControllerV2 : mc
+rcnn_size.MangoMeasurementSystem --* controller_v2.ConveyorControllerV2 : rcnn_size
+torch._C.Size --* torch._C.TensorBase : shape
+torch._C.device --* controller_v2.ConveyorControllerV2 : device
+torch._C.device --* rcnn_size.MangoMeasurementSystem : device
+torch._C.device --* torch._C.TensorBase : device
+torch._C.dtype --* torch._C.TensorBase : dtype
+torch._C.layout --* torch._C.TensorBase : layout
+torch._dynamo.eval_frame.OptimizedModule --* torch.nn.modules.module.Module : _compiled_call_impl
+torch._tensor.Tensor --* torch._C.TensorBase : data
+torch._tensor.Tensor --* torch._C.TensorBase : real
+torch._tensor.Tensor --* torch._C.TensorBase : imag
+torch._tensor.Tensor --* torch._C.TensorBase : T
+torch._tensor.Tensor --* torch._C.TensorBase : H
+torch._tensor.Tensor --* torch._C.TensorBase : mT
+torch._tensor.Tensor --* torch._C.TensorBase : mH
+torch.nn.modules.batchnorm.BatchNorm2d --* efficientnet_pytorch.model.EfficientNet : _bn0
+torch.nn.modules.batchnorm.BatchNorm2d --* efficientnet_pytorch.model.EfficientNet : _bn1
+torch.nn.modules.container.ModuleList --* efficientnet_pytorch.model.EfficientNet : _blocks
+torch.nn.modules.dropout.Dropout --* efficientnet_pytorch.model.EfficientNet : _dropout
+torch.nn.modules.linear.Linear --* efficientnet_pytorch.model.EfficientNet : _fc
+torch.nn.modules.pooling.AdaptiveAvgPool2d --* efficientnet_pytorch.model.EfficientNet : _avg_pooling
+torch.nn.parameter.Parameter --* torch.nn.modules.batchnorm._NormBase : weight
+torch.nn.parameter.Parameter --* torch.nn.modules.batchnorm._NormBase : bias
+torch.nn.parameter.Parameter --* torch.nn.modules.conv._ConvNd : weight
+torch.nn.parameter.Parameter --* torch.nn.modules.conv._ConvNd : weight
+torch.nn.parameter.Parameter --* torch.nn.modules.conv._ConvNd : bias
+torch.nn.parameter.Parameter --* torch.nn.modules.linear.Linear : weight
+torch.nn.parameter.Parameter --* torch.nn.modules.linear.Linear : bias
+torchvision.models.detection.faster_rcnn.FasterRCNN --* rcnn_size.MangoMeasurementSystem : model
+torchvision.transforms.transforms.Compose --* ai_analyzer.AIAnalyzer : transform
+.Union --o torch.nn.modules.pooling._AdaptiveAvgPoolNd : output_size
+PIL.ImageTk.PhotoImage --o customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas : image
+PIL.ImageTk.PhotoImage --o customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas : image
+customtkinter.windows.widgets.core_rendering.ctk_canvas.CTkCanvas --o customtkinter.windows.widgets.core_rendering.draw_engine.DrawEngine : _canvas
+torch.nn.modules.module.Module --o torch._dynamo.eval_frame.OptimizedModule : _orig_mod
+torch.nn.modules.module.Module --o torchvision.models.detection.generalized_rcnn.GeneralizedRCNN : transform
+torch.nn.modules.module.Module --o torchvision.models.detection.generalized_rcnn.GeneralizedRCNN : backbone
+torch.nn.modules.module.Module --o torchvision.models.detection.generalized_rcnn.GeneralizedRCNN : rpn
+torch.nn.modules.module.Module --o torchvision.models.detection.generalized_rcnn.GeneralizedRCNN : roi_heads
+@enduml
