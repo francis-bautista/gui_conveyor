@@ -77,16 +77,36 @@ class AIAnalyzer:
                   
     def get_predicted_class(self, image, isRipeness):
         image = self.transform(image).unsqueeze(0).to(self.device)
-        if (isRipeness):
-            output = self.model_ripeness(image)
-            class_labels = list(self.RIPENESS_SCORES.keys())
-        else:
-            output = self.model_bruises(image)            
-            class_labels = list(self.BRUISES_SCORES.keys())
-        _, predicted = torch.max(output, 1)
-
-        return class_labels[predicted.item()]
-
+        
+        with torch.no_grad():  # Disable gradient computation for inference
+            if (isRipeness):
+                output = self.model_ripeness(image)
+                class_labels = list(self.RIPENESS_SCORES.keys())
+            else:
+                output = self.model_bruises(image)            
+                class_labels = list(self.BRUISES_SCORES.keys())
+            
+            # Apply softmax to get probabilities
+            probabilities = torch.softmax(output, dim=1)
+            
+            # Get the highest confidence prediction
+            confidence, predicted = torch.max(probabilities, 1)
+            
+            predicted_class = class_labels[predicted.item()]
+            confidence_score = confidence.item()
+            
+            # Display confidence information
+            print(f"Predicted class: {predicted_class}")
+            print(f"Confidence: {confidence_score:.4f} ({confidence_score*100:.2f}%)")
+            
+            # Optional: Display all class probabilities
+            print("All class probabilities:")
+            for i, label in enumerate(class_labels):
+                prob = probabilities[0][i].item()
+                print(f"  {label}: {prob:.4f} ({prob*100:.2f}%)")
+            
+            return predicted_class, confidence_score
+        
     def get_overall_grade(self, scores, predicted):
         resulting_grade = (predicted['ripeness']*self.RIPENESS_SCORES[scores['ripeness']] +
             predicted['bruises']*self.BRUISES_SCORES[scores['bruises']] +
