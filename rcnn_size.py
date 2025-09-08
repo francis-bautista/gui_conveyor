@@ -39,9 +39,9 @@ class MangoMeasurementSystem:
             missing_keys, unexpected_keys = model.load_state_dict(model_state, strict=False)
             
             if missing_keys:
-                print(f"⚠️ Missing keys: {len(missing_keys)}")
+                print(f"Missing keys: {len(missing_keys)}")
             if unexpected_keys:
-                print(f"⚠️ Unexpected keys: {len(unexpected_keys)}")
+                print(f"Unexpected keys: {len(unexpected_keys)}")
             
             model.to(self.device)
             model.eval()
