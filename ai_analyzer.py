@@ -105,7 +105,7 @@ class AIAnalyzer:
                 prob = probabilities[0][i].item()
                 print(f"  {label}: {prob:.4f} ({prob*100:.2f}%)")
             
-            return predicted_class, confidence_score
+            return predicted_class
         
     def get_overall_grade(self, scores, predicted):
         resulting_grade = (predicted['ripeness']*self.RIPENESS_SCORES[scores['ripeness']] +
