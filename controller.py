@@ -509,7 +509,7 @@ class ConveyorController:
 
     def picture_side1(self):
         print("Process and pictured side 1")
-        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        # self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         s1 = self.ai.get_is_s1()
         t_img = self.picam2.get_image()            
         filename = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
