@@ -472,6 +472,21 @@ class ConveyorController:
                 self.button_enter.configure(text="Cancel", fg_color=self.colors["bg_red"], hover_color=self.colors["hover_red"])
                 self.formula.set_input_priority(self.get_input_priorities())
                 self.priority_enabled = False
+                # TODO: check if this works
+                # Create a base directory with current date and time
+                self.img_dir = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                os.makedirs(self.img_dir, exist_ok=True)
+                # Create subdirectories for Grade-A, Grade-B, and Grade-C inside it
+                for grade in ["Grade-A", "Grade-B", "Grade-C"]:
+                    os.makedirs(os.path.join(self.img_dir, grade), exist_ok=True)
+                # === Save input priorities to a text file ===
+                priorities = self.get_input_priorities()
+                txt_path = os.path.join(self.img_dir, "input_priorities.txt")
+                with open(txt_path, "w") as f:
+                    for key, val in priorities.items():
+                        f.write(f"{key}: {val}\n")
+                print(f"Created directories under {self.img_dir}")
+                print(f"Saved priorities to {txt_path}")
         else:
             top_parent = self.button_background.winfo_toplevel()
             self.set_error_pop_up(top_parent, self.errors[error_log]["title"],
@@ -574,6 +589,23 @@ class ConveyorController:
         self.button_background.configure(text="Capture Background")
         for button, state in button_configs.items():
             button.configure(state=state)
+
+        # === Move BOTH images into Grade-{ave_letter} folder ===
+        grade_folder = os.path.join(self.img_dir, f"Grade-{ave_letter.upper()}")
+        os.makedirs(grade_folder, exist_ok=True)
+
+        top_src = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
+        bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
+        top_dst = os.path.join(grade_folder, f"{self.recorded_time}_top.png")
+        bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_bottom.png")
+
+        if os.path.exists(top_src):
+            shutil.move(top_src, top_dst)
+            print(f"Moved TOP image to: {top_dst}")
+
+        if os.path.exists(bottom_src):
+            shutil.move(bottom_src, bottom_dst)
+            print(f"Moved BOTTOM image to: {bottom_dst}")
      
     def get_input_priorities(self):
         arr = {
