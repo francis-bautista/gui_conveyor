@@ -1,4 +1,4 @@
-import torch, time, sys, os, threading, json
+import torch, time, sys, os, threading, json, shutil
 from datetime import datetime
 import customtkinter as ctk
 from PIL import ImageTk
@@ -555,8 +555,8 @@ class ConveyorController:
         b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())        
         path_img_bottom = os.path.join(self.img_dir, f"{f_dt}_bottom.png")
         path_img_background = os.path.join(self.img_dir, f"{f_dt}_background.png")
-        imgs = {'m': f"{f_dt}_bottom.png",
-                'g': f"{f_dt}_background.png",
+        imgs = {'m': path_img_bottom,
+                'g': path_img_background,
                 'f_dt': f_dt}
         b_x, b_y = calculate_size(imgs, s2)
         # # TODO: check this rcnn and then display it on ctk
