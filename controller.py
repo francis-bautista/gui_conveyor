@@ -35,7 +35,8 @@ class ConveyorController:
         self.bottom_final_score = 0
         self.priority_enabled = True
         self.BUTTON_WIDTH = 180
-        self.BUTTON_HEIGHT = 40
+        self.BUTTON_HEIGHT = 40        
+        self.img_dir = ""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.mc = MotorController()
