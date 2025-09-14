@@ -100,6 +100,9 @@ class MangoMeasurementSystem:
             
             length_cm = max(width_cm, height_cm)
             width_cm = min(width_cm, height_cm)
+            # Filter out predictions with length_cm < 10
+            if length_cm < 10:
+                continue
             
             area_cm2 = length_cm * width_cm
             
