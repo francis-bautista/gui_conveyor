@@ -522,7 +522,7 @@ class ConveyorController:
         imgs = {'m': path_img_top,
                 'g': path_img_background,
                 'f_dt': f_dt}
-        t_x, t_y = calculate_size(imgs, s1)
+        t_x, t_y = calculate_size(imgs, s1, self.img_dir)
         # # TODO: check this rcnn and then display on ctk
         # print("\n\nRCNN")
         # rcnn_size = self.rcnn_size.get_size(imgs['m'])
@@ -558,7 +558,7 @@ class ConveyorController:
         imgs = {'m': path_img_bottom,
                 'g': path_img_background,
                 'f_dt': f_dt}
-        b_x, b_y = calculate_size(imgs, s2)
+        b_x, b_y = calculate_size(imgs, s2, self.img_dir)
         # # TODO: check this rcnn and then display it on ctk
         # print("\n\nRCNN")
         # self.rcnn_size.get_size(imgs['m'])

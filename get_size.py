@@ -109,7 +109,7 @@ def load_json_file(filepath, default_data=None):
 def calculate_real_world_dimension(pixel_dimension, distance_camera_to_object, focal_length_pixels):
     return (pixel_dimension * distance_camera_to_object) / focal_length_pixels
 
-def calculate_size(img, top):
+def calculate_size(img, top, dir):
     fg = img['m']
     bg = img['g']
     formatted_date_time = img['f_dt']
@@ -125,15 +125,18 @@ def calculate_size(img, top):
             
         fgMask = cv2.absdiff(foreground, background)
         fgMask_filename = f"{formatted_date_time}_fgMask_{suffix}.png"
-        cv2.imwrite(fgMask_filename, fgMask)
+        # cv2.imwrite(fgMask_filename, fgMask)
+        cv2.imwrite(os.path.join(dir, fgMask_filename), fgMask)
         # print(f"Foreground mask saved as {fgMask_filename}")
         
         _, thresh = cv2.threshold(cv2.cvtColor(fgMask, cv2.COLOR_BGR2GRAY), 50, 255, cv2.THRESH_BINARY)
         thresh_filename = f"{formatted_date_time}_thresh_{suffix}.png"
-        cv2.imwrite(thresh_filename, thresh)
+        # cv2.imwrite(thresh_filename, thresh)        
+        thresh_path = os.path.join(dir, thresh_filename)
+        cv2.imwrite(thresh_path, thresh)
         # print(f"Threshold saved as {thresh_filename}")
         
-        image = cv2.imread(thresh_filename)
+        image = cv2.imread(thresh_path)
         if image is None:
             print(f"Error: Unable to read threshold image {thresh_filename}")
             return 0, 0
