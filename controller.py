@@ -508,14 +508,18 @@ class ConveyorController:
 
     def picture_side1(self):
         print("Process and pictured side 1")
+        self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         s1 = self.ai.get_is_s1()
-        t_img = self.picam2.get_image()
-        t_img.save(f"{self.recorded_time}_top.png")
+        t_img = self.picam2.get_image()            
+        filename = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
+        t_img.save(filename)
         f_dt = self.recorded_time
         t_r = self.ai.get_predicted_class(t_img, self.ai.get_is_ripeness())
         t_b = self.ai.get_predicted_class(t_img, self.ai.get_is_bruises())
-        imgs = {'m': f"{f_dt}_top.png",
-                'g': f"{f_dt}_background.png",
+        path_img_top = os.path.join(self.img_dir, f"{f_dt}_top.png")
+        path_img_background = os.path.join(self.img_dir, f"{f_dt}_background.png")
+        imgs = {'m': path_img_top,
+                'g': path_img_background,
                 'f_dt': f_dt}
         t_x, t_y = calculate_size(imgs, s1)
         # # TODO: check this rcnn and then display on ctk
@@ -542,11 +546,14 @@ class ConveyorController:
     def picture_side2(self):
         print("Process and pictured side 2")
         s2 = self.ai.get_is_s2()
-        b_img = self.picam2.get_image()
-        b_img.save(f"{self.recorded_time}_bottom.png")
+        b_img = self.picam2.get_image()        
+        filename = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
+        b_img.save(filename)
         f_dt = self.recorded_time
         b_r = self.ai.get_predicted_class(b_img, self.ai.get_is_ripeness())
-        b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())
+        b_b = self.ai.get_predicted_class(b_img, self.ai.get_is_bruises())        
+        path_img_bottom = os.path.join(self.img_dir, f"{f_dt}_bottom.png")
+        path_img_background = os.path.join(self.img_dir, f"{f_dt}_background.png")
         imgs = {'m': f"{f_dt}_bottom.png",
                 'g': f"{f_dt}_background.png",
                 'f_dt': f_dt}
