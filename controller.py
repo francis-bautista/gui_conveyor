@@ -400,7 +400,8 @@ class ConveyorController:
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             
             background_img = self.picam2.get_image()
-            background_img.save(f"{self.recorded_time}_background.png")
+            filename = os.path.join(self.img_dir, f"{self.recorded_time}_background.png")
+            background_img.save(filename)
             
             button_configs = {
                 self.button_background: "disabled",
