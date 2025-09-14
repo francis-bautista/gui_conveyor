@@ -599,22 +599,77 @@ class ConveyorController:
         for button, state in button_configs.items():
             button.configure(state=state)
 
-        # === Move BOTH images into Grade-{ave_letter} folder ===
+        # # === Move BOTH images into Grade-{ave_letter} folder ===
+        # grade_folder = os.path.join(self.img_dir, f"Grade-{ave_letter.upper()}")
+        # os.makedirs(grade_folder, exist_ok=True)
+        #
+        # top_src = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
+        # bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
+        # top_dst = os.path.join(grade_folder, f"{self.recorded_time}_top.png")
+        # bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_bottom.png")
+        #
+        # if os.path.exists(top_src):
+        #     shutil.move(top_src, top_dst)
+        #     print(f"Moved TOP image to: {top_dst}")
+        #
+        # if os.path.exists(bottom_src):
+        #     shutil.move(bottom_src, bottom_dst)
+        #     print(f"Moved BOTTOM image to: {bottom_dst}")
+        #
+        # === Move ALL images into Grade-{ave_letter} folder ===
         grade_folder = os.path.join(self.img_dir, f"Grade-{ave_letter.upper()}")
         os.makedirs(grade_folder, exist_ok=True)
 
+        # Original images
         top_src = os.path.join(self.img_dir, f"{self.recorded_time}_top.png")
         bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_bottom.png")
         top_dst = os.path.join(grade_folder, f"{self.recorded_time}_top.png")
         bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_bottom.png")
 
+        # Threshold images
+        thresh_top_src = os.path.join(self.img_dir, f"{self.recorded_time}_thresh_top.png")
+        thresh_bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_thresh_bottom.png")
+        thresh_top_dst = os.path.join(grade_folder, f"{self.recorded_time}_thresh_top.png")
+        thresh_bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_thresh_bottom.png")
+
+        # Foreground mask images
+        fgMask_top_src = os.path.join(self.img_dir, f"{self.recorded_time}_fgMask_top.png")
+        fgMask_bottom_src = os.path.join(self.img_dir, f"{self.recorded_time}_fgMask_bottom.png")
+        fgMask_top_dst = os.path.join(grade_folder, f"{self.recorded_time}_fgMask_top.png")
+        fgMask_bottom_dst = os.path.join(grade_folder, f"{self.recorded_time}_fgMask_bottom.png")
+
+        # Background image
+        background_src = os.path.join(self.img_dir, f"{self.recorded_time}_background.png")
+        background_dst = os.path.join(grade_folder, f"{self.recorded_time}_background.png")
+
+        # Move original images
         if os.path.exists(top_src):
             shutil.move(top_src, top_dst)
             print(f"Moved TOP image to: {top_dst}")
-
         if os.path.exists(bottom_src):
             shutil.move(bottom_src, bottom_dst)
             print(f"Moved BOTTOM image to: {bottom_dst}")
+
+        # Move threshold images
+        if os.path.exists(thresh_top_src):
+            shutil.move(thresh_top_src, thresh_top_dst)
+            print(f"Moved THRESH TOP image to: {thresh_top_dst}")
+        if os.path.exists(thresh_bottom_src):
+            shutil.move(thresh_bottom_src, thresh_bottom_dst)
+            print(f"Moved THRESH BOTTOM image to: {thresh_bottom_dst}")
+
+        # Move foreground mask images
+        if os.path.exists(fgMask_top_src):
+            shutil.move(fgMask_top_src, fgMask_top_dst)
+            print(f"Moved FGMASK TOP image to: {fgMask_top_dst}")
+        if os.path.exists(fgMask_bottom_src):
+            shutil.move(fgMask_bottom_src, fgMask_bottom_dst)
+            print(f"Moved FGMASK BOTTOM image to: {fgMask_bottom_dst}")
+
+        # Move background image
+        if os.path.exists(background_src):
+            shutil.move(background_src, background_dst)
+            print(f"Moved BACKGROUND image to: {background_dst}")
      
     def get_input_priorities(self):
         arr = {
