@@ -184,9 +184,7 @@ def calculate_size(img, top, dir):
 #         'max_x': 14.5,
 #         'max_y': 9,
 # } 
-
 def determine_size(length, width):
-
     area = { 'min_x': 13.8,
             'min_y': 7.4,
             'max_x': 15.4,
