@@ -13,7 +13,10 @@ class Help(ctk.CTkToplevel):
         self.main_frame = ctk.CTkScrollableFrame(self)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        close_button = ctk.CTkButton(self, text="Close", command=self.destroy)
+        close_button = ctk.CTkButton(self, text="Close",
+                                    fg_color="#979da2",
+                                    hover_color="#6e7174", 
+                                    command=self.destroy)
         close_button.pack(pady=10)
             
         try:
