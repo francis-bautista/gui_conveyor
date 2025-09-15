@@ -178,21 +178,28 @@ def calculate_size(img, top, dir):
     except Exception as e:
         print(f"Error in calculate_size: {e}")
         return 0, 0
-    
+
+# area = { 'min_x': 12.5,
+#         'min_y': 8.0,
+#         'max_x': 14.5,
+#         'max_y': 9,
+# } 
+
 def determine_size(length, width):
-    area = { 'min_x': 12.5,
-            'min_y': 8.5,
-            'max_x': 14.5,
-            'max_y': 9,
+
+    area = { 'min_x': 13.8,
+            'min_y': 7.4,
+            'max_x': 15.4,
+            'max_y': 8.2,
     }
     minArea = float(area['min_x'] * area['min_y'])
     maxArea = float(area['max_x'] * area['max_y'])
     area = float(length * width)
-    if area < minArea: # less than 106.25 cm area
+    if area < minArea: 
         return 'small'
-    elif minArea <= area < maxArea: # between  106.25 and 130.5 cm area
+    elif minArea <= area < maxArea: 
         return 'medium'
-    else: # greater than 130.5 cm
+    else: 
         return 'large'
     
 def midpoint(ptA, ptB):
