@@ -27,6 +27,6 @@
   {
     "name": "rotate_bottom_backward_button",
     "img_path": "assets/rotate_backward_bottom_belt_button.png",
-    "text": "rotates the the bottom conveyor belt backward"
+    "text": "rotates the bottom conveyor belt backward"
   }
 ]
