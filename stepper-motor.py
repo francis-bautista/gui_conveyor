@@ -7,9 +7,9 @@ step_pin = 20   # Physical pin 20 or 3
 steps_per_revolution = 200
 
 # Define absolute positions (steps from home)
-position1 = 100
-position2 = 300
-position3 = 600
+position1 = 0
+position2 = 90
+position3 = 180
 # position4 = 200
 
 current_position = 0  # Track current position
