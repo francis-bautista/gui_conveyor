@@ -32,7 +32,7 @@ pi.set_PWM_frequency(STEP, 500)  # 500 pulses per second
 
 try:
     while True:
-        pi.write(DIR, pi.read(SWITCH))  # Set direction
+        pi.write(DIR, pi.read(1))  # Set direction
         sleep(.1)
 
 except KeyboardInterrupt:
