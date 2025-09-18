@@ -22,7 +22,7 @@ for x in range(step_count):
     sleep(delay)
 
 sleep(.5)
-GPIO.output(DIR, CCW)
+GPIO.output(DIR, CW)
 for x in range(step_count):
     GPIO.output(STEP, GPIO.HIGH)
     sleep(delay)
