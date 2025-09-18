@@ -36,8 +36,8 @@ GPIO.cleanup()
 from time import sleep
 import pigpio
 
-DIR = 20     # Direction GPIO Pin
-STEP = 21    # Step GPIO Pin
+DIR = 21     # Direction GPIO Pin
+STEP = 20    # Step GPIO Pin
 SWITCH = 16  # GPIO pin of switch
 
 # Connect to pigpiod daemon
