@@ -13,7 +13,7 @@ position3 = 180
 # position4 = 200
 
 current_position = 0  # Track current position
-step_delay = 0.001    # 1ms delay between steps (adjust for speed)
+step_delay = 0.01    # 1ms delay between steps (adjust for speed)
 
 def setupPy():
     GPIO.setmode(GPIO.BCM)
