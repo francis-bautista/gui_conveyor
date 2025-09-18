@@ -3,8 +3,8 @@ import RPi.GPIO as GPIO
 
 DIR = 21   # Direction GPIO Pin
 STEP = 20  # Step GPIO Pin
-CW = 0     # Try flipping logic here
-CCW = 1
+CW = 1     # Try flipping logic here
+CCW = 0
 SPR = 48   # Steps per Revolution (360 / 7.5)
 
 GPIO.setmode(GPIO.BCM)
