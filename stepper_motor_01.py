@@ -29,12 +29,6 @@ for x in range(step_count):
     GPIO.output(STEP, GPIO.LOW)
     sleep(delay)
 
-sleep(.5)
-GPIO.output(DIR, CCW)
-for x in range(step_count):
-    GPIO.output(STEP, GPIO.LOW)
-    sleep(delay)
-    GPIO.output(STEP, GPIO.HIGH)
-    sleep(delay)
+
 
 GPIO.cleanup()
