@@ -43,8 +43,10 @@ class ConveyorControllerV2:
         self.mc = MotorController()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
+        # mango_detection_model 
         # mango_detection_model_stopper 
-        RCNN_PATH = "mango_detection_model_stopper.pth"
+        # mango_detection_model_more_stop 
+        RCNN_PATH = "mango_detection_model_more_stop.pth"
         self.rcnn_size = MangoMeasurementSystem(RCNN_PATH)
         self.init_ui()
     
