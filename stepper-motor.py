@@ -13,8 +13,8 @@ position3 = 600
 # position4 = 200
 
 current_position = 0  # Track current position
-step_delay = 0.001    # 1ms delay between steps (adjust for speed)
-
+step_delay = 0.0208    # 1ms delay between steps (adjust for speed)
+# 0.001
 def setupPy():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(dir_pin, GPIO.OUT)
@@ -24,7 +24,7 @@ def setupPy():
 
 def move_to_position(target):
     global current_position
-    steps_needed = target - current_position
+    steps_needed = abs(target - current_position)
     
     if steps_needed == 0:
         return  # Already at position
