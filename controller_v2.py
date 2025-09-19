@@ -9,6 +9,7 @@ from ai_analyzer import AIAnalyzer
 from camera_manager import CameraManager
 from formula_controller import FormulaController
 from rcnn_size import MangoMeasurementSystem
+from sorting import SorterController
     
 class ConveyorControllerV2:
     def __init__(self, app, data):
@@ -43,6 +44,7 @@ class ConveyorControllerV2:
         self.mc = MotorController()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
+        self.sorting = SorterController()
         # mango_detection_model 
         # mango_detection_model_stopper 
         # mango_detection_model_more_stop 
@@ -510,6 +512,7 @@ class ConveyorControllerV2:
 
 
     def picture_side1(self):
+        # TODO: STOP THE motor3 and motor4
         isTrue = self.check_priority
         if (isTrue):
             self.button_enter.configure(state="disabled")
@@ -623,6 +626,13 @@ class ConveyorControllerV2:
             print(f"Moved BOTTOM image to: {bottom_dst}")
 
         # TODO: add the sorting.py
+        # pseudocode
+        # if ave_letter is a
+        #   then move motor3 and motor4 to cw or ccw
+        # else ave_letter is b
+        #   then move motor3 and motor4 to cw or ccw#
+        # else ave_letter is c
+        #   then move motor3 and motor4 to cw or ccw      
      
     def get_input_priorities(self):
         arr = {
