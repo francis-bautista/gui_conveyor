@@ -6,16 +6,16 @@ controller = SorterController()
 
 states = [
     # individual motor activation
-    
+    # only long conveyor towards two options (towards motor)
     [1, 0, 0, 0],
     [0, 0, 0, 0],
-    
+    # only long conveyor towards A. (against motor)
     [0, 1, 0, 0],
     [0, 0, 0, 0],
-    
+    # only short conveyor towards motor
     [0, 0, 1, 0],
     [0, 0, 0, 0],
-
+    # only short conveyor against motor 
     [0, 0, 0, 1],
     [0, 0, 0, 0],
     
