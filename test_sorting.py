@@ -17,7 +17,7 @@ try:
     for i, state in enumerate(states):
         print(f"State {i+1}: {state}")
         controller.set_motors(state)
-        time.sleep(2)
+        time.sleep(30)
     
     controller.stop_motors()
     controller.clean_gpio()
