@@ -5,11 +5,31 @@ from sorting import SorterController
 controller = SorterController()
 
 states = [
+    # individual motor activation
+    
+    [1, 0, 0, 0],
+    [0, 0, 0, 0],
+    
+    [0, 1, 0, 0],
+    [0, 0, 0, 0],
+    
+    [0, 0, 1, 0],
+    [0, 0, 0, 0],
+
+    [0, 0, 0, 1],
+    [0, 0, 0, 0],
+    
+    # multiple motor activation
+    
     [0, 1, 0, 1],
     [0, 0, 0, 0],
+
     [1, 0, 1, 0],
     [0, 0, 0, 0],
+
     [0, 1, 1, 0],
+    [0, 0, 0, 0],
+
     [1, 0, 0, 1]
 ]
 
