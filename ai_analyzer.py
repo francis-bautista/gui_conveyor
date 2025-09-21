@@ -31,7 +31,8 @@ class AIAnalyzer:
         ])
 
         return transform
-
+    
+    # todo: use this for ripeness only maybe
     def old_load_models(self):
         from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
         import torch.nn as nn
