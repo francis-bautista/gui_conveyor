@@ -42,9 +42,11 @@ class ConveyorControllerV2:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.ai = AIAnalyzer(self.device, self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.mc = MotorController()
+        self.mc.setup_gpio()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
         self.sort = SorterController()
+        self.sort.setup_gpio()
         # mango_detection_model 
         # mango_detection_model_stopper 
         # mango_detection_model_more_stop 

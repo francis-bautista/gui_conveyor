@@ -10,6 +10,7 @@ class SorterController:
         self.setup_gpio()
     
     def setup_gpio(self):
+        self.relays =  {'r1': 4, 'r2': 17, 'r3': 27, 'r4': 22}
         GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         for pin_number in self.relays.values():

@@ -16,6 +16,7 @@ class MotorController:
         self.setup_gpio()
     
     def setup_gpio(self):
+        self.relays = {'r1': 6, 'r2': 13, 'r3': 19, 'r4': 26}
         GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         for pin_number in self.relays.values():
