@@ -28,7 +28,6 @@ class ConveyorControllerV2:
         self.TITLE_FONT = ctk.CTkFont(family=ctk.ThemeManager.theme["CTkFont"]["family"],
                                       size=self.TITLE_FONT_SIZE,weight="bold")
         self.RIPENESS_SCORES = {'green': 3.0, 'yellow': 1.0, 'yellow_green': 2.0}       
-        # self.RIPENESS_SCORES = {'yellow': 1.0, 'yellow_green': 2.0, 'green': 3.0}
         self.BRUISES_SCORES = {'bruised': 1.0, 'unbruised': 2.0}
         self.SIZE_SCORES = {'small': 1.0, 'medium': 2.0, 'large': 3.0}
         self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -151,7 +150,20 @@ class ConveyorControllerV2:
         self.textbox.set(txt["default_val"])
         self.textbox.grid(row=row_index, column=col_index, columnspan=2, 
                                  padx=txt["padx"], pady=txt["pady"], sticky="nswe")
-        
+
+        row_index += 1
+        self.button_background = ctk.CTkButton(left_frame, text=txt["button_sort"],
+                                               width=self.BUTTON_WIDTH * 2 + 40,
+                                               height=self.BUTTON_HEIGHT, 
+                                               hover="disabled",
+                                              fg_color=self.colors["default_button"],
+                                               hover_color=self.colors["hover_gray"], 
+                                               font=self.DEFAULT_BOLD)
+        self.button_background.configure(command=self.sort.stop_motors())
+        self.button_background.grid(row=row_index, column=col_index, columnspan=2,
+                                    padx=txt["padx"], pady=txt["pady"],
+                                    sticky="nswe")
+
         row_index += 1
 
         self.button_run = ctk.CTkButton(left_frame, text=txt["button_run"], 
