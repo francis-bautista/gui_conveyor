@@ -151,15 +151,16 @@ class ConveyorControllerV2:
         self.textbox.grid(row=row_index, column=col_index, columnspan=2, 
                                  padx=txt["padx"], pady=txt["pady"], sticky="nswe")
 
+        # TODO: stop the sorting test
         row_index += 1
         self.button_background = ctk.CTkButton(left_frame, text=txt["button_sort"],
                                                width=self.BUTTON_WIDTH * 2 + 40,
                                                height=self.BUTTON_HEIGHT, 
                                                # hover="disabled",
-                                              fg_color=self.colors["default_button"],
-                                               hover_color=self.colors["hover_gray"], 
+                                              fg_color=self.colors["bg_red"],
+                                               hover_color=self.colors["hover_red"], 
                                                font=self.DEFAULT_BOLD)
-        self.button_background.configure(command=self.sort.stop_motors())
+        self.button_background.configure(command=self.stop_sorting())
         self.button_background.grid(row=row_index, column=col_index, columnspan=2,
                                     padx=txt["padx"], pady=txt["pady"],
                                     sticky="nswe")
@@ -467,6 +468,9 @@ class ConveyorControllerV2:
     def help_popup(self):
         help_page = help_module.Help(self.app)
         help_page.grab_set()
+
+    def stop_sorting(self):
+        self.sort.stop_motors()
 
     def reset_program(self):
         print("Resetting")
