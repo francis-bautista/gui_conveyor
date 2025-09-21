@@ -20,7 +20,7 @@
       "9.0"
     ],
     "button_bg": "Capture Background", 
-    "button_sort": "Stop Sorting",
+    "button_sort": "Stop Sorting Motors",
     "button_dn": "Captured Background",
     "button_run": "Run Conveyor(s) (top/bottom)",
     "button_s1": "Capture Side 1",
