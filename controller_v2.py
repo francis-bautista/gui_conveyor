@@ -160,7 +160,7 @@ class ConveyorControllerV2:
                                               fg_color=self.colors["bg_red"],
                                                hover_color=self.colors["hover_red"], 
                                                font=self.DEFAULT_BOLD)
-        self.button_background.configure(command=self.stop_sorting())
+        self.button_background.configure(command=lambda: self.stop_sorting())
         self.button_background.grid(row=row_index, column=col_index, columnspan=2,
                                     padx=txt["padx"], pady=txt["pady"],
                                     sticky="nswe")
