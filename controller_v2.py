@@ -155,7 +155,7 @@ class ConveyorControllerV2:
         self.button_background = ctk.CTkButton(left_frame, text=txt["button_sort"],
                                                width=self.BUTTON_WIDTH * 2 + 40,
                                                height=self.BUTTON_HEIGHT, 
-                                               hover="disabled",
+                                               # hover="disabled",
                                               fg_color=self.colors["default_button"],
                                                hover_color=self.colors["hover_gray"], 
                                                font=self.DEFAULT_BOLD)
