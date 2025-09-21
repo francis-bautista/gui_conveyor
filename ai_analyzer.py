@@ -2,6 +2,7 @@ import torch, timm
 import torchvision.transforms as transforms
 from efficientnet_pytorch import EfficientNet
 import torch.nn as nn
+from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
 
 class AIAnalyzer:
     def __init__(self, device, ripeness_scores, bruises_scores, size_scores):
@@ -34,9 +35,6 @@ class AIAnalyzer:
     
     # todo: use this for ripeness only maybe
     def old_load_models(self):
-        from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
-        import torch.nn as nn
-        
         # Load ripeness model (EfficientNetV2-M)
         weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
         self.model_ripeness = efficientnet_v2_m(weights=weights)
@@ -62,17 +60,28 @@ class AIAnalyzer:
         print("loaded the ripeness and bruises model")
     
     def load_models(self):
-        # ---- Ripeness model (EfficientNetV2-B3) ----
-        self.model_ripeness = timm.create_model(
-            'tf_efficientnetv2_b3',
-            pretrained=False,  # don't load ImageNet weights since we have trained weights
-            num_classes=len(self.RIPENESS_SCORES)
+        # Load ripeness model (EfficientNetV2-M)
+        weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
+        self.model_ripeness = efficientnet_v2_m(weights=weights)
+        self.model_ripeness.classifier[1] = nn.Linear(
+            self.model_ripeness.classifier[1].in_features, 
+            len(self.RIPENESS_SCORES)
         )
         self.model_ripeness = self.model_ripeness.to(self.device)
-        self.model_ripeness.load_state_dict(
-            torch.load("ripeness_v2b3.pth", map_location=self.device)
-        )
+        self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
         self.model_ripeness.eval()
+
+        # # ---- Ripeness model (EfficientNetV2-B3) ----
+        # self.model_ripeness = timm.create_model(
+        #     'tf_efficientnetv2_b3',
+        #     pretrained=False,  # don't load ImageNet weights since we have trained weights
+        #     num_classes=len(self.RIPENESS_SCORES)
+        # )
+        # self.model_ripeness = self.model_ripeness.to(self.device)
+        # self.model_ripeness.load_state_dict(
+        #     torch.load("ripeness_v2b3.pth", map_location=self.device)
+        # )
+        # self.model_ripeness.eval()
 
         # ---- Bruises model (EfficientNetV2-B3) ----
         self.model_bruises = timm.create_model(
