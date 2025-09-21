@@ -44,7 +44,7 @@ class ConveyorControllerV2:
         self.mc = MotorController()
         self.picam2 = CameraManager()
         self.formula = FormulaController(self.RIPENESS_SCORES, self.BRUISES_SCORES, self.SIZE_SCORES)
-        self.sorting = SorterController()
+        self.sort = SorterController()
         # mango_detection_model 
         # mango_detection_model_stopper 
         # mango_detection_model_more_stop 
