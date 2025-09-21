@@ -421,6 +421,7 @@ class ConveyorControllerV2:
                                self.button_run]:
                     button.configure(state="disabled")
                 self.priority_enabled = True
+                self.sort.stop_motors()
             else: # All sucessful input is true
                 for combo in [self.ripeness_combo, self.bruises_combo, self.size_combo]:
                     combo.configure(state="disabled")
@@ -457,12 +458,16 @@ class ConveyorControllerV2:
 
     def reset_program(self):
         print("Resetting")
+        self.sort.stop_motors()
+        self.sort.clean_gpio()
         self.mc.clean_gpio()
         self.picam2.stop_camera()
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def exit_program(self):
         print("Goodbye")
+        self.sort.stop_motors()
+        self.sort.clean_gpio()
         self.mc.clean_gpio()
         self.picam2.stop_camera()
         sys.exit(0)
