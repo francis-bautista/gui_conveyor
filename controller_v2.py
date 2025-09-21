@@ -734,6 +734,7 @@ class ConveyorControllerV2:
                     textbox.configure(state="normal")
                 else:
                     button_state_array = [1 if self.colors["green"] in color else 0 for color in button_color]
+                    print(button_state_array)
                     self.mc.set_motors(button_state_array)
                     buttontorun.configure(text="Running...", state="disabled")
                     set_countdown_thread = threading.Thread(target=self.set_countdown_thread, 
