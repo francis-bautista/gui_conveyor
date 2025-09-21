@@ -517,6 +517,7 @@ class ConveyorControllerV2:
         # TODO: STOP THE motor3 and motor4
         isTrue = self.check_priority
         if (isTrue):
+            self.sort.stop_motors()
             self.button_enter.configure(state="disabled")
             self.recorded_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             print("Process and pictured side 1")
@@ -635,6 +636,18 @@ class ConveyorControllerV2:
         #   then move motor3 and motor4 to cw or ccw#
         # else ave_letter is c
         #   then move motor3 and motor4 to cw or ccw      
+        if ave_letter.upper()  == 'A':
+            button_state_array = [0, 1, 0, 0]
+            print(button_state_array)
+            self.sort.set_motors(button_state_array)
+        elif ave_letter.upper() == 'B':
+            button_state_array = [1, 0, 1, 0]
+            print(button_state_array)
+            self.sort.set_motors(button_state_array)
+        elif ave_letter.upper() == 'C':
+            button_state_array = [1, 0, 0, 1]
+            print(button_state_array)
+            self.sort.set_motors(button_state_array)
      
     def get_input_priorities(self):
         arr = {
