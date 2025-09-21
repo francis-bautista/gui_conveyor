@@ -1,6 +1,6 @@
 try:
     import RPi.GPIO as GPIO
-    print("Imported RPi.GPIO successfully motor controller")
+    print("Imported RPi.GPIO successfully sorting controller")
 except ImportError:
     from fake_gpio import GPIO
 import time
