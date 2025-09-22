@@ -61,27 +61,27 @@ class AIAnalyzer:
     
     def load_models(self):
         # Load ripeness model (EfficientNetV2-M)
-        weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
-        self.model_ripeness = efficientnet_v2_m(weights=weights)
-        self.model_ripeness.classifier[1] = nn.Linear(
-            self.model_ripeness.classifier[1].in_features, 
-            len(self.RIPENESS_SCORES)
-        )
-        self.model_ripeness = self.model_ripeness.to(self.device)
-        self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
-        self.model_ripeness.eval()
-
-        # # ---- Ripeness model (EfficientNetV2-B3) ----
-        # self.model_ripeness = timm.create_model(
-        #     'tf_efficientnetv2_b3',
-        #     pretrained=False,  # don't load ImageNet weights since we have trained weights
-        #     num_classes=len(self.RIPENESS_SCORES)
+        # weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
+        # self.model_ripeness = efficientnet_v2_m(weights=weights)
+        # self.model_ripeness.classifier[1] = nn.Linear(
+        #     self.model_ripeness.classifier[1].in_features, 
+        #     len(self.RIPENESS_SCORES)
         # )
         # self.model_ripeness = self.model_ripeness.to(self.device)
-        # self.model_ripeness.load_state_dict(
-        #     torch.load("ripeness_v2b3.pth", map_location=self.device)
-        # )
+        # self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
         # self.model_ripeness.eval()
+
+        # # ---- Ripeness model (EfficientNetV2-B3) ----
+        self.model_ripeness = timm.create_model(
+            'tf_efficientnetv2_b3',
+            pretrained=False,  # don't load ImageNet weights since we have trained weights
+            num_classes=len(self.RIPENESS_SCORES)
+        )
+        self.model_ripeness = self.model_ripeness.to(self.device)
+        self.model_ripeness.load_state_dict(
+            torch.load("ripeness_v2b3_02.pth", map_location=self.device)
+        ) #ripeness_v2b3
+        self.model_ripeness.eval()
 
         # ---- Bruises model (EfficientNetV2-B3) ----
         self.model_bruises = timm.create_model(
@@ -92,7 +92,7 @@ class AIAnalyzer:
         self.model_bruises = self.model_bruises.to(self.device)
         self.model_bruises.load_state_dict(
             torch.load("bruises_v2b3.pth", map_location=self.device)
-        )
+        ) # bruises_v2b3 
         self.model_bruises.eval()
 
         print("Loaded ripeness and bruises models (EfficientNetV2-B3)")
