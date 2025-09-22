@@ -74,7 +74,7 @@ class AIAnalyzer:
         # # ---- Ripeness model (EfficientNetV2-B3) ----
         self.model_ripeness = timm.create_model(
             'tf_efficientnetv2_b3',
-            pretrained=False,  # don't load ImageNet weights since we have trained weights
+            pretrained=False, 
             num_classes=len(self.RIPENESS_SCORES)
         )
         self.model_ripeness = self.model_ripeness.to(self.device)
@@ -91,7 +91,7 @@ class AIAnalyzer:
         )
         self.model_bruises = self.model_bruises.to(self.device)
         self.model_bruises.load_state_dict(
-            torch.load("bruises_v2b3.pth", map_location=self.device)
+            torch.load("bruises_v2b3_02.pth", map_location=self.device)
         ) # bruises_v2b3 
         self.model_bruises.eval()
 
