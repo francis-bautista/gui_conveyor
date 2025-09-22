@@ -21,7 +21,7 @@ class AIAnalyzer:
     def get_is_s2(self):
         return False
     def create_transform(self):
-        self.tf_params = {'px': 224, 'py': 224,
+        self.tf_params = {'px': 300, 'py': 300,
                           'mean_r':0.485, 'mean_g':0.456, 'mean_b':0.406,
                           'sd_r':0.229, 'sd_g':0.224, 'sd_b': 0.225}
         transform = transforms.Compose([
