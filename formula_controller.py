@@ -34,6 +34,7 @@ class FormulaController:
         all_valid = True
         all_values = []
         error_type = "null"
+        
         for key, combo in combo_boxes.items():
             value = combo.get()
             if value == "" or value is None:
@@ -47,13 +48,18 @@ class FormulaController:
                 error_type = "not_num"
                 all_valid = False
                 break
+        
         if all_valid:
-            if all(v == 0.0 for v in all_values):
+            # Check for negative values
+            if any(v < 0 for v in all_values):
+                error_type = "not_num"
+                all_valid = False
+            # Check if all values are zero
+            elif all(v == 0.0 for v in all_values):
                 error_type = "all_zero"
                 all_valid = False
-
+        
         return [all_valid, error_type]
-
 
     def set_input_priority(self, arr):
         print(arr)
