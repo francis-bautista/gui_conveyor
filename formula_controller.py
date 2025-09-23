@@ -52,7 +52,7 @@ class FormulaController:
         if all_valid:
             # Check for negative values
             if any(v < 0 for v in all_values):
-                error_type = "not_num"
+                error_type = "neg_num"
                 all_valid = False
             # Check if all values are zero
             elif all(v == 0.0 for v in all_values):

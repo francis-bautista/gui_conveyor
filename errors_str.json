@@ -3,6 +3,10 @@
     "title": "ERROR: Null Button Error",
     "message": "Please select one of the buttons for the direction of the conveyor(s)."
   },
+  "invalid_num": {
+    "title": "ERROR: Invalid Time Error",
+    "message": "Please enter a valid time."
+  },
   "not_number": {
     "title": "ERROR: Not a number",
     "message": "Please enter a number."
@@ -33,6 +37,10 @@
   },
   "not_num": {
     "title": "ERROR: Value Error",
+    "message": "Please enter a valid number for all priorities"
+  },
+  "neg_num": {
+    "title": "ERROR: Invalid Number Error",
     "message": "Please enter a valid number for all priorities"
   },
   "all_zero": {

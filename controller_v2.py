@@ -756,9 +756,9 @@ class ConveyorControllerV2:
                             self.button_cwc2.cget("fg_color"),
                             self.button_ccwc2.cget("fg_color")]
             
-            if run_time is None:
-                self.set_error_pop_up(top_parent, self.errors["null_time"]["title"],
-                                      self.errors["null_time"]["message"])
+            if run_time <= 0:
+                self.set_error_pop_up(top_parent, self.errors["invalid_num"]["title"],
+                                      self.errors["invalid_num"]["message"])
                 textbox.configure(state="normal")
             elif self.colors["green"] in button_color:
                 if ((button_color[0] == self.colors["green"] and button_color[1] == self.colors["green"]) or 
