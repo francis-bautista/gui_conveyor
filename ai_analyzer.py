@@ -2,7 +2,7 @@ import torch, timm
 import torchvision.transforms as transforms
 from efficientnet_pytorch import EfficientNet
 import torch.nn as nn
-#from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
+from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
 
 class AIAnalyzer:
     def __init__(self, device, ripeness_scores, bruises_scores, size_scores):
@@ -15,7 +15,7 @@ class AIAnalyzer:
     def get_is_ripeness(self):
         return True
     def get_is_bruises(self):
-        return True
+        return False
     def get_is_s1(self):
         return True
     def get_is_s2(self):
