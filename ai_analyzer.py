@@ -2,7 +2,7 @@ import torch, timm
 import torchvision.transforms as transforms
 from efficientnet_pytorch import EfficientNet
 import torch.nn as nn
-from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
+#from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
 
 class AIAnalyzer:
     def __init__(self, device, ripeness_scores, bruises_scores, size_scores):
@@ -15,7 +15,7 @@ class AIAnalyzer:
     def get_is_ripeness(self):
         return True
     def get_is_bruises(self):
-        return False
+        return True
     def get_is_s1(self):
         return True
     def get_is_s2(self):
@@ -36,43 +36,43 @@ class AIAnalyzer:
     # todo: use this for ripeness only maybe
     def old_load_models(self):
         # Load ripeness model (EfficientNetV2-M)
-        weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
-        self.model_ripeness = efficientnet_v2_m(weights=weights)
-        self.model_ripeness.classifier[1] = nn.Linear(
-            self.model_ripeness.classifier[1].in_features, 
-            len(self.RIPENESS_SCORES)
-        )
-        self.model_ripeness = self.model_ripeness.to(self.device)
-        self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
-        self.model_ripeness.eval()
+        #weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
+        #self.model_ripeness = efficientnet_v2_m(weights=weights)
+        #self.model_ripeness.classifier[1] = nn.Linear(
+        #    self.model_ripeness.classifier[1].in_features, 
+        #    len(self.RIPENESS_SCORES)
+        #)
+        #self.model_ripeness = self.model_ripeness.to(self.device)
+        #self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
+        #self.model_ripeness.eval()
         
         # Load bruises model (EfficientNetV2-M)
-        weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
-        self.model_bruises = efficientnet_v2_m(weights=weights)
-        self.model_bruises.classifier[1] = nn.Linear(
-            self.model_bruises.classifier[1].in_features, 
-            len(self.BRUISES_SCORES)
-        )
-        self.model_bruises = self.model_bruises.to(self.device)
-        self.model_bruises.load_state_dict(torch.load("bruises_v2m.pth", map_location=self.device))
-        self.model_bruises.eval()
+        #weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
+        #self.model_bruises = efficientnet_v2_m(weights=weights)
+        #self.model_bruises.classifier[1] = nn.Linear(
+        #    self.model_bruises.classifier[1].in_features, 
+        #    len(self.BRUISES_SCORES)
+        #)
+        #self.model_bruises = self.model_bruises.to(self.device)
+        #self.model_bruises.load_state_dict(torch.load("bruises_v2m.pth", map_location=self.device))
+        #self.model_bruises.eval()
         
         print("loaded the ripeness and bruises model")
     
     def load_models(self):
-        # # Load ripeness model (EfficientNetV2-M)
-        # # TODO: this is the best method for now
-        # weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
-        # self.model_ripeness = efficientnet_v2_m(weights=weights)
-        # self.model_ripeness.classifier[1] = nn.Linear(
-        #     self.model_ripeness.classifier[1].in_features, 
-        #     len(self.RIPENESS_SCORES)
-        # )
-        # self.model_ripeness = self.model_ripeness.to(self.device)
-        # self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
-        # self.model_ripeness.eval()
+        # Load ripeness model (EfficientNetV2-M)
+        # TODO: this is the best method for now
+        #weights = EfficientNet_V2_M_Weights.IMAGENET1K_V1
+        #self.model_ripeness = efficientnet_v2_m(weights=weights)
+        #self.model_ripeness.classifier[1] = nn.Linear(
+        #    self.model_ripeness.classifier[1].in_features, 
+        #    len(self.RIPENESS_SCORES)
+        #)
+        #self.model_ripeness = self.model_ripeness.to(self.device)
+        #self.model_ripeness.load_state_dict(torch.load("ripeness_v2m.pth", map_location=self.device))
+        #self.model_ripeness.eval()
 
-        # # ---- Ripeness model (EfficientNetV2-B3) ----
+        # # # ---- Ripeness model (EfficientNetV2-B3) ----
         self.model_ripeness = timm.create_model(
             'tf_efficientnetv2_b3',
             pretrained=False, 
@@ -80,7 +80,7 @@ class AIAnalyzer:
         )
         self.model_ripeness = self.model_ripeness.to(self.device)
         self.model_ripeness.load_state_dict(
-            torch.load("ripeness_v2b3_02.pth", map_location=self.device)
+            torch.load("ripeness_v2b3.pth", map_location=self.device)
         ) #ripeness_v2b3
         self.model_ripeness.eval()
 
@@ -92,7 +92,7 @@ class AIAnalyzer:
         )
         self.model_bruises = self.model_bruises.to(self.device)
         self.model_bruises.load_state_dict(
-            torch.load("bruises_v2b3_02.pth", map_location=self.device)
+            torch.load("bruises_v2b3.pth", map_location=self.device)
         ) # bruises_v2b3 
         self.model_bruises.eval()
 

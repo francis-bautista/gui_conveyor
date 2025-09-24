@@ -158,7 +158,7 @@ Examples:
         analyzer = AIAnalyzer(device, RIPENESS_SCORES, BRUISES_SCORES, SIZE_SCORES)
     except Exception as e:
         print(f"Error initializing AI Analyzer: {e}")
-        print("Make sure the model files (ripeness_v2b3_02.pth, bruises_v2b3_02.pth) are in the current directory")
+        print("Make sure the model files (ripeness_v2b3.pth, bruises_v2b3.pth) are in the current directory")
         sys.exit(1)
     
     test_ripeness = not args.bruises_only
