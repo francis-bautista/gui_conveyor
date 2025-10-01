@@ -36,7 +36,8 @@ try:
         print(f"State {i+1}: {state}")
         controller.set_motors(state)
         time.sleep(60)
-        controller.stop_motors(3)
+        controller.stop_motors()
+        time.sleep(3)
     
     controller.stop_motors()
     controller.clean_gpio()
